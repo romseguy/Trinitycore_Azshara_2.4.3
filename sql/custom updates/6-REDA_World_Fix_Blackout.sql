@@ -1,0 +1,10 @@
+DELETE FROM spell_proc_event WHERE `entry`=15268;
+DELETE FROM spell_proc_event WHERE `entry`=15323;
+DELETE FROM spell_proc_event WHERE `entry`=15324;
+DELETE FROM spell_proc_event WHERE `entry`=15325;
+DELETE FROM spell_proc_event WHERE `entry`=15326;
+INSERT INTO spell_proc_event VALUES (15268, 0, 6, 5506224136192, 65536, 0, 0, 0, 0);
+INSERT INTO spell_proc_event VALUES (15323, 0, 6, 5506224136192, 65536, 0, 0, 0, 0);
+INSERT INTO spell_proc_event VALUES (15324, 0, 6, 5506224136192, 65536, 0, 0, 0, 0);
+INSERT INTO spell_proc_event VALUES (15325, 0, 6, 5506224136192, 65536, 0, 0, 0, 0);
+INSERT INTO spell_proc_event VALUES (15326, 0, 6, 5506224136192, 65536, 0, 0, 0, 0);

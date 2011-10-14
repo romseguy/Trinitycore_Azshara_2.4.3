@@ -1,0 +1,1 @@
+UPDATE creature_template set `unit_flags`=0 where `entry`=510;

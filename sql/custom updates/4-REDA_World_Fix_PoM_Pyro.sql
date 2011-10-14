@@ -1,0 +1,10 @@
+INSERT INTO spell_linked_spell VALUES ('11366', '-12043', '0', 'DoublePompyro Fix Rank 1');
+INSERT INTO spell_linked_spell VALUES ('12505', '-12043', '0', 'DoublePompyro Fix Rank 2');
+INSERT INTO spell_linked_spell VALUES ('12522', '-12043', '0', 'DoublePompyro Fix Rank 3');
+INSERT INTO spell_linked_spell VALUES ('12523', '-12043', '0', 'DoublePompyro Fix Rank 4');
+INSERT INTO spell_linked_spell VALUES ('12524', '-12043', '0', 'DoublePompyro Fix Rank 5');
+INSERT INTO spell_linked_spell VALUES ('12525', '-12043', '0', 'DoublePompyro Fix Rank 6');
+INSERT INTO spell_linked_spell VALUES ('12526', '-12043', '0', 'DoublePompyro Fix Rank 7');
+INSERT INTO spell_linked_spell VALUES ('18809', '-12043', '0', 'DoublePompyro Fix Rank 8');
+INSERT INTO spell_linked_spell VALUES ('27132', '-12043', '0', 'DoublePompyro Fix Rank 9');
+INSERT INTO spell_linked_spell VALUES ('33938', '-12043', '0', 'DoublePompyro Fix Rank 10');

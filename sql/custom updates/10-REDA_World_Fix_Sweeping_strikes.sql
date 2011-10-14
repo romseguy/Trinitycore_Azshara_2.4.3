@@ -1,0 +1,1 @@
+REPLACE INTO `spell_linked_spell` VALUES (71, -12328, 0, 'Sweeping Strikes Defensive Stance fix');
