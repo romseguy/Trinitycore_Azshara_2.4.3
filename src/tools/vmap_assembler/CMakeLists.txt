@@ -19,7 +19,7 @@ include_directories(
 )
 
 add_definitions(-DNO_CORE_FUNCS)
-add_executable(vmap_assembler VMapAssembler.cpp)
+add_executable(vmap_assembler vmap_assembler.cpp)
 add_dependencies(vmap_assembler mpq)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")

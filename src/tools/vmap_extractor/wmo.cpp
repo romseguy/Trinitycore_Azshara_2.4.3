@@ -1,22 +1,19 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
- * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * Copyright (C) 2010 Oregon <http://www.oregoncore.com/>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #include "vmapexport.h"
@@ -32,6 +29,7 @@
 #include "mpq_libmpq04.h"
 
 using namespace std;
+extern uint16 *LiqType;
 
 WMORoot::WMORoot(std::string &filename) : filename(filename)
 {
@@ -40,7 +38,7 @@ WMORoot::WMORoot(std::string &filename) : filename(filename)
 bool WMORoot::open()
 {
     MPQFile f(filename.c_str());
-    if (f.isEof())
+    if(f.isEof ())
     {
         printf("No such file.\n");
         return false;
@@ -126,7 +124,7 @@ bool WMORoot::ConvertToVMAPRootWmo(FILE *pOutfile)
 {
     //printf("Convert RootWmo...\n");
 
-    fwrite("VMAP003",1,8,pOutfile);
+    fwrite(szRawVMAPMagic,1,8,pOutfile);
     unsigned int nVectors = 0;
     fwrite(&nVectors,sizeof(nVectors),1,pOutfile); // will be filled later
     fwrite(&nGroups,4,1,pOutfile);
@@ -146,7 +144,7 @@ WMOGroup::WMOGroup(std::string &filename) : filename(filename),
 bool WMOGroup::open()
 {
     MPQFile f(filename.c_str());
-    if (f.isEof())
+    if(f.isEof ())
     {
         printf("No such file.\n");
         return false;
@@ -225,6 +223,13 @@ bool WMOGroup::open()
             int nLiquBytes = hlq->xtiles * hlq->ytiles;
             LiquBytes = new char[nLiquBytes];
             f.read(LiquBytes, nLiquBytes);
+
+            /* std::ofstream llog("Buildings/liquid.log", ios_base::out | ios_base::app);
+            llog << filename;
+            llog << "\nbbox: " << bbcorn1[0] << ", " << bbcorn1[1] << ", " << bbcorn1[2] << " | " << bbcorn2[0] << ", " << bbcorn2[1] << ", " << bbcorn2[2];
+            llog << "\nlpos: " << hlq->pos_x << ", " << hlq->pos_y << ", " << hlq->pos_z;
+            llog << "\nx-/yvert: " << hlq->xverts << "/" << hlq->yverts << " size: " << size << " expected size: " << 30 + hlq->xverts*hlq->yverts*8 + hlq->xtiles*hlq->ytiles << std::endl;
+            llog.close(); */
         }
         f.seek((int)nextpos);
     }
@@ -241,7 +246,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE *output, WMORoot *rootWMO, bool pPrecis
     fwrite(bbcorn2, sizeof(float), 3, output);
     fwrite(&liquflags,sizeof(uint32),1,output);
     int nColTriangles = 0;
-    if (pPreciseVectorData)
+    if(pPreciseVectorData)
     {
         char GRP[] = "GRP ";
         fwrite(GRP,1,4,output);
@@ -249,7 +254,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE *output, WMORoot *rootWMO, bool pPrecis
         int k = 0;
         int moba_batch = moba_size/12;
         MobaEx = new int[moba_batch*4];
-        for (int i=8; i<moba_size; i+=12)
+        for(int i=8; i<moba_size; i+=12)
         {
             MobaEx[k++] = MOBA[i];
         }
@@ -261,50 +266,50 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE *output, WMORoot *rootWMO, bool pPrecis
 
         uint32 nIdexes = nTriangles * 3;
 
-        if (fwrite("INDX",4, 1, output) != 1)
+        if(fwrite("INDX",4, 1, output) != 1)
         {
             printf("Error while writing file nbraches ID");
             exit(0);
         }
         int wsize = sizeof(uint32) + sizeof(unsigned short) * nIdexes;
-        if (fwrite(&wsize, sizeof(int), 1, output) != 1)
+        if(fwrite(&wsize, sizeof(int), 1, output) != 1)
         {
             printf("Error while writing file wsize");
-            // no need to exit?
+            exit(0);
         }
-        if (fwrite(&nIdexes, sizeof(uint32), 1, output) != 1)
+        if(fwrite(&nIdexes, sizeof(uint32), 1, output) != 1)
         {
             printf("Error while writing file nIndexes");
             exit(0);
         }
-        if (nIdexes >0)
+        if(nIdexes >0)
         {
-            if (fwrite(MOVI, sizeof(unsigned short), nIdexes, output) != nIdexes)
+            if(fwrite(MOVI, sizeof(unsigned short), nIdexes, output) != nIdexes)
             {
                 printf("Error while writing file indexarray");
                 exit(0);
             }
         }
 
-        if (fwrite("VERT",4, 1, output) != 1)
+        if(fwrite("VERT",4, 1, output) != 1)
         {
             printf("Error while writing file nbraches ID");
             exit(0);
         }
         wsize = sizeof(int) + sizeof(float) * 3 * nVertices;
-        if (fwrite(&wsize, sizeof(int), 1, output) != 1)
+        if(fwrite(&wsize, sizeof(int), 1, output) != 1)
         {
             printf("Error while writing file wsize");
-            // no need to exit?
+            exit(0);
         }
-        if (fwrite(&nVertices, sizeof(int), 1, output) != 1)
+        if(fwrite(&nVertices, sizeof(int), 1, output) != 1)
         {
             printf("Error while writing file nVertices");
             exit(0);
         }
-        if (nVertices >0)
+        if(nVertices >0)
         {
-            if (fwrite(MOVT, sizeof(float)*3, nVertices, output) != nVertices)
+            if(fwrite(MOVT, sizeof(float)*3, nVertices, output) != nVertices)
             {
                 printf("Error while writing file vectors");
                 exit(0);
@@ -320,7 +325,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE *output, WMORoot *rootWMO, bool pPrecis
         int k = 0;
         int moba_batch = moba_size/12;
         MobaEx = new int[moba_batch*4];
-        for (int i=8; i<moba_size; i+=12)
+        for(int i=8; i<moba_size; i+=12)
         {
             MobaEx[k++] = MOBA[i];
         }
@@ -331,8 +336,8 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE *output, WMORoot *rootWMO, bool pPrecis
         fwrite(MobaEx,4,k,output);
         delete [] MobaEx;
 
-        // INDX
-        // MOPY
+        //-------INDX------------------------------------
+        //-------MOPY--------
         MoviEx = new uint16[nTriangles*3]; // "worst case" size...
         int *IndexRenum = new int[nVertices];
         memset(IndexRenum, 0xFF, nVertices*sizeof(int));
@@ -379,7 +384,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE *output, WMORoot *rootWMO, bool pPrecis
         int check = 3*nColVertices;
         fwrite(VERT,4,3,output);
         for (uint32 i=0; i<nVertices; ++i)
-            if (IndexRenum[i] >= 0)
+            if(IndexRenum[i] >= 0)
                 check -= fwrite(MOVT+3*i, sizeof(float), 3, output);
 
         assert(check==0);
@@ -388,8 +393,8 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE *output, WMORoot *rootWMO, bool pPrecis
         delete [] IndexRenum;
     }
 
-    // LIQU
-    if (LiquEx_size != 0)
+    //------LIQU------------------------
+    if(LiquEx_size != 0)
     {
         int LIQU_h[] = {0x5551494C, sizeof(WMOLiquidHeader) + LiquEx_size + hlq->xtiles*hlq->ytiles};// "LIQU"
         fwrite(LIQU_h, 4, 2, output);
@@ -420,7 +425,7 @@ int WMOGroup::ConvertLiquidType(int hlqLiquid, std::string &filename)
     filename = filename.substr(0, filename.find_last_of("\\"));     // trim filename
     filename = filename.substr(filename.find_last_of("\\") + 1);    // trim everything except current wmo path part
 
-    if (hlqLiquid == 3 && filename == "AZ_Blackrock")               // lava in Molten Cire
+    if (hlqLiquid == 3 && filename == "AZ_Blackrock")               // lava in Molten Core
         return 2;
     else if (filename == "KL_OrgrimmarLavaDungeon")                 // lava in Ragefire Chasm
         return 2;
@@ -461,14 +466,14 @@ WMOInstance::WMOInstance(MPQFile &f,const char* WmoInstName, uint32 mapID, uint3
     f.read(&adtId,2);
     f.read(&trash,2);
 
-    // add_in _dir_file
+    //-----------add_in _dir_file----------------
 
     char tempname[512];
     sprintf(tempname, "%s/%s", szWorkDirWmo, WmoInstName);
     FILE *input;
     input = fopen(tempname, "r+b");
 
-    if (!input)
+    if(!input)
     {
         printf("WMOInstance::WMOInstance: couldn't open %s\n", tempname);
         return;
@@ -479,13 +484,13 @@ WMOInstance::WMOInstance(MPQFile &f,const char* WmoInstName, uint32 mapID, uint3
     fread(&nVertices, sizeof (int), 1, input);
     fclose(input);
 
-    if (nVertices == 0)
+    if(nVertices == 0)
         return;
 
     float x,z;
     x = pos.x;
     z = pos.z;
-    if (x==0 && z == 0)
+    if(x==0 && z == 0)
     {
         pos.x = 533.33333f*32;
         pos.z = 533.33333f*32;
@@ -496,7 +501,7 @@ WMOInstance::WMOInstance(MPQFile &f,const char* WmoInstName, uint32 mapID, uint3
 
     float scale = 1.0f;
     uint32 flags = MOD_HAS_BOUND;
-    if (tileX == 65 && tileY == 65) flags |= MOD_WORLDSPAWN;
+    if(tileX == 65 && tileY == 65) flags |= MOD_WORLDSPAWN;
     //write mapID, tileX, tileY, Flags, ID, Pos, Rot, Scale, Bound_lo, Bound_hi, name
     fwrite(&mapID, sizeof(uint32), 1, pDirfile);
     fwrite(&tileX, sizeof(uint32), 1, pDirfile);
@@ -525,4 +530,3 @@ WMOInstance::WMOInstance(MPQFile &f,const char* WmoInstName, uint32 mapID, uint3
 
     // fclose(dirfile);
 }
-

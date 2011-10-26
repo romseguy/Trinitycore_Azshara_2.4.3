@@ -1,24 +1,3 @@
-/*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
- *
- * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
- *
- * Copyright (C) 2010 Oregon <http://www.oregoncore.com/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 #define _CRT_SECURE_NO_DEPRECATE
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -45,14 +24,14 @@ public:
     void close();
 
     void GetFileListTo(vector<string>& filelist) {
-        uint32 filenum;
-        if (libmpq__file_number(mpq_a, "(listfile)", &filenum)) return;
-        libmpq__off_t size, transferred;
-        libmpq__file_unpacked_size(mpq_a, filenum, &size);
+    	uint32 filenum;
+    	if(libmpq__file_number(mpq_a, "(listfile)", &filenum)) return;
+    	libmpq__off_t size, transferred;
+		libmpq__file_unpacked_size(mpq_a, filenum, &size);
 
         char *buffer = new char[size];
 
-        libmpq__file_read(mpq_a, filenum, (unsigned char*)buffer, size, &transferred);
+		libmpq__file_read(mpq_a, filenum, (unsigned char*)buffer, size, &transferred);
 
         char seps[] = "\n";
         char *token;
@@ -71,7 +50,6 @@ public:
         delete[] buffer;
     }
 };
-
 typedef std::deque<MPQArchive*> ArchiveSet;
 
 class MPQFile
@@ -111,4 +89,3 @@ inline void flipcc(char *fcc)
 }
 
 #endif
-

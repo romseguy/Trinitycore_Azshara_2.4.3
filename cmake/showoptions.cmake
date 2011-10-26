@@ -34,6 +34,7 @@ endif()
 
 if( TOOLS )
   message("* Build map/vmap tools   : Yes")
+  add_definitions(-DMMAP_GENERATOR)
 else()
   message("* Build map/vmap tools   : No  (default)")
 endif()

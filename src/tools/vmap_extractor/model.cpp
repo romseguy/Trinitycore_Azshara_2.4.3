@@ -1,22 +1,19 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
- * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * Copyright (C) 2010 Oregon <http://www.oregoncore.com/>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #include "vmapexport.h"
@@ -45,14 +42,14 @@ bool Model::open()
     }
 
     memcpy(&header, f.getBuffer(), sizeof(ModelHeader));
-    if (header.nBoundingTriangles > 0)
+    if(header.nBoundingTriangles > 0)
     {
         origVertices = (ModelVertex*)(f.getBuffer() + header.ofsVertices);
         vertices = new Vec3D[header.nVertices];
 
         for (size_t i=0; i<header.nVertices; i++)
         {
-            vertices[i] = fixCoordSystem(origVertices[i].pos);
+            vertices[i] = fixCoordSystem(origVertices[i].pos);;
         }
 
         ModelView *view = (ModelView*)(f.getBuffer() + header.ofsViews);
@@ -81,13 +78,14 @@ bool Model::ConvertToVMAPModel(char * outfilename)
 {
     int N[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
     FILE * output=fopen(outfilename,"wb");
-    if (!output)
+    if(!output)
     {
         printf("Can't create the output file '%s'\n",outfilename);
         return false;
     }
-    fwrite("VMAP003",8,1,output);
-    uint32 nVertices = header.nVertices;
+    fwrite(szRawVMAPMagic,8,1,output);
+    uint32 nVertices = 0;
+    nVertices = header.nVertices;
     fwrite(&nVertices, sizeof(int), 1, output);
     uint32 nofgroups = 1;
     fwrite(&nofgroups,sizeof(uint32), 1, output);
@@ -106,7 +104,7 @@ bool Model::ConvertToVMAPModel(char * outfilename)
     wsize = sizeof(uint32) + sizeof(unsigned short) * nIndexes;
     fwrite(&wsize, sizeof(int), 1, output);
     fwrite(&nIndexes, sizeof(uint32), 1, output);
-    if (nIndexes >0)
+    if(nIndexes >0)
     {
         fwrite(indices, sizeof(unsigned short), nIndexes, output);
     }
@@ -114,9 +112,9 @@ bool Model::ConvertToVMAPModel(char * outfilename)
     wsize = sizeof(int) + sizeof(float) * 3 * nVertices;
     fwrite(&wsize, sizeof(int), 1, output);
     fwrite(&nVertices, sizeof(int), 1, output);
-    if (nVertices >0)
+    if(nVertices >0)
     {
-        for (uint32 vpos=0; vpos <nVertices; ++vpos)
+        for(uint32 vpos=0; vpos <nVertices; ++vpos)
         {
             float sy = vertices[vpos].y;
             vertices[vpos].y = vertices[vpos].z;
@@ -164,7 +162,7 @@ ModelInstance::ModelInstance(MPQFile &f,const char* ModelInstName, uint32 mapID,
     FILE *input;
     input = fopen(tempname, "r+b");
 
-    if (!input)
+    if(!input)
     {
         //printf("ModelInstance::ModelInstance couldn't open %s\n", tempname);
         return;
@@ -175,12 +173,12 @@ ModelInstance::ModelInstance(MPQFile &f,const char* ModelInstName, uint32 mapID,
     fread(&nVertices, sizeof (int), 1, input);
     fclose(input);
 
-    if (nVertices == 0)
+    if(nVertices == 0)
         return;
 
     uint16 adtId = 0;// not used for models
     uint32 flags = MOD_M2;
-    if (tileX == 65 && tileY == 65) flags |= MOD_WORLDSPAWN;
+	if(tileX == 65 && tileY == 65) flags |= MOD_WORLDSPAWN;
     //write mapID, tileX, tileY, Flags, ID, Pos, Rot, Scale, name
     fwrite(&mapID, sizeof(uint32), 1, pDirfile);
     fwrite(&tileX, sizeof(uint32), 1, pDirfile);
@@ -211,4 +209,3 @@ ModelInstance::ModelInstance(MPQFile &f,const char* ModelInstName, uint32 mapID,
         realx2, realy2
         ); */
 }
-
