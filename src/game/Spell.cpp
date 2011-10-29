@@ -1115,7 +1115,8 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
                 return;
             }
             unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
-			if (m_customAttr & SPELL_ATTR_CU_AURA_CC)
+			
+            if ((m_customAttr & SPELL_ATTR_CU_AURA_CC) && m_spellInfo->Mechanic != MECHANIC_ROOT && m_spellInfo->SchoolMask != SPELL_SCHOOL_MASK_FROST)
 				unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CC);
         }
         else
