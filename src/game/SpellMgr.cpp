@@ -2561,6 +2561,9 @@ void SpellMgr::LoadSpellCustomAttr()
 		case 34580:
 			mSpellCustomAttr[i] |= SPELL_ATTR_CU_IGNORE_ARMOR;
 			break;
+        case 38699:
+            spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+            break;
         default:
             break;
 		}

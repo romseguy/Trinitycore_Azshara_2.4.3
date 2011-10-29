@@ -2087,6 +2087,9 @@ void Unit::AttackerStateUpdate (Unit *pVictim, WeaponAttackType attType, bool ex
         m_currentSpells[CURRENT_MELEE_SPELL]->cast();
         return;
     }
+	
+    // attack can be redirected to another target
+    pVictim = SelectMagnetTarget(pVictim);
 
     CalcDamageInfo damageInfo;
     CalculateMeleeDamage(pVictim, 0, &damageInfo, attType);
@@ -7239,6 +7242,47 @@ void Unit::SetCharm(Unit* charm, bool apply)
             || charm->GetOwnerGUID() != GetGUID())
             m_Controlled.erase(charm);
     }
+}
+
+Unit* Unit::SelectMagnetTarget(Unit *victim, SpellEntry const *spellInfo)
+{
+    if (!victim)
+        return NULL;
+
+    // Magic case
+    if (spellInfo && (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_NONE || spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC))
+    {
+         if (spellInfo->Attributes & SPELL_ATTR_UNK4 || spellInfo->AttributesEx & SPELL_ATTR_EX_UNK3 || spellInfo->Attributes & SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)
+            return victim;
+        //I am not sure if this should be redirected.
+        if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_NONE)
+            return victim;
+
+        Unit::AuraList const& magnetAuras = victim->GetAurasByType(SPELL_AURA_SPELL_MAGNET);
+        for (Unit::AuraList::const_iterator itr = magnetAuras.begin(); itr != magnetAuras.end(); ++itr)
+            if (Unit* magnet = (*itr)->GetCaster())
+                if (magnet->isAlive())
+					return magnet;
+    }
+    // Melee && ranged case
+    else
+    {
+        Unit::AuraList const& hitTriggerAuras = victim->GetAurasByType(SPELL_AURA_ADD_CASTER_HIT_TRIGGER);
+        for (Unit::AuraList::const_iterator i = hitTriggerAuras.begin(); i != hitTriggerAuras.end(); ++i)
+            if (Unit* magnet = (*i)->GetCaster())
+            {
+                if (magnet->isAlive() && magnet->IsWithinLOSInMap(this) && magnet->IsWithinDistInMap(this, 20.0f))
+                    if (roll_chance_i((*i)->GetModifier()->m_amount))
+                    {
+                        (*i)->SetAuraProcCharges((*i)->m_procCharges-1);
+                        if((*i)->m_procCharges <= 0)
+                            victim->RemoveAura((*i)->GetSpellProto()->Id, 1);
+                        return magnet;
+                    }
+			}
+    }
+
+    return victim;
 }
 
 Unit* Unit::GetFirstControlled() const

@@ -392,9 +392,6 @@ class Spell
         void FillTargetMap();
 
         void SetTargetMap(uint32 i, uint32 cur);
-		
-        Unit* SelectMagnetTarget();
-        void HandleHitTriggerAura();
 
         bool CheckTarget(Unit* target, uint32 eff);
 

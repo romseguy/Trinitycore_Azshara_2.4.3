@@ -1564,12 +1564,25 @@ void Spell::SetTargetMap(uint32 i, uint32 cur)
             switch(cur)
             {
                 case TARGET_UNIT_TARGET_ENEMY:
+                    if (Unit *magnet = m_caster->SelectMagnetTarget(target, m_spellInfo))
+                        {
+                            if (magnet->GetTypeId() == TYPEID_UNIT && magnet->ToCreature()->isTotem() && magnet->ToCreature()->GetEntry() == 5925 && m_spellInfo->Effect[0] != SPELL_EFFECT_SCHOOL_DAMAGE && m_spellInfo->Effect[1] != SPELL_EFFECT_SCHOOL_DAMAGE && m_spellInfo->Effect[2] != SPELL_EFFECT_SCHOOL_DAMAGE)
+                                magnet->setDeathState(DEAD);
+                            m_targets.setUnitTarget(magnet);
+                        }
+                    pushType = PUSH_CHAIN;
+                    break;
+                case TARGET_UNIT_TARGET_ANY:
+                    if (!IsPositiveSpell(m_spellInfo->Id))
+                        if (Unit *magnet = m_caster->SelectMagnetTarget(target, m_spellInfo))
+                            if (magnet != target)
+                                m_targets.setUnitTarget(magnet);
+                    pushType = PUSH_CHAIN;
                 case TARGET_UNIT_CHAINHEAL:
                     pushType = PUSH_CHAIN;
                     break;
                 case TARGET_UNIT_TARGET_ALLY:
                 case TARGET_UNIT_TARGET_RAID:
-				case TARGET_UNIT_TARGET_ANY: // SelectMagnetTarget()?
                 case TARGET_UNIT_TARGET_PARTY:
                 case TARGET_UNIT_MINIPET:
                     AddUnitTarget(target, i);
@@ -5201,69 +5214,6 @@ bool Spell::CheckTarget(Unit* target, uint32 eff)
     }
 
     return true;
-}
-
-Unit* Spell::SelectMagnetTarget()
-{
-    Unit* target = m_targets.getUnitTarget();
-
-    if (target && m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC && target->HasAuraType(SPELL_AURA_SPELL_MAGNET)) //Attributes & 0x10 what is this?
-    {
-        Unit::AuraList const& magnetAuras = target->GetAurasByType(SPELL_AURA_SPELL_MAGNET);
-        for (Unit::AuraList::const_iterator itr = magnetAuras.begin(); itr != magnetAuras.end(); ++itr)
-        {
-            if (Unit* magnet = (*itr)->GetCaster())
-            {
-                if ((*itr)->m_procCharges>0)
-                {
-                    (*itr)->SetAuraProcCharges((*itr)->m_procCharges-1);
-                    target = magnet;
-                    m_targets.setUnitTarget(target);
-                    AddUnitTarget(target, 0);
-                    uint64 targetGUID = target->GetGUID();
-                    for (std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin();ihit != m_UniqueTargetInfo.end();++ihit)
-                    {
-                        if (ihit->deleted)
-                            continue;
-
-                        if (targetGUID == ihit->targetGUID)                 // Found in list
-                        {
-                            (*ihit).damage = target->GetHealth();
-                            break;
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
-    return target;
-}
-
-void Spell::HandleHitTriggerAura()
-{
-    Unit* target = m_targets.getUnitTarget();
-
-    if (target && m_spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MAGIC && target->HasAuraType(SPELL_AURA_ADD_CASTER_HIT_TRIGGER))
-    {
-        Unit::AuraList const& hitTriggerAuras = target->GetAurasByType(SPELL_AURA_ADD_CASTER_HIT_TRIGGER);
-        for (Unit::AuraList::const_iterator itr = hitTriggerAuras.begin(); itr != hitTriggerAuras.end(); ++itr)
-        {
-            if (Unit* hitTarget = (*itr)->GetCaster())
-            {
-                if ((*itr)->m_procCharges>0)
-                {
-                    (*itr)->SetAuraProcCharges((*itr)->m_procCharges-1);
-                    target = hitTarget;
-                    m_targets.setUnitTarget(target);
-                    AddUnitTarget(target, 0);
-                    uint64 targetGUID = target->GetGUID();
-                    return;
-                }
-            }
-        }
-    }
 }
 
 bool Spell::IsNeedSendToClient() const
