@@ -3166,6 +3166,10 @@ void Aura::HandleModConfuse(bool apply, bool Real)
 
 void Aura::HandleModFear(bool apply, bool Real)
 {
+	// damage before spell is automaticly removed
+	int32 max_damage = int32(m_target->GetCreateHealth() * 0.20f); // Should be 15% but im not sure if the random break function is working
+	int32 breakChance = irand(40,80);
+	m_modifier.m_amount = max_damage*((float)breakChance) / 100.0f;
     if (!Real)
         return;
 
