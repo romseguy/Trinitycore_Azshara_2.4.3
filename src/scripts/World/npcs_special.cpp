@@ -1279,55 +1279,6 @@ CreatureAI* GetAI_npc_winter_reveler(Creature* pCreature)
 }
 
 /*####
-## npc_meleesummon
-####*/
-
-struct npc_meleesummonAI : public ScriptedAI
-{
-    npc_meleesummonAI(Creature *c) : ScriptedAI(c) {}
-    void UpdateAI(const uint32 diff)
-    {
-        Unit *Owner = me->GetOwner();
-        if (!me->isSummon() || !me->GetOwner())
-            return;
-
-        //Follow if not in combat
-        if (!me->isInCombat())
-        {
-            Unit *newTarget = me->SelectNearestTarget(100);
-            if(newTarget)
-            {
-                AttackStart(newTarget);
-                Owner->SetInCombatWith(newTarget);
-            }
-            else
-            {
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MoveFollow(me->GetOwner(),PET_FOLLOW_DIST,PET_FOLLOW_ANGLE);
-            }
-        }
-
-        //No victim -> get new from owner (need this because MoveInLineOfSight won't work while following -> corebug)
-        if (!me->getVictim())
-        {
-            if (me->isInCombat())
-                DoStopAttack();
-
-            if (me->GetOwner()->getAttackerForHelper())
-                AttackStart(me->GetOwner()->getAttackerForHelper());
-
-            return;
-        }
-        DoMeleeAttackIfReady();   
-    }
-};
-
-CreatureAI* GetAI_npc_meleesummon(Creature* pCreature)
-{
-    return new npc_meleesummonAI(pCreature);
-}
-
-/*####
 ## npc_snake_trap_serpents
 ####*/
 
@@ -1345,17 +1296,16 @@ struct npc_snake_trap_serpentsAI : public ScriptedAI
     npc_snake_trap_serpentsAI(Creature *c) : ScriptedAI(c) {}
 
     uint32 SpellTimer;
-    Unit *Owner;
     bool IsViper;
+	
+	bool Spawn;
 
     void EnterCombat(Unit * /*who*/) {}
 
     void Reset()
     {
-        Owner = me->GetOwner();
-
-        if (!me->isSummon() || !Owner)
-            return;
+        Spawn = true;
+        SpellTimer = 0;
 
         CreatureInfo const *Info = me->GetCreatureInfo();
 
@@ -1366,39 +1316,52 @@ struct npc_snake_trap_serpentsAI : public ScriptedAI
 
         //Add delta to make them not all hit the same time
         uint32 delta = (rand() % 7) * 100;
-        SpellTimer = (rand() % 10) * 100;
         me->SetStatFloatValue(UNIT_FIELD_BASEATTACKTIME, Info->baseattacktime + delta);
         me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER , Info->attackpower);
     }
 
-    void UpdateAI(const uint32 diff)
+    //Redefined for random target selection:
+    void MoveInLineOfSight(Unit *who)
     {
-        if (!me->isSummon() || !me->GetOwner())
-            return;
-
-        //Follow if not in combat
-        if (!me->isInCombat())
+        if (!me->getVictim() && who->isTargetableForAttack() && (me->IsHostileTo(who)) && who->isInAccessiblePlaceFor(me))
         {
-            Unit *newTarget = me->SelectNearestTarget(100);
-            if(newTarget)
-                AttackStart(newTarget);
-            else
+            if (me->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
+                return;
+
+            if (me->IsWithinDistInMap(who, 10.0f) && me->IsWithinLOSInMap(who) && !who->HasAuraWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE) && !who->HasAura(SPELL_AURA_MOD_STEALTH,1) && !who->HasAura(SPELL_AURA_MOD_INVISIBILITY,1))
             {
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MoveFollow(me->GetOwner(),PET_FOLLOW_DIST,PET_FOLLOW_ANGLE);
+
+                    me->setAttackTimer(BASE_ATTACK, (rand() % 10) * 100);
+                    SpellTimer = (rand() % 10) * 100;
+                    AttackStart(who);
+                
             }
         }
+		
+		Unit * Owner = CAST_SUM(me)->GetSummoner();
+        if(me->IsHostileTo(who) && me->IsWithinDistInMap(who, 5.0f) && !who->HasAuraWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE) && !who->HasAura(SPELL_AURA_MOD_STEALTH,1) && !who->HasAura(SPELL_AURA_MOD_INVISIBILITY,1))
+        Owner->SetInCombatWith(who);
+    }
+	
+	
 
-        //No victim -> get new from owner (need this because MoveInLineOfSight won't work while following -> corebug)
+    void UpdateAI(const uint32 diff)
+    {
+		if (Spawn)
+        {
+        Spawn = false;
+		
+			// Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
+			if (!me->getVictim() && me->isSummon())
+				if (Unit * Owner = CAST_SUM(me)->GetSummoner())
+					if (Owner->getAttackerForHelper())                      
+						AttackStart(Owner->getAttackerForHelper());
+        }
+
         if (!me->getVictim())
         {
             if (me->isInCombat())
-                DoStopAttack();
-
-            if (me->GetOwner()->getAttackerForHelper())
-                AttackStart(me->GetOwner()->getAttackerForHelper());
-
-            return;
+                EnterEvadeMode();
         }
 
         if (SpellTimer <= diff)
@@ -1433,6 +1396,69 @@ CreatureAI* GetAI_npc_snake_trap_serpents(Creature* pCreature)
 {
     return new npc_snake_trap_serpentsAI(pCreature);
 }
+
+/*####
+## npc_petfix
+####*/
+
+struct npc_petfixAI : public ScriptedAI
+{
+    npc_petfixAI(Creature *c) : ScriptedAI(c) {}
+
+    bool Spawn;
+
+    void EnterCombat(Unit * /*who*/) {}
+
+    void Reset()
+    {
+        Spawn = true;
+    }
+
+    //Redefined for random target selection:
+    void MoveInLineOfSight(Unit *who)
+    {
+        if (!me->getVictim() && who->isTargetableForAttack() && (me->IsHostileTo(who)) && who->isInAccessiblePlaceFor(me))
+        {
+            if (me->IsWithinDistInMap(who, 25.0f) && me->IsWithinLOSInMap(who) && !who->HasAuraWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE) && !who->HasAura(SPELL_AURA_MOD_STEALTH,1) && !who->HasAura(SPELL_AURA_MOD_INVISIBILITY,1))
+            {
+                AttackStart(who);
+            }
+
+        }
+		
+		Unit * Owner = CAST_SUM(me)->GetSummoner();
+        if(me->IsHostileTo(who) && me->IsWithinDistInMap(who, 5.0f) && !who->HasAuraWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE) && !who->HasAura(SPELL_AURA_MOD_STEALTH,1) && !who->HasAura(SPELL_AURA_MOD_INVISIBILITY,1))
+        Owner->SetInCombatWith(who);
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        if (Spawn)
+        {
+            Spawn = false;
+            // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
+            if (!me->getVictim() && me->isSummon())
+                if (Unit * Owner = CAST_SUM(me)->GetSummoner())
+                    if (Owner->getAttackerForHelper())
+                       AttackStart(Owner->getAttackerForHelper());
+        }
+
+        if (!me->getVictim())
+        {
+            if (me->isInCombat())
+                EnterEvadeMode();
+
+            return;
+        }
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_npc_petfix(Creature* pCreature)
+{
+    return new npc_petfixAI(pCreature);
+}
+
 
 #define SAY_RANDOM_MOJO0    "Now that's what I call froggy-style!"
 #define SAY_RANDOM_MOJO1    "Your lily pad or mine?"
@@ -1598,10 +1624,10 @@ void AddSC_npcs_special()
     newscript->Name = "npc_snake_trap_serpents";
     newscript->GetAI = &GetAI_npc_snake_trap_serpents;
     newscript->RegisterSelf();
-    
-    newscript = new Script;
-    newscript->Name = "npc_meleesummon";
-    newscript->GetAI = &GetAI_npc_meleesummon;
+	
+	newscript = new Script;
+    newscript->Name = "npc_petfix";
+    newscript->GetAI = &GetAI_npc_petfix;
     newscript->RegisterSelf();
 
     newscript = new Script;
