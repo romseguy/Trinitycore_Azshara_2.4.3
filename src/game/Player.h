@@ -1576,6 +1576,8 @@ class Player : public Unit, public GridObject<Player>
         void UpdateSpellCritChance(uint32 school);
         void UpdateExpertise(WeaponAttackType attType);
         void UpdateManaRegen();
+		
+		uint32 m_invisibilityUpdateTimer;
 
         const uint64& GetLootGUID() const { return m_lootGuid; }
         void SetLootGUID(const uint64 &guid) { m_lootGuid = guid; }

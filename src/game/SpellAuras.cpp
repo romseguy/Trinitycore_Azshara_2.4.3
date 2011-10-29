@@ -3309,13 +3309,17 @@ void Aura::HandleModStealth(bool apply, bool Real)
                 m_target->SetFlag(PLAYER_FIELD_BYTES2, 0x2000);
             
 
+			/*
             // apply only if not in GM invisibility (and overwrite invisibility state)
             if (m_target->GetVisibility() != VISIBILITY_OFF)
             {
-                //m_target->SetVisibility(VISIBILITY_GROUP_NO_DETECT);
-                //m_target->SetVisibility(VISIBILITY_OFF);
                 m_target->SetVisibility(VISIBILITY_GROUP_STEALTH);
             }
+			*/
+			
+			Player* target = (Player*)m_target;
+            if (target)
+                target->m_invisibilityUpdateTimer = 200;
 
             // for RACE_NIGHTELF stealth
             if (m_target->GetTypeId() == TYPEID_PLAYER && GetId() == 20580)
