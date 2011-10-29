@@ -940,7 +940,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     else if (missInfo == SPELL_MISS_REFLECT)                // In case spell reflect from target, do all effect on caster (if hit)
     {
         if (target->reflectResult == SPELL_MISS_NONE)       // If reflected spell hit caster -> do all effect on him
-			DoSpellHitOnUnit(m_caster, mask);
+		{
+				// Start triggers for remove charges if need (trigger only for victim, and mark as active spell)
+				m_caster->ProcDamageAndSpell(unit, PROC_FLAG_NONE, PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT, PROC_EX_REFLECT, 1, BASE_ATTACK, m_spellInfo);
+				DoSpellHitOnUnit(m_caster, mask);
+		}
     }
 
     // All calculated do it!
