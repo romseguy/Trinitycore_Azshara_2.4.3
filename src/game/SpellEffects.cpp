@@ -6005,8 +6005,12 @@ void Spell::EffectDestroyAllTotems(uint32 /*i*/)
             uint32 spell_id = totem->GetUInt32Value(UNIT_CREATED_BY_SPELL);
             SpellEntry const* spellInfo = sSpellStore.LookupEntry(spell_id);
             if (spellInfo)
-            mana += spellInfo->manaCost * damage / 100;
-
+				{
+					float cost = spellInfo->manaCost;
+					if(spellInfo->ManaCostPercentage)
+					cost = spellInfo->ManaCostPercentage * m_caster->GetCreateMana() / 100;
+					mana += cost * damage / 100.0f;
+			    }
             ((Totem*)totem)->UnSummon();
         }
     }
