@@ -2507,6 +2507,9 @@ void SpellMgr::LoadSpellCustomAttr()
 		case 33110:
 			spellInfo->spellLevel = 70;
 			break;
+		case 66:
+            spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
+            break;
 		case 24905: // Moonkin form -> elune's touch
 			spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_CASTER;
 			break;
