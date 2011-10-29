@@ -2493,9 +2493,17 @@ void SpellMgr::LoadSpellCustomAttr()
 		case 33619: //Reflective shield fix
 			spellInfo->AttributesEx3 |= SPELL_ATTR_EX3_NO_INITIAL_AGGRO;
 			break;
+		case 5171:
+		case 6774:
+			spellInfo->AttributesEx3 |= SPELL_ATTR_EX3_NO_INITIAL_AGGRO; // slice and dice no longer gives combat or remove stealth
+            spellInfo->AttributesEx |= SPELL_ATTR_EX_NOT_BREAK_STEALTH;
+            break;
 		case 14157:
             spellInfo->AttributesEx3 |= SPELL_ATTR_EX3_NO_INITIAL_AGGRO;
             break;
+		case 12051:
+			spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT; // evocation can now be interupted
+			break;
 		case 24905: // Moonkin form -> elune's touch
 			spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_CASTER;
 			break;
