@@ -3489,6 +3489,9 @@ uint8 Spell::CanCast(bool strict)
     }
 
     Unit *target = m_targets.getUnitTarget();
+	
+	if(((m_spellInfo->Id == 45438) || (m_spellInfo->Id == 498) || (m_spellInfo->Id == 5573) || (m_spellInfo->Id == 642) || (m_spellInfo->Id == 1020)) && m_caster->HasAura(33786, 0))
+		return SPELL_FAILED_TARGET_AURASTATE;
 
     if (target)
     {
