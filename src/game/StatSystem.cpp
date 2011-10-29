@@ -882,6 +882,9 @@ void Pet::UpdateResistances(uint32 school)
         // hunter and warlock pets gain 40% of owner's resistance
         if (owner && (getPetType() == HUNTER_PET || (getPetType() == SUMMON_PET && owner->getClass() == CLASS_WARLOCK)))
             value += float(owner->GetResistance(SpellSchools(school))) * 0.4f;
+			
+		if(owner->HasAura(37386, 0))
+			value += 130;
 
         SetResistance(SpellSchools(school), int32(value));
 		SetResistance(SPELL_SCHOOL_HOLY, 0); //Pets No Longer Have Any Holy Resistance. By Bigpwn

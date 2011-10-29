@@ -3963,6 +3963,19 @@ void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
             default: break;
         }
     }
+		
+	//Void Star Talisman
+    if(GetId() == 37386)
+    {
+        Pet* pet = m_target->ToPlayer()->GetPet();
+        if(pet)
+        {
+                for(int8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; i++)
+                {
+                       pet->UpdateResistances(i);
+                }
+        }
+    }
 }
 
 void Aura::HandleAuraModStalked(bool apply, bool Real)
