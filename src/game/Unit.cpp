@@ -10727,7 +10727,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit * pTarget, uint32 procFlag,
     {
 
         SpellProcEventEntry const* spellProcEvent = NULL;
-        bool active = (damage > 0) || (procExtra & PROC_EX_ABSORB && isVictim);
+        bool active = (damage > 0) || (procExtra & PROC_EX_ABSORB);// && isVictim));
         if (!IsTriggeredAtSpellProcEvent(pTarget, itr->second, procSpell, procFlag, procExtra, attType, isVictim, active, spellProcEvent))
            continue;
 
