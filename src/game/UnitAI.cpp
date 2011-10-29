@@ -41,7 +41,7 @@ void UnitAI::AttackStartCaster(Unit *victim, float dist)
 
 void UnitAI::DoMeleeAttackIfReady()
 {
-    if (me->hasUnitState(UNIT_STAT_CASTING))
+    if (me->hasUnitState(UNIT_STAT_CASTING) || me->GetEntry() == 510)
         return;
 
     //Make sure our attack is ready and we aren't currently casting before checking distance

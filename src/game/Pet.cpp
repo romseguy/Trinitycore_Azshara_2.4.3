@@ -1069,6 +1069,8 @@ bool Guardian::InitStatsForLevel(uint32 petlevel)
                     float val = m_owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FROST) * 0.4;
                     if (val < 0)
                         val = 0;
+					ApplySpellImmune(NULL, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true); // Make Water Elemental immune to frost damage.
+					m_corpseDelay = 0;
                     SetBonusDamage(int32(val));
                     break;
                 }

@@ -316,7 +316,10 @@ void Guardian::InitStats(uint32 duration)
     if (m_owner->GetTypeId() == TYPEID_PLAYER && HasSummonMask(SUMMON_MASK_CONTROLABLE_GUARDIAN))
         m_charmInfo->InitCharmCreateSpells();
 
-    SetReactState(REACT_AGGRESSIVE);
+    if (ToCreature()->GetEntry() == 510)
+		SetReactState(REACT_PASSIVE);
+	else
+		SetReactState(REACT_AGGRESSIVE));
 }
 
 void Guardian::InitSummon()

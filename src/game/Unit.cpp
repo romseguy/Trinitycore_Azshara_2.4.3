@@ -10403,6 +10403,14 @@ void CharmInfo::InitCharmCreateSpells()
                 if (spellInfo->EffectImplicitTargetA[i] != TARGET_UNIT_CASTER && spellInfo->EffectImplicitTargetA[i] != 0)
                     onlyselfcast = false;
             }
+			
+           if(spellId == 31707) 
+			{ // Hardcoded spells for 'charmpets' to autocast...
+                newstate = ACT_ENABLED;
+				ToggleCreatureAutocast(spellId,true);
+			}
+			
+            else if (onlyselfcast || !IsPositiveSpell(spellId))   //only self cast and spells versus enemies are autocastable
                 newstate = ACT_CAST;
 
             AddSpellToActionBar(0, spellId, newstate);

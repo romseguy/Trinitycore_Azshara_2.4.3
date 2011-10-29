@@ -679,6 +679,7 @@ class Creature : public Unit, public GridObject<Creature>
         time_t m_respawnTime;                               // (secs) time of next respawn
         uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning
         uint32 m_corpseDelay;                               // (secs) delay between death and corpse disappearance
+		uint32 m_deathTimer;								// (elemental fix)
         float m_respawnradius;
 
         uint8 m_emoteState;
