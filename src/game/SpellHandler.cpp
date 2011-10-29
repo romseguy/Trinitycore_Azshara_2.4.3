@@ -176,6 +176,11 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
                 sLog.outError("Item (Entry: %u) has invalid spell id %u, ignoring ",proto->ItemId, spellData.SpellId);
                 continue;
             }
+			
+			Player *pl;
+				pl = GetPlayer();
+			if(spellData.SpellId == 27103 && pl->HasAura(37447,0))
+				pl->AddAura(37445,pl);
 
             Spell *spell = new Spell(pUser, spellInfo, (count > 0));
             spell->m_CastItem = pItem;
