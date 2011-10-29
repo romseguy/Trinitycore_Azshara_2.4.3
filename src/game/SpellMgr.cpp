@@ -2504,6 +2504,9 @@ void SpellMgr::LoadSpellCustomAttr()
 		case 12051:
 			spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT; // evocation can now be interupted
 			break;
+		case 33110:
+			spellInfo->spellLevel = 70;
+			break;
 		case 24905: // Moonkin form -> elune's touch
 			spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_CASTER;
 			break;

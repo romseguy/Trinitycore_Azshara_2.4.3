@@ -8013,7 +8013,7 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
 
     // These Spells are doing fixed amount of healing (TODO found less hack-like check)
     if (spellProto->Id == 15290 || spellProto->Id == 39373 ||
-        spellProto->Id == 33778 || spellProto->Id == 379   ||
+     /*spellProto->Id == 33778  ||*/ spellProto->Id == 379 ||
         spellProto->Id == 38395 || spellProto->Id == 40972 ||
         spellProto->Id == 22845 || spellProto->Id == 33504 ||
         spellProto->Id == 34299 || spellProto->Id == 27813 ||
@@ -11637,10 +11637,9 @@ bool Unit::HandleMendingAuraProc(Aura* triggeredByAura)
                 mod->charges = 0;
 
                 caster->AddSpellMod(mod, true);
-                CastCustomSpell(target,spellProto->Id,&heal,NULL,NULL,true,NULL,triggeredByAura,caster->GetGUID());
-                caster->AddSpellMod(mod, false);
+                CastCustomSpell(target,spellProto->Id,&heal,NULL,NULL,true,NULL,triggeredByAura,caster->GetGUID());                
             }
-            heal = caster->SpellHealingBonus(spellProto, heal, HEAL, this);
+			caster->AddSpellMod(mod, false);
         }
     }
 
