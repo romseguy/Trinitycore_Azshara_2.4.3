@@ -3450,6 +3450,7 @@ bool Player::resetTalents(bool no_cost)
                 // unlearn if first rank is talent or learned by talent
                 if (itrFirstId == talentInfo->RankID[j] || spellmgr.IsSpellLearnToSpell(talentInfo->RankID[j],itrFirstId))
                 {
+					RemoveArenaAuras(); // Combustion fix
                     removeSpell(itr->first,!IsPassiveSpell(itr->first));
                     itr = GetSpellMap().begin();
                     continue;
