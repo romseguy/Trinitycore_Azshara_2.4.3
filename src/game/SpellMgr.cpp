@@ -2493,6 +2493,9 @@ void SpellMgr::LoadSpellCustomAttr()
 		case 33619: //Reflective shield fix
 			spellInfo->AttributesEx3 |= SPELL_ATTR_EX3_NO_INITIAL_AGGRO;
 			break;
+		case 14157:
+            spellInfo->AttributesEx3 |= SPELL_ATTR_EX3_NO_INITIAL_AGGRO;
+            break;
 		case 24905: // Moonkin form -> elune's touch
 			spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_CASTER;
 			break;
