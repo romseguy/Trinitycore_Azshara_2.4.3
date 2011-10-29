@@ -286,6 +286,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
 
     if (!Oregon::IsValidMapCoord(movementInfo.GetPos()->GetPositionX(), movementInfo.GetPos()->GetPositionY(), movementInfo.GetPos()->GetPositionZ(), movementInfo.GetPos()->GetOrientation()))
         return;
+		
+	if (mover->IsSitState() && movementInfo.GetMovementFlags() & (MOVEFLAG_MOVING | MOVEFLAG_TURNING))
+		mover->SetStandState(UNIT_STAND_STATE_STAND);
 
     bool updateOrientationOnly = false;
     bool skipAnticheat = false;
