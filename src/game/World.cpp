@@ -1655,7 +1655,7 @@ void World::Update(time_t diff)
     {
         if (m_updateTimeSum > m_configs[CONFIG_INTERVAL_LOG_UPDATE] && uint32(diff) >= m_configs[CONFIG_MIN_LOG_UPDATE])
         {
-            sLog.outBasic("Update time diff: %u. Players online: %u.", m_updateTimeSum / m_updateTimeCount, GetActiveSessionCount());
+            //sLog.outBasic("Update time diff: %u. Players online: %u.", m_updateTimeSum / m_updateTimeCount, GetActiveSessionCount());
             m_updateTimeSum = m_updateTime;
             m_updateTimeCount = 1;
         }
