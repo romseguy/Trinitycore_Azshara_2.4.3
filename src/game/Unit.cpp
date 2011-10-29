@@ -2603,6 +2603,22 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell)
     // Can`t miss on dead target (on skinning for example)
     if (!pVictim->isAlive())
         return SPELL_MISS_NONE;
+		
+ 	// MASS DISPEL STOICISM
+ 	if (spell->Id == 39897)
+ 	{
+		if (pVictim->HasAura(31845, 0))
+		{
+			if (urand(0,99) < 30)
+				return SPELL_MISS_RESIST;
+		}
+		
+		else if (pVictim->HasAura(31844, 0))
+		{
+			if (urand(0,99) < 15)
+				return SPELL_MISS_RESIST;
+		}
+	}
 
     SpellSchoolMask schoolMask = GetSpellSchoolMask(spell);
     // PvP - PvE spell misschances per leveldif > 2
