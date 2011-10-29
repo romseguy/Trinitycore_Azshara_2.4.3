@@ -7385,6 +7385,9 @@ void Player::CastItemCombatSpell(Unit *target, WeaponAttackType attType, uint32 
 
             if(spellData.SpellId == 15600)
                 chance = 1.0f;
+				
+			if(spellData.SpellId == 36070) //Rod of the Sun King fix
+			chance = 4.5f;
 
             if (roll_chance_f(chance))
                 CastSpell(target, spellInfo->Id, true, item);
