@@ -8475,8 +8475,28 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage, WeaponAttackType att
     }
     else
     {
-        APbonus += pVictim->GetTotalAuraModifier(SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS);
-    
+        AuraList const& mAttackerPower = pVictim->GetAurasByType(SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS);
+        for (AuraList::const_iterator i = mAttackerPower.begin();i != mAttackerPower.end(); ++i)
+            if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_HUNTER && ((*i)->GetSpellProto()->SpellFamilyFlags&0x0000000000000400LL))
+                if (Unit *pCaster = (*i)->GetCaster())
+                {
+                    AuraList const& mClassScriptAuras = pCaster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+                    for (AuraList::const_iterator k = mClassScriptAuras.begin();k != mClassScriptAuras.end(); ++k)
+                        switch ((*k)->GetModifier()->m_miscvalue)
+                        {
+                            case 5236:
+                            case 5237:
+                            case 5238:
+                            case 5239:
+                            case 5240:
+                                APbonus += (*i)->GetSpellProto()->EffectBasePoints[1] * (*k)->GetModifier()->m_amount / 100.0f;
+                                break;
+                            default:
+                                break;
+                        }
+                }
+                else
+                    APbonus += (*i)->GetModifierValue(); 
 
         // ..done (base at attack power and creature type)
         AuraList const& mCreatureAttackPower = GetAurasByType(SPELL_AURA_MOD_MELEE_ATTACK_POWER_VERSUS);
@@ -10959,7 +10979,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit * pTarget, uint32 procFlag,
                 // Hunter's Mark (1-4 Rangs)
                 if (spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && (spellInfo->SpellFamilyFlags&0x0000000000000400LL))
                 {
-		    uint32 basevalue = triggeredByAura->GetBasePoints();
+		    uint32 basevalue = spellInfo->EffectBasePoints[1];
                     auraModifier->m_amount += basevalue/10;
                     if (auraModifier->m_amount > basevalue*4)
                         auraModifier->m_amount = basevalue*4;
