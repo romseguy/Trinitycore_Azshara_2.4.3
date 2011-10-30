@@ -93,6 +93,7 @@ class Aura
         void HandleModAttackSpeed(bool Apply, bool Real);
         void HandleModMeleeRangedSpeedPct(bool apply, bool Real);
         void HandleModCombatSpeedPct(bool apply, bool Real);
+		void HandleAuraReflect(bool apply, bool Real);
         void HandleModThreat(bool Apply, bool Real);
         void HandleModTaunt(bool Apply, bool Real);
         void HandleFeignDeath(bool Apply, bool Real);

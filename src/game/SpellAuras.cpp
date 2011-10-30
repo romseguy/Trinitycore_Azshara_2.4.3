@@ -84,7 +84,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleAuraModPacify,                             // 25 SPELL_AURA_MOD_PACIFY
     &Aura::HandleAuraModRoot,                               // 26 SPELL_AURA_MOD_ROOT
     &Aura::HandleAuraModSilence,                            // 27 SPELL_AURA_MOD_SILENCE
-    &Aura::HandleNoImmediateEffect,                         // 28 SPELL_AURA_REFLECT_SPELLS        implement in Unit::SpellHitResult
+    &Aura::HandleAuraReflect,                               // 28 SPELL_AURA_REFLECT_SPELLS        implement in Unit::SpellHitResult
     &Aura::HandleAuraModStat,                               // 29 SPELL_AURA_MOD_STAT
     &Aura::HandleAuraModSkill,                              // 30 SPELL_AURA_MOD_SKILL
     &Aura::HandleAuraModIncreaseSpeed,                      // 31 SPELL_AURA_MOD_INCREASE_SPEED
@@ -3536,6 +3536,14 @@ void Aura::HandleAuraModSilence(bool apply, bool Real)
 
         m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
     }
+}
+
+void Aura::HandleAuraReflect(bool apply, bool Real)
+{
+    if (!Real)
+        return;
+
+    m_target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_CHARM, apply);
 }
 
 void Aura::HandleModThreat(bool apply, bool Real)

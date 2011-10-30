@@ -2755,8 +2755,13 @@ void Spell::finish(bool ok)
 
     //remove spell mods
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
-         m_caster->ToPlayer()->RemoveSpellMods(this);
+    {
+        m_caster->ToPlayer()->RemoveSpellMods(this);
 
+        if (Unit *target = m_targets.getUnitTarget())
+            if (m_spellInfo->Mechanic == MECHANIC_CHARM && target->HasAuraType(SPELL_AURA_REFLECT_SPELLS))
+                target->RemoveAuraTypeByCaster(SPELL_AURA_REFLECT_SPELLS, target->GetGUID());
+    }
 
     // Okay to remove extra attacks
     if (IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_ADD_EXTRA_ATTACKS))
