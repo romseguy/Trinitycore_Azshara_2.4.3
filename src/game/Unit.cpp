@@ -3562,6 +3562,16 @@ bool Unit::AddAura(Aura *Aur)
             return false;
         }
     }
+	
+    // Maim Interrupt
+    if(aurSpellInfo->Id == 22570)
+    {
+        Unit* target = Aur->GetTarget();
+        Unit* caster = Aur->GetCaster();
+        if(caster->HasAura(44835,0))
+            CastSpell(target,32747,true,0,0,0);
+	}
+	
     bool stackModified=false;
     // passive and persistent auras can stack with themselves any number of times
     if (!Aur->IsPassive() && !Aur->IsPersistent())
