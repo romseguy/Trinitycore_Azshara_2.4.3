@@ -4937,7 +4937,33 @@ void Aura::HandleModSpellCritChanceShool(bool /*apply*/, bool Real)
 
 void Aura::HandleModCastingSpeed(bool apply, bool /*Real*/)
 {
-    m_target->ApplyCastTimePercentMod(GetModifierValue(),apply);
+    // PI/IV pendant BL/H
+    if ((m_spellProto->Id == 10060 || m_spellProto->Id == 12472) && (m_target->HasAura(2825, 0) || m_target->HasAura(32182, 0)))
+        return;
+
+    // BL/H pendant PI/IV
+    if ((m_spellProto->Id == 2825 || m_spellProto->Id == 32182) && (m_target->HasAura(10060, 0) || m_target->HasAura(12472, 0)))
+    {
+        int32 mod = m_target->GetAura((m_target->HasAura(10060, 0))? 10060 : 12472, 0)->GetModifierValue();
+
+        if (apply)
+        {
+            // il faut enlever la reduction de la PI/IV
+            m_target->ApplyCastTimePercentMod(mod,!apply);
+            // et appliquer celle de la BL
+            m_target->ApplyCastTimePercentMod(GetModifierValue(),apply);
+            return;
+        }
+        else
+        {
+            // il faut enlever la reduction de la BL
+            m_target->ApplyCastTimePercentMod(GetModifierValue(),apply);
+            // et ajouter celle de la PI/IV
+            m_target->ApplyCastTimePercentMod(mod,!apply);
+            return;
+        }
+    }
+   m_target->ApplyCastTimePercentMod(GetModifierValue(),apply);
 }
 
 void Aura::HandleModMeleeRangedSpeedPct(bool apply, bool /*Real*/)
