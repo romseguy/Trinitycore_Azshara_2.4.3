@@ -2074,6 +2074,7 @@ enum DiminishingGroup
     DIMINISHING_POLYMORPH,
     // Rogue Specific
     DIMINISHING_KIDNEYSHOT,                                 // Kidney Shot is not diminished with Cheap Shot
+	DIMINISHING_GARROTE,
     // Warlock Specific
     DIMINISHING_DEATHCOIL,                                  // Death Coil Diminish only with another Death Coil
     DIMINISHING_WARLOCK_FEAR,                               // Also with Sedduction

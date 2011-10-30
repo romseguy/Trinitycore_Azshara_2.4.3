@@ -2983,6 +2983,8 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto
 		{
 			if (spellproto->Id == 12494) // frostbite
 				return DIMINISHING_TRIGGER_ROOT;
+			else if (spellproto->Id == 1330)
+                return DIMINISHING_GARROTE;
 			break;
 		}
 	}
@@ -3021,6 +3023,7 @@ bool IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group)
 	case DIMINISHING_CONTROL_STUN:
 	case DIMINISHING_TRIGGER_STUN:
 	case DIMINISHING_KIDNEYSHOT:
+	case DIMINISHING_GARROTE:
 	case DIMINISHING_SLEEP:
 	case DIMINISHING_CONTROL_ROOT:
 	case DIMINISHING_TRIGGER_ROOT:
@@ -3046,6 +3049,7 @@ DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group)
 	case DIMINISHING_CONTROL_STUN:
 	case DIMINISHING_TRIGGER_STUN:
 	case DIMINISHING_KIDNEYSHOT:
+	case DIMINISHING_GARROTE:
 		return DRTYPE_ALL;
 	case DIMINISHING_SLEEP:
 	case DIMINISHING_CONTROL_ROOT:
