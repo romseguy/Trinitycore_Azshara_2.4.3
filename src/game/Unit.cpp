@@ -803,18 +803,71 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         }
     }
 
-    if (damage || (cleanDamage && cleanDamage->damage))
+    // si le sort a pour but d'infliger des dommages
+    if (damagetype != NODAMAGE)
     {
-        pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spellProto ? spellProto->Id : 0);
-        pVictim->RemoveSpellbyDamageTaken(damage, spellProto ? spellProto->Id : 0);
-         // Rage from physical damage received
-        if (!damage)
+		// si les dommages sont abs et que la victime a deja un camouflage : on ne break pas le stealth
+        if (!damage && pVictim->HasAuraType(SPELL_AURA_MOD_STEALTH))
+			return 0;
+			
+        if (spellProto)
         {
-            if ((damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL) && pVictim->GetTypeId() == TYPEID_PLAYER && (pVictim->getPowerType() == POWER_RAGE))
-                pVictim->ToPlayer()->RewardRage(cleanDamage->damage, 0, false);
-            return 0;
-		}
+            // si les dommages infliges par le spell (sans tenir compte de l'absorption) doivent casser des auras
+            if (!(spellProto->AttributesEx4 & SPELL_ATTR_EX4_DAMAGE_DOESNT_BREAK_AURAS))
+            {
+                // on casse les auras correspondants
+                pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spellProto->Id);
+                pVictim->RemoveSpellbyDamageTaken(damage, spellProto->Id);
+            }
+        }
+        else
+        {
+            pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, 0);
+            pVictim->RemoveSpellbyDamageTaken(damage, 0);
+        }
+    }
 
+    // Rage from Damage made (only from direct weapon damage)
+    if (cleanDamage && damagetype == DIRECT_DAMAGE && this != pVictim && GetTypeId() == TYPEID_PLAYER && (getPowerType() == POWER_RAGE))
+    {
+        uint32 weaponSpeedHitFactor;
+
+        switch(cleanDamage->attackType)
+        {
+            case BASE_ATTACK:
+            {
+                if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
+                    weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType)/1000.0f * 7);
+                else
+                    weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType)/1000.0f * 3.5f);
+
+                ToPlayer()->RewardRage(damage, weaponSpeedHitFactor, true);
+
+                break;
+            }
+            case OFF_ATTACK:
+            {
+                if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
+                    weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType)/1000.0f * 3.5f);
+                else
+                    weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType)/1000.0f * 1.75f);
+
+                ToPlayer()->RewardRage(damage, weaponSpeedHitFactor, true);
+
+                break;
+            }
+            case RANGED_ATTACK:
+                break;
+        }
+    }
+
+    // On donne de la rage a la victime qui a absorbe les dommages de l'attaquant
+    if (!damage && cleanDamage && cleanDamage->damage)
+    {
+        if ((damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL) && pVictim->GetTypeId() == TYPEID_PLAYER && (pVictim->getPowerType() == POWER_RAGE))
+            pVictim->ToPlayer()->RewardRage(cleanDamage->damage, 0, false);
+        // On n'inflige pas de dommages a la victime puisque tout a ete absorbe
+       return 0;
 	}
 
     if (pVictim->GetTypeId() != TYPEID_PLAYER)
@@ -858,40 +911,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
             damage = health-1;
 
         duel_hasEnded = true;
-    }
-	
-    // Rage from Damage made (only from direct weapon damage)
-    if (cleanDamage && damagetype == DIRECT_DAMAGE && this != pVictim && GetTypeId() == TYPEID_PLAYER && (getPowerType() == POWER_RAGE))
-    {
-        uint32 weaponSpeedHitFactor;
-
-        switch(cleanDamage->attackType)
-        {
-            case BASE_ATTACK:
-            {
-                if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
-                    weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType)/1000.0f * 7);
-                else
-                    weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType)/1000.0f * 3.5f);
-
-                ToPlayer()->RewardRage(damage, weaponSpeedHitFactor, true);
-
-                break;
-            }
-            case OFF_ATTACK:
-            {
-                if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
-                    weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType)/1000.0f * 3.5f);
-                else
-                    weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType)/1000.0f * 1.75f);
-
-                ToPlayer()->RewardRage(damage, weaponSpeedHitFactor, true);
-
-                break;
-            }
-            case RANGED_ATTACK:
-                break;
-        }
     }
 
     if (pVictim->GetTypeId() == TYPEID_PLAYER && GetTypeId() == TYPEID_PLAYER)

@@ -2584,6 +2584,15 @@ void SpellMgr::LoadSpellCustomAttr()
         case 38699:
             spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
             break;
+		case 1787:
+		case 1786:
+		case 1785:
+		case 1784:
+		case 5215:
+		case 6783:
+		case 9913:
+			spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL;
+			break;
         default:
             break;
 		}
