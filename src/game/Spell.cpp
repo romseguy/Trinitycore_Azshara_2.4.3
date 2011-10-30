@@ -4277,7 +4277,7 @@ uint8 Spell::CanCast(bool strict)
             case SPELL_AURA_MOD_POSSESS:
             case SPELL_AURA_MOD_CHARM:
             {
-                if (m_caster->GetPetGUID())
+                if (m_caster->GetPetGUID() && !(m_spellInfo->Id == 10912) && !(m_spellInfo->Id == 10911) && !(m_spellInfo->Id == 605)) // mind control allowed when shadowfiend is summoned.
                     return SPELL_FAILED_ALREADY_HAVE_SUMMON;
 
                 if (m_caster->GetCharmGUID())
