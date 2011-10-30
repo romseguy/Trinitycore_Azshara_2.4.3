@@ -1140,6 +1140,9 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
 void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
 {
     sLog.outDebug("WORLD: CMSG_SOCKET_GEMS");
+	
+	if (_player->InArena())
+        return;
 
     uint64 guids[4];
     uint32 GemEnchants[3], OldEnchants[3];
