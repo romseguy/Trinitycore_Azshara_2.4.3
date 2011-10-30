@@ -2722,45 +2722,43 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
     if (this == pVictim)
         return SPELL_MISS_NONE;
 		
-	// frost warding rank 1
-	if(pVictim->HasAura(11189,0) && (pVictim->HasAura(32796,1)))
-	WardCanReflect = true;
-	
-	// frost warding rank 2
-	if(pVictim->HasAura(28332,0) && (pVictim->HasAura(32796,1)))
-	WardCanReflect = true;
+    // frost warding rank 1
+        if(pVictim->HasAura(11189,0) && (pVictim->HasAura(32796,1)))
+            WardCanReflect = true;
+    // frost warding rank 2
+        if(pVictim->HasAura(28332,0) && (pVictim->HasAura(32796,1)))
+            WardCanReflect = true;
 
-	// molten shields rank 1
-	if(pVictim->HasAura(11094,0) && (pVictim->HasAura(27128,1)))
-	WardCanReflect = true;
-	
-	// molten shields rank 2
-	if(pVictim->HasAura(13043,0) && (pVictim->HasAura(27128,1)))
-	WardCanReflect = true;
+    // molten shields rank 1
+        if(pVictim->HasSpell(11094) && (pVictim->HasAura(27128,1)))
+        WardCanReflect = true;
+    // molten shields rank 2
+        if(pVictim->HasSpell(13043) && (pVictim->HasAura(27128,1)))
+        WardCanReflect = true;
+    
+        // Try victim reflect spell
+    if (WardCanReflect)
+    {
+        int32 reflectchance = pVictim->GetTotalAuraModifier(SPELL_AURA_REFLECT_SPELLS);
+        // frost warding rank 1 && molten shields rank 1
+        if(pVictim->HasAura(11189,0) || pVictim->HasSpell(11094))
+            reflectchance = 10;
+        // frost warding rank 2 && molten shields rank 2
+        if(pVictim->HasAura(28332,0) || pVictim->HasSpell(13043))
+            reflectchance = 20;
 
-	// Try victim reflect spell
-	if (WardCanReflect)
-	{
-		int32 reflectchance = 0;
-		// frost warding rank 1 && molten shields rank 1
-			if(pVictim->HasAura(11189,0) || pVictim->HasAura(11094,0))
-				reflectchance = 9;
-		// frost warding rank 2 && molten shields rank 2
-			if(pVictim->HasAura(28332,0) || pVictim->HasAura(13043,0))
-				reflectchance = 19;
 
-				
-	if((pVictim->HasAura(28332,0) || pVictim->HasAura(11189,0)) && spell->SchoolMask == SPELL_SCHOOL_MASK_FROST)
-		{
-			if (reflectchance > 0 && roll_chance_i(reflectchance))
-				return SPELL_MISS_REFLECT;
-		}
-			if((pVictim->HasAura(11094,0) || pVictim->HasAura(13043,0)) && spell->SchoolMask == SPELL_SCHOOL_MASK_FIRE)
-		{
-			if (reflectchance > 0 && roll_chance_i(reflectchance))
-				return SPELL_MISS_REFLECT;
-		}
-	}	
+            if((pVictim->HasAura(28332,0) || pVictim->HasAura(11189,0)) && spell->SchoolMask == SPELL_SCHOOL_MASK_FROST)
+            {
+                if (reflectchance > 0 && roll_chance_i(reflectchance))
+                    return SPELL_MISS_REFLECT;
+            }
+            if((pVictim->HasSpell(11094) || pVictim->HasSpell(13043)) && spell->SchoolMask == SPELL_SCHOOL_MASK_FIRE)
+            {
+                if (reflectchance > 0 && roll_chance_i(reflectchance))
+                    return SPELL_MISS_REFLECT;
+            }
+    }
 
     // Try victim reflect spell
     if (CanReflect)

@@ -1010,6 +1010,20 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             int32 damagePoint  = damageInfo.damage * 33 / 100;
             m_caster->CastCustomSpell(m_caster, 32220, &damagePoint, NULL, NULL, true);
         }
+				
+		// Molten Shields - rank 1
+		if(unitTarget->HasSpell(11094) && unitTarget->HasAura(30482,1))
+		{
+			if(urand(0,1) == 1 || unitTarget != m_caster)
+			unitTarget->CastCustomSpell(m_caster, 34913, NULL, NULL, NULL, true);
+		}
+		
+		//Molten Shields - rank 2
+		if(unitTarget->HasSpell(13043) && unitTarget->HasAura(30482,1))
+		{
+			if(unitTarget != m_caster)
+				unitTarget->CastCustomSpell(m_caster, 34913, NULL, NULL, NULL, true);
+		}
 		
         // Bloodthirst
         else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && m_spellInfo->SpellFamilyFlags & 0x40000000000LL)
