@@ -2559,6 +2559,9 @@ void SpellMgr::LoadSpellCustomAttr()
         case 2094:                        // Blind
             spellInfo->speed = 590.0f;    // Minor delay
             break;
+		 case 6358:
+			spellInfo->Mechanic = MECHANIC_FEAR;
+            break;
         case 27066:
             spellInfo->Dispel = 0;
             break;
