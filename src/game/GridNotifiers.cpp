@@ -285,14 +285,16 @@ void DynamicObjectUpdater::VisitHelper(Unit* target)
         if (i_check->IsFriendlyTo(target))
             return;
 			
-        i_check->CombatStart(target);
+		if ((spellInfo && !spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO) || !spellInfo)
+			i_check->CombatStart(target);
     }
     else
     {
         if (!i_check->IsHostileTo(target))
             return;
         
-        i_check->CombatStart(target);
+        if ((spellInfo && !spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO) || !spellInfo)
+			i_check->CombatStart(target);
     }
 
     // Check target immune to spell or aura
