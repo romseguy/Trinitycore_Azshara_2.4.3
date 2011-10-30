@@ -3550,6 +3550,8 @@ void Spell::EffectDispel(uint32 i)
                 else
                 unitTarget->RemoveAurasDueToSpellByDispel(spellInfo->Id, j->second, m_caster);
              }
+			m_caster->CombatStart(unitTarget,true);
+     		unitTarget->CombatStart(m_caster,true);
             m_caster->SendMessageToSet(&data, true);
 
             // On succes dispel
@@ -3583,6 +3585,8 @@ void Spell::EffectDispel(uint32 i)
             data << uint32(m_spellInfo->Id);                // dispel spell id
             for (std::list< uint32 >::iterator j = fail_list.begin(); j != fail_list.end(); ++j)
                 data << uint32(*j);                         // Spell Id
+			m_caster->CombatStart(unitTarget,true);
+			unitTarget->CombatStart(m_caster,true);
             m_caster->SendMessageToSet(&data, true);
         }
     }
@@ -6351,7 +6355,9 @@ void Spell::EffectStealBeneficialBuff(uint32 i)
                 data << uint8(0);                    // 0 - steals != 0 transfers
                 unitTarget->RemoveAurasDueToSpellBySteal(spellInfo->Id, j->second, m_caster);
             }
-            unitTarget->CombatStart(m_caster,true);
+			unitTarget->CombatStart(m_caster,true);
+			m_caster->CombatStart(unitTarget,true);
+            m_caster->SendMessageToSet(&data, true);
         }
 
         // Is there other way to send spellsteal resists?
@@ -6365,7 +6371,9 @@ void Spell::EffectStealBeneficialBuff(uint32 i)
             data << uint32(m_spellInfo->Id);                // dispel spell id
             for (std::list< uint32 >::iterator j = fail_list.begin(); j != fail_list.end(); ++j)
                 data << uint32(*j);                         // Spell Id
-            unitTarget->CombatStart(m_caster,true);
+			unitTarget->CombatStart(m_caster,true);
+			m_caster->CombatStart(unitTarget,true);
+            m_caster->SendMessageToSet(&data, true);
         }
     }
 }
