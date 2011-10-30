@@ -769,6 +769,9 @@ bool GameObject::isVisibleForInState(Player const* u, bool inVisibleList) const
         if (GetEntry() == 187039 && ((u->m_detectInvisibilityMask | u->m_invisibilityMask) & (1<<10)) == 0)
             return false;
     }
+	
+	if(u->InArena()) // In arenas, game objects are now visible everytime nvm at what distance you are
+		return true;
 
     // check distance
     return IsWithinDistInMap(u->m_seer, World::GetMaxVisibleDistanceForObject() +
