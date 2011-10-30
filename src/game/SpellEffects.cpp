@@ -2031,7 +2031,8 @@ void Spell::EffectTriggerSpell(uint32 i)
                 if ((spell->DmgClass == SPELL_DAMAGE_CLASS_MAGIC // only affect magic spells
                     || ((1<<spell->Dispel) & dispelMask))
                     // ignore positive and passive auras
-                    && !iter->second->IsPositive() && !iter->second->IsPassive())     
+                    && !iter->second->IsPositive() && !iter->second->IsPassive() 
+					&& spell->Id != 25203 && spell->Id != 26998 && spell->Id != 12323) // Cape d'ombre ne supprime plus Cri demoralisant et les effets similaires (rang max uniquement).     
                 {
                     m_caster->RemoveAurasDueToSpell(spell->Id);
                     iter = Auras.begin();
@@ -6471,13 +6472,19 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const *
             return;
 
         if (summon->HasSummonMask(SUMMON_MASK_GUARDIAN))
-            ((Guardian*)summon)->InitStatsForLevel(level);	
-		
+            ((Guardian*)summon)->InitStatsForLevel(level);
+
+		if (summon->GetEntry() != 19668)
 		summon->GetMotionMaster()->MoveFollow(caster,PET_FOLLOW_DIST,summon->GetFollowAngle());
+		
         summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
         summon->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_PVP_ATTACKABLE);
 		
-		summon->AI()->EnterEvadeMode();
+		if(summon->GetEntry() == 19668)
+		{
+			Unit *newTarget = summon->SelectNearestTarget(100);
+			summon->Attack(newTarget,true);
+		}
     }
 }
 

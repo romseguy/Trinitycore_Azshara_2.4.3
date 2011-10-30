@@ -1117,6 +1117,23 @@ bool Guardian::InitStatsForLevel(uint32 petlevel)
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel / 2));
                     break;
                 }
+				case 19668: // Shadowfiend
+				{
+					if (!pInfo)
+					{
+						SetCreateMana(28 + 10*petlevel);
+						SetCreateHealth(40*petlevel);
+					}	
+					
+					float bonus_dmg = m_owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW) * 0.0657;
+					
+					if (bonus_dmg < 0)
+						bonus_dmg = 0;						
+					SetAttackTime(BASE_ATTACK,1500);
+					SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float((petlevel+30) - (petlevel / 4) + bonus_dmg));
+					SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float((petlevel+30) + (petlevel / 4) + bonus_dmg));
+					break;
+				}
                 default:
                 {
                     if (!pInfo)

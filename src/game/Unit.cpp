@@ -4843,9 +4843,16 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     if (!target)
                         return false;
 						
-					basepoints0 = int32(damage * 2.5f);     // manaregen
-                    triggered_spell_id = 34650;
-
+					if(pVictim->HasAuraType(SPELL_AURA_SCHOOL_ABSORB))
+					{
+						basepoints0 = int32((urand(108, 137) + (target->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW) * 0.0657))* 2.5f); // hardcoded manaregen for absorbed hits
+						triggered_spell_id = 34650;
+					}					
+					else
+					{
+						basepoints0 = int32(damage * 2.5f);     // manaregen
+						triggered_spell_id = 34650;
+					}
                     break;
                 }
                 // Mark of Malice
