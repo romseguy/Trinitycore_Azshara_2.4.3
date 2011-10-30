@@ -3974,11 +3974,23 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit 
             // add the new aura to stealer
             stealer->AddAura(new_aur);
             // Remove aura as dispel
-            RemoveAura(iter, AURA_REMOVE_BY_DISPEL);
-        }
-        else
-            ++iter;
-    }
+            if (iter->second->GetStackAmount() > 1)
+			{
+				// reapply modifier with reduced stack amount
+				iter->second->ApplyModifier(false,true);
+				iter->second->SetStackAmount(iter->second->GetStackAmount()-1);
+				iter->second->ApplyModifier(true,true);
+		
+				iter->second->UpdateSlotCounterAndDuration();
+					return; // not remove aura if stack amount > 1
+			}
+			else
+				RemoveAura(iter,AURA_REMOVE_BY_DISPEL);
+				RemoveAurasDueToSpell(33763);
+		}
+		else
+           ++iter;
+   }
 }
 
 void Unit::RemoveAurasDueToSpellByCancel(uint32 spellId)
