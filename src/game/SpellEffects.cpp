@@ -611,7 +611,8 @@ void Spell::SpellDamageSchoolDmg(uint32 effect_idx)
                 //Explosive Trap Effect
                 else if (m_spellInfo->SpellFamilyFlags & 0x00000004)
                 {
-					damage += int32(m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.1);
+                    if (m_originalCaster)
+						damage += int32(m_originalCaster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.1);
                 }
                 break;
             }
