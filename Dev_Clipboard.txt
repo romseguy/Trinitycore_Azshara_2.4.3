@@ -1,0 +1,1 @@
+REV. d565944f20e4 > REDA > From now, core is clean with a Warden system who detects WoWEmuHacker and an anticheat who make pushbacks when a player try to speed/fly hack with another third party program.
