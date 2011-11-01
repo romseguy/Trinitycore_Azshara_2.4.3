@@ -319,7 +319,7 @@ void Guardian::InitStats(uint32 duration)
     if (ToCreature()->GetEntry() == 510)
 		SetReactState(REACT_PASSIVE);
 	else
-		SetReactState(REACT_AGGRESSIVE));
+		SetReactState(REACT_AGGRESSIVE);
 }
 
 void Guardian::InitSummon()

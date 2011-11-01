@@ -733,6 +733,14 @@ bool Unit::HasAuraTypeWithFamilyFlags(AuraType auraType, uint32 familyName  ,uin
     return false;
 }
 
+bool Unit::HasAuraWithInterruptFlags(uint32 flag) const
+{
+	if (m_interruptMask & flag) 
+		return true;
+	else
+		return false;
+}
+
 /* Called by DealDamage for auras that have a chance to be dispelled on damage taken. */
 void Unit::RemoveSpellbyDamageTaken(uint32 damage, uint32 spell)
 {
@@ -1912,8 +1920,6 @@ void Unit::CalcAbsorbResist(Unit *pVictim, SpellSchoolMask schoolMask, DamageEff
         int32 currentAbsorb;
 
         //Reflective Shield
-	if ((pVictim != this && (!hasUnitState(UNIT_STAT_LOST_CONTROL)) && !HasAura(9913,0) && !HasAura(1787,0) && !HasAura(24453,0) && !HasAura(58984,0) && !HasAura(32612,0) && damagetype != DOT))
-	{
         if ((pVictim != this) && (*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PRIEST && (*i)->GetSpellProto()->SpellFamilyFlags == 0x1)
         {
             if (Unit* caster = (*i)->GetCaster())
@@ -1944,7 +1950,6 @@ void Unit::CalcAbsorbResist(Unit *pVictim, SpellSchoolMask schoolMask, DamageEff
                 }
             }
         }
-	}
 
         if (RemainingDamage >= *p_absorbAmount)
         {
@@ -11767,9 +11772,10 @@ bool Unit::HandleMendingAuraProc(Aura* triggeredByAura)
                 mod->charges = 0;
 
                 caster->AddSpellMod(mod, true);
-                CastCustomSpell(target,spellProto->Id,&heal,NULL,NULL,true,NULL,triggeredByAura,caster->GetGUID());                
+                CastCustomSpell(target,spellProto->Id,&heal,NULL,NULL,true,NULL,triggeredByAura,caster->GetGUID());
+				caster->AddSpellMod(mod, false);
             }
-			caster->AddSpellMod(mod, false);
+			
         }
     }
 

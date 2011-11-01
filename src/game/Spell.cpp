@@ -3816,7 +3816,6 @@ uint8 Spell::CanCast(bool strict)
 			if (uint8 castResult = CheckRange(strict))
 				return castResult;
 		}
-}
 
     for (int i = 0; i < 3; i++)
     {

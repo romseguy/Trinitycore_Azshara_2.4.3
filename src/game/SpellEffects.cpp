@@ -6020,7 +6020,6 @@ void Spell::EffectDestroyAllTotems(uint32 /*i*/)
             ((Totem*)totem)->UnSummon();
         }
     }
-    mana = mana * damage / 100;
 
     int32 gain = m_caster->ModifyPower(POWER_MANA,int32(mana));
     m_caster->SendEnergizeSpellLog(m_caster, m_spellInfo->Id, gain, POWER_MANA);
