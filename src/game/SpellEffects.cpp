@@ -5824,8 +5824,8 @@ void Spell::EffectCharge(uint32 /*i*/)
 
     float x, y, z;
     target->GetContactPoint(m_caster, x, y, z);
-    m_caster->GetMotionMaster()->MoveCharge(x, y, z);
-    //m_caster->Relocate(x,y,z,m_caster->GetOrientation());
+    m_caster->MonsterMoveByPath(x, y, z, 25, true);
+    // m_caster->MonsterMoveByPath(x, y, z, 1, true); //on problems try this
 
     // not all charge effects used in negative spells
     if (!IsPositiveSpell(m_spellInfo->Id) && m_caster->GetTypeId() == TYPEID_PLAYER)

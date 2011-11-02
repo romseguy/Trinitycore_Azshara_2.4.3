@@ -33,6 +33,8 @@
 #include "ObjectAccessor.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
+#include "BattleGroundMgr.h"
+#include "MoveMap.h"
 
 #define DEFAULT_GRID_EXPIRY     300
 #define MAX_GRID_LOAD_TIME      50
@@ -73,7 +75,7 @@ bool Map::ExistMap(uint32 mapid,int gx,int gy)
         map_fileheader header;
         if (fread(&header, sizeof(header), 1, pf) == 1)
         {
-            if (header.mapMagic != uint32(MAP_MAGIC) || header.versionMagic != uint32(MAP_VERSION_MAGIC))
+            if (header.mapMagic != *((uint32 const*)(MAP_MAGIC)) || header.versionMagic != *((uint32 const*)(MAP_VERSION_MAGIC)))
                 sLog.outError("Map file '%s' is from an incompatible clientversion. Please recreate using the mapextractor.",tmp);
             else
                 ret = true;
@@ -158,7 +160,7 @@ void Map::LoadMap(int gx,int gy, bool reload)
     GridMaps[gx][gy] = new GridMap();
     if (!GridMaps[gx][gy]->loadData(tmp))
     {
-        sLog.outError("Error loading map file: \n %s\n", tmp);
+        sLog.outError("Error loading map file: %s grid[%i,%i]\n", tmp, gx, gy);
     }
     delete [] tmp;
 }
@@ -166,8 +168,14 @@ void Map::LoadMap(int gx,int gy, bool reload)
 void Map::LoadMapAndVMap(int gx,int gy)
 {
     LoadMap(gx,gy);
-    if (i_InstanceId == 0)
-        LoadVMap(gx, gy);                                   // Only load the data for the base map
+
+    if (i_InstanceId == 0) // Only load the data for the base map
+    {
+        LoadVMap(gx, gy);
+
+        // load navmesh
+        MMAP::MMapFactory::createOrGetMMapManager()->loadMap(GetId(), gx, gy);
+    }
 }
 
 void Map::InitStateMachine()
@@ -854,7 +862,7 @@ Map::PlayerRelocation(Player *player, float x, float y, float z, float orientati
 }
 
 void
-Map::CreatureRelocation(Creature *creature, float x, float y, float z, float ang)
+Map::CreatureRelocation(Creature *creature, float x, float y, float z, float ang, bool respawnRelocationOnFail)
 {
     ASSERT(CheckGridIntegrity(creature,false));
 
@@ -862,6 +870,9 @@ Map::CreatureRelocation(Creature *creature, float x, float y, float z, float ang
 
     CellPair new_val = Oregon::ComputeCellPair(x, y);
     Cell new_cell(new_val);
+
+    if (!respawnRelocationOnFail && !getNGrid(new_cell.GridX(), new_cell.GridY()))
+        return;
 
     // delay creature move for grid/cell to grid/cell moves
     if (old_cell.DiffCell(new_cell) || old_cell.DiffGrid(new_cell))
@@ -1077,6 +1088,7 @@ bool Map::UnloadGrid(const uint32 &x, const uint32 &y, bool unloadAll)
                 delete GridMaps[gx][gy];
             }
             VMAP::VMapFactory::createOrGetVMapManager()->unloadMap(GetId(), gx, gy);
+            MMAP::MMapFactory::createOrGetMMapManager()->unloadMap(GetId(), gx, gy);
         }
         else
             ((MapInstanced*)m_parentMap)->RemoveGridMapReference(GridPair(gx, gy));
@@ -1164,7 +1176,7 @@ bool GridMap::loadData(char *filename)
         return false;
     }
 
-    if (header.mapMagic == uint32(MAP_MAGIC) && header.versionMagic == uint32(MAP_VERSION_MAGIC))
+    if (header.mapMagic == *((uint32 const*)(MAP_MAGIC)) && header.versionMagic == *((uint32 const*)(MAP_VERSION_MAGIC)))
     {
         // loadup area data
         if (header.areaMapOffset && !loadAreaData(in, header.areaMapOffset, header.areaMapSize))
@@ -1214,9 +1226,13 @@ bool GridMap::loadAreaData(FILE *in, uint32 offset, uint32 /*size*/)
 {
     map_areaHeader header;
     fseek(in, offset, SEEK_SET);
+    fread(&header, sizeof(header), 1, in);
 
-    if (fread(&header, sizeof(header), 1, in) != 1 || header.fourcc != uint32(MAP_AREA_MAGIC))
+    if (header.fourcc != *((uint32 const*)(MAP_AREA_MAGIC)))
+    {
+        sLog.outError("Error reading header. offset: %u\n", offset);
         return false;
+    }
 
     m_gridArea = header.gridArea;
     if (!(header.flags & MAP_AREA_NO_AREA))
@@ -1232,8 +1248,9 @@ bool GridMap::loadHeightData(FILE *in, uint32 offset, uint32 /*size*/)
 {
     map_heightHeader header;
     fseek(in, offset, SEEK_SET);
+    fread(&header, sizeof(header), 1, in);
 
-    if (fread(&header, sizeof(header), 1, in) != 1 || header.fourcc != uint32(MAP_HEIGHT_MAGIC))
+    if (header.fourcc != *((uint32 const*)(MAP_HEIGHT_MAGIC)))
         return false;
 
     m_gridHeight = header.gridHeight;
@@ -1278,8 +1295,9 @@ bool  GridMap::loadLiquidData(FILE *in, uint32 offset, uint32 /*size*/)
 {
     map_liquidHeader header;
     fseek(in, offset, SEEK_SET);
+    fread(&header, sizeof(header), 1, in);
 
-    if (fread(&header, sizeof(header), 1, in) != 1 || header.fourcc != uint32(MAP_LIQUID_MAGIC))
+    if (header.fourcc != *((uint32 const*)(MAP_LIQUID_MAGIC)))
         return false;
 
     m_liquidType   = header.liquidType;
@@ -2653,9 +2671,21 @@ void BattleGroundMap::RemoveAllPlayers()
     if (HavePlayers())
         for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
             if (Player* plr = itr->getSource())
+            {
+                if(plr->m_isArenaSpectator == true)
+                {
+                    plr->m_isArenaSpectator = false;
+                    plr->UpdateSpeed(MOVE_RUN,true);
+                    plr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
+                    plr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                    plr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    WorldPacket status;
+                    sBattleGroundMgr.BuildBattleGroundStatusPacket(&status, NULL, 0, 0, STATUS_NONE, 0, 0, 0, 0);
+                    plr->GetSession()->SendPacket(&status); // remove minimap PvP icon
+                }
                 if (!plr->IsBeingTeleportedFar())
                     plr->TeleportTo(plr->GetBattleGroundEntryPoint());
-					
+            }
 }
 
 Creature*

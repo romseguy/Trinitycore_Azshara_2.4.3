@@ -207,16 +207,18 @@ struct keyFrame
 
 bool Transport::GenerateWaypoints(uint32 pathid, std::set<uint32> &mapids)
 {
-    TransportPath path;
-    objmgr.GetTransportPathNodes(pathid, path);
+    if (pathid >= sTaxiPathNodesByPath.size())
+        return false;
 
-    if (path.Empty())
+    TaxiPathNodeList const& path = sTaxiPathNodesByPath[pathid];
+
+    if (path.empty())
         return false;
 
     std::vector<keyFrame> keyFrames;
     int mapChange = 0;
     mapids.clear();
-    for (size_t i = 1; i < path.Size() - 1; ++i)
+    for (size_t i = 1; i < path.size() - 1; ++i)
     {
         if (mapChange == 0)
         {

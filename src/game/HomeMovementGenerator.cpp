@@ -55,8 +55,16 @@ HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
 
     CreatureTraveller traveller(owner);
 
-    uint32 travel_time = i_destinationHolder.SetDestination(traveller, x, y, z);
-    modifyTravelTime(travel_time);
+    i_destinationHolder.SetDestination(traveller, x, y, z, false);
+
+    PathInfo path(&owner, x, y, z, true);
+    PointPath pointPath = path.getFullPath();
+
+    float speed = traveller.Speed() * 0.001f; // in ms
+    uint32 traveltime = uint32(pointPath.GetTotalLength() / speed);
+    modifyTravelTime(traveltime);
+    owner.SendMonsterMoveByPath(pointPath, 1, pointPath.size(), traveltime);
+
     owner.clearUnitState(UNIT_STAT_ALL_STATE);
 }
 
@@ -66,7 +74,7 @@ HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff
     CreatureTraveller traveller(owner);
     i_destinationHolder.UpdateTraveller(traveller, time_diff);
 
-    if (time_diff > i_travel_timer)
+    if (time_diff >  i_travel_time)
     {
         owner.AddUnitMovementFlag(MOVEFLAG_WALK_MODE);
 
@@ -83,7 +91,7 @@ HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff
         return false;
     }
 
-    i_travel_timer -= time_diff;
+     i_travel_time -= time_diff;
 
     return true;
 }

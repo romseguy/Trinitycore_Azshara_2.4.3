@@ -47,7 +47,7 @@ class TransportPath
 
         unsigned int Size(void) const { return i_nodes.size(); }
         bool Empty(void) const { return i_nodes.empty(); }
-        void Resize(unsigned int sz) { i_nodes.resize(sz); }
+        void resize(unsigned int sz) { i_nodes.resize(sz); }
         void Clear(void) { i_nodes.clear(); }
         PathNode* GetNodes(void) { return static_cast<PathNode *>(&i_nodes[0]); }
 

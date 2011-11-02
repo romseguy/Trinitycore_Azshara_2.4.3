@@ -50,6 +50,7 @@
 #include "AuctionHouseBot.h"
 #include "WaypointMovementGenerator.h"
 #include "VMapFactory.h"
+#include "MoveMap.h"
 #include "GameEventMgr.h"
 #include "PoolHandler.h"
 #include "Database/DatabaseImpl.h"
@@ -134,6 +135,7 @@ World::~World()
         delete command;
 
     VMAP::VMapFactory::clear();
+    MMAP::MMapFactory::clear();
 
     delete m_resultQueue;
 
@@ -552,6 +554,8 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_GRID_UNLOAD] = sConfig.GetBoolDefault("GridUnload", true);
     m_configs[CONFIG_INTERVAL_SAVE] = sConfig.GetIntDefault("PlayerSaveInterval", 900000);
     m_configs[CONFIG_INTERVAL_DISCONNECT_TOLERANCE] = sConfig.GetIntDefault("DisconnectToleranceInterval", 0);
+	
+	m_configs[CONFIG_ARENA_SPECTATOR_UPDATES] = sConfig.GetBoolDefault("ArenaSpectatorUpdates", false); // add value to config file
 
     m_configs[CONFIG_INTERVAL_GRIDCLEAN] = sConfig.GetIntDefault("GridCleanUpDelay", 300000);
     if (m_configs[CONFIG_INTERVAL_GRIDCLEAN] < MIN_GRID_DELAY)
@@ -714,6 +718,19 @@ void World::LoadConfigSettings(bool reload)
         sLog.outError("StartHonorPoints (%i) must be in range 0..MaxHonorPoints(%u). Set to %u.",
             m_configs[CONFIG_START_HONOR_POINTS],m_configs[CONFIG_MAX_HONOR_POINTS],m_configs[CONFIG_MAX_HONOR_POINTS]);
         m_configs[CONFIG_START_HONOR_POINTS] = m_configs[CONFIG_MAX_HONOR_POINTS];
+    }
+
+    rate_values[RATE_PVP_RANK_EXTRA_HONOR] = sConfig.GetFloatDefault("PvPRank.Rate.ExtraHonor", 1);
+    std::string s_pvp_ranks = sConfig.GetStringDefault("PvPRank.HKPerRank", "10,50,100,200,450,750,1300,2000,3500,6000,9500,15000,21000,30000");
+    char *c_pvp_ranks = const_cast<char*>(s_pvp_ranks.c_str());
+    for (int i = 0; i !=HKRANKMAX; i++)
+    {
+        if(i==0)
+            pvp_ranks[0] = 0;
+        else if(i==1)
+            pvp_ranks[1] = atoi(strtok (c_pvp_ranks, ","));
+        else
+            pvp_ranks[i] = atoi(strtok (NULL, ","));
     }
 
     m_configs[CONFIG_MAX_ARENA_POINTS] = sConfig.GetIntDefault("MaxArenaPoints", 5000);
@@ -940,6 +957,11 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS]              = sConfig.GetBoolDefault("Arena.AutoDistributePoints", false);
     m_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS]       = sConfig.GetIntDefault("Arena.AutoDistributeInterval", 7);
     m_configs[CONFIG_ARENA_LOG_EXTENDED_INFO]                   = sConfig.GetBoolDefault("ArenaLogExtendedInfo", false);
+    m_configs[CONFIG_BOOL_ARENA_ANTIWINTRADE]                   = sConfig.GetBoolDefault("Arena.Wintrade.Enable",false);
+ 	m_configs[CONFIG_UINT32_ARENA_ANTIWINTRADE_WEEKDAY_START] = sConfig.GetIntDefault("Arena.Wintrade.WeekdayStart", 0);
+ 	m_configs[CONFIG_UINT32_ARENA_ANTIWINTRADE_WEEKDAY_END]   = sConfig.GetIntDefault("Arena.Wintrade.WeekdayEnd", 23);
+ 	m_configs[CONFIG_UINT32_ARENA_ANTIWINTRADE_WEEKEND_START] = sConfig.GetIntDefault("Arena.Wintrade.WeekendStart", 0);
+ 	m_configs[CONFIG_UINT32_ARENA_ANTIWINTRADE_WEEKEND_END]   = sConfig.GetIntDefault("Arena.Wintrade.WeekendEnd", 23);
     m_configs[CONFIG_INSTANT_LOGOUT]                            = sConfig.GetIntDefault("InstantLogout", SEC_MODERATOR);
 
     m_VisibleUnitGreyDistance = sConfig.GetFloatDefault("Visibility.Distance.Grey.Unit", 1);
@@ -1041,6 +1063,7 @@ void World::LoadConfigSettings(bool reload)
     bool enableLOS = sConfig.GetBoolDefault("vmap.enableLOS", true);
     bool enableHeight = sConfig.GetBoolDefault("vmap.enableHeight", true);
     bool enablePetLOS = sConfig.GetBoolDefault("vmap.petLOS", true);
+    std::string ignoreMapIds = sConfig.GetStringDefault("vmap.ignoreMapIds", "");
     std::string ignoreSpellIds = sConfig.GetStringDefault("vmap.ignoreSpellIds", "");
 
     if (!enableHeight)
@@ -1048,6 +1071,7 @@ void World::LoadConfigSettings(bool reload)
 
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableLineOfSightCalc(enableLOS);
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableHeightCalc(enableHeight);
+    VMAP::VMapFactory::createOrGetVMapManager()->preventMapsFromBeingUsed(ignoreMapIds.c_str());
     VMAP::VMapFactory::preventSpellsFromBeingTestedForLoS(ignoreSpellIds.c_str());
     sLog.outString("WORLD: VMap support included. LineOfSight:%i, getHeight:%i, indoorCheck:%i, PetLOS:%i", enableLOS, enableHeight, enableIndoor, enablePetLOS);
     sLog.outString("WORLD: VMap data directory is: %svmaps",m_dataPath.c_str());
@@ -1109,6 +1133,12 @@ void World::LoadConfigSettings(bool reload)
 
     // warden
     m_configs[CONFIG_BOOL_WARDEN_KICK] = sConfig.GetBoolDefault("Warden.Kick", false);
+    
+    // mmaps
+    m_configs[CONFIG_BOOL_MMAP_ENABLED] = sConfig.GetBoolDefault("mmap.enable", true);
+    std::string ignoreMMapIds = sConfig.GetStringDefault("mmap.ignoreMapIds", "");
+    MMAP::MMapFactory::preventPathfindingOnMaps(ignoreMMapIds.c_str());
+    sLog.outString("WORLD: mmap pathfinding %sabled", getConfig(CONFIG_BOOL_MMAP_ENABLED) ? "en" : "dis");
 }
 
 // Initialize the World
@@ -1116,6 +1146,9 @@ void World::SetInitialWorldSettings()
 {
     // Initialize the random number generator
     srand((unsigned int)time(NULL));
+
+    // Initialize detour memory management
+    dtAllocSetCustom(dtCustomAlloc, dtCustomFree);
 
     // Initialize config settings
     LoadConfigSettings();
@@ -1655,7 +1688,7 @@ void World::Update(time_t diff)
     {
         if (m_updateTimeSum > m_configs[CONFIG_INTERVAL_LOG_UPDATE] && uint32(diff) >= m_configs[CONFIG_MIN_LOG_UPDATE])
         {
-            //sLog.outBasic("Update time diff: %u. Players online: %u.", m_updateTimeSum / m_updateTimeCount, GetActiveSessionCount());
+            sLog.outBasic("Update time diff: %u. Players online: %u.", m_updateTimeSum / m_updateTimeCount, GetActiveSessionCount());
             m_updateTimeSum = m_updateTime;
             m_updateTimeCount = 1;
         }
