@@ -554,8 +554,6 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_GRID_UNLOAD] = sConfig.GetBoolDefault("GridUnload", true);
     m_configs[CONFIG_INTERVAL_SAVE] = sConfig.GetIntDefault("PlayerSaveInterval", 900000);
     m_configs[CONFIG_INTERVAL_DISCONNECT_TOLERANCE] = sConfig.GetIntDefault("DisconnectToleranceInterval", 0);
-	
-	m_configs[CONFIG_ARENA_SPECTATOR_UPDATES] = sConfig.GetBoolDefault("ArenaSpectatorUpdates", false); // add value to config file
 
     m_configs[CONFIG_INTERVAL_GRIDCLEAN] = sConfig.GetIntDefault("GridCleanUpDelay", 300000);
     if (m_configs[CONFIG_INTERVAL_GRIDCLEAN] < MIN_GRID_DELAY)
@@ -718,19 +716,6 @@ void World::LoadConfigSettings(bool reload)
         sLog.outError("StartHonorPoints (%i) must be in range 0..MaxHonorPoints(%u). Set to %u.",
             m_configs[CONFIG_START_HONOR_POINTS],m_configs[CONFIG_MAX_HONOR_POINTS],m_configs[CONFIG_MAX_HONOR_POINTS]);
         m_configs[CONFIG_START_HONOR_POINTS] = m_configs[CONFIG_MAX_HONOR_POINTS];
-    }
-
-    rate_values[RATE_PVP_RANK_EXTRA_HONOR] = sConfig.GetFloatDefault("PvPRank.Rate.ExtraHonor", 1);
-    std::string s_pvp_ranks = sConfig.GetStringDefault("PvPRank.HKPerRank", "10,50,100,200,450,750,1300,2000,3500,6000,9500,15000,21000,30000");
-    char *c_pvp_ranks = const_cast<char*>(s_pvp_ranks.c_str());
-    for (int i = 0; i !=HKRANKMAX; i++)
-    {
-        if(i==0)
-            pvp_ranks[0] = 0;
-        else if(i==1)
-            pvp_ranks[1] = atoi(strtok (c_pvp_ranks, ","));
-        else
-            pvp_ranks[i] = atoi(strtok (NULL, ","));
     }
 
     m_configs[CONFIG_MAX_ARENA_POINTS] = sConfig.GetIntDefault("MaxArenaPoints", 5000);
@@ -957,11 +942,6 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS]              = sConfig.GetBoolDefault("Arena.AutoDistributePoints", false);
     m_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS]       = sConfig.GetIntDefault("Arena.AutoDistributeInterval", 7);
     m_configs[CONFIG_ARENA_LOG_EXTENDED_INFO]                   = sConfig.GetBoolDefault("ArenaLogExtendedInfo", false);
-    m_configs[CONFIG_BOOL_ARENA_ANTIWINTRADE]                   = sConfig.GetBoolDefault("Arena.Wintrade.Enable",false);
- 	m_configs[CONFIG_UINT32_ARENA_ANTIWINTRADE_WEEKDAY_START] = sConfig.GetIntDefault("Arena.Wintrade.WeekdayStart", 0);
- 	m_configs[CONFIG_UINT32_ARENA_ANTIWINTRADE_WEEKDAY_END]   = sConfig.GetIntDefault("Arena.Wintrade.WeekdayEnd", 23);
- 	m_configs[CONFIG_UINT32_ARENA_ANTIWINTRADE_WEEKEND_START] = sConfig.GetIntDefault("Arena.Wintrade.WeekendStart", 0);
- 	m_configs[CONFIG_UINT32_ARENA_ANTIWINTRADE_WEEKEND_END]   = sConfig.GetIntDefault("Arena.Wintrade.WeekendEnd", 23);
     m_configs[CONFIG_INSTANT_LOGOUT]                            = sConfig.GetIntDefault("InstantLogout", SEC_MODERATOR);
 
     m_VisibleUnitGreyDistance = sConfig.GetFloatDefault("Visibility.Distance.Grey.Unit", 1);
