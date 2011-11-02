@@ -19,9 +19,9 @@
 /*
   _dig_vec arrays are public because they are used in several outer places.
 */
-char _dig_vec_upper[] =
+char NEAR _dig_vec_upper[] =
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-char _dig_vec_lower[] =
+char NEAR _dig_vec_lower[] =
   "0123456789abcdefghijklmnopqrstuvwxyz";
 
 

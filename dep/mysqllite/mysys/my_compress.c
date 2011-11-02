@@ -51,7 +51,7 @@ my_bool my_compress(uchar *packet, size_t *len, size_t *complen)
     if (!compbuf)
       DBUG_RETURN(*complen ? 0 : 1);
     memcpy(packet,compbuf,*len);
-    my_free(compbuf);
+    my_free(compbuf,MYF(MY_WME));
   }
   DBUG_RETURN(0);
 }
@@ -73,14 +73,14 @@ uchar *my_compress_alloc(const uchar *packet, size_t *len, size_t *complen)
 
   if (res != Z_OK)
   {
-    my_free(compbuf);
+    my_free(compbuf, MYF(MY_WME));
     return 0;
   }
 
   if (*complen >= *len)
   {
     *complen= 0;
-    my_free(compbuf);
+    my_free(compbuf, MYF(MY_WME));
     DBUG_PRINT("note",("Packet got longer on compression; Not compressed"));
     return 0;
   }
@@ -125,11 +125,11 @@ my_bool my_uncompress(uchar *packet, size_t len, size_t *complen)
     if (error != Z_OK)
     {						/* Probably wrong packet */
       DBUG_PRINT("error",("Can't uncompress packet, error: %d",error));
-      my_free(compbuf);
+      my_free(compbuf, MYF(MY_WME));
       DBUG_RETURN(1);
     }
     memcpy(packet, compbuf, *complen);
-    my_free(compbuf);
+    my_free(compbuf, MYF(MY_WME));
   }
   else
     *complen= len;
@@ -250,7 +250,7 @@ int unpackfrm(uchar **unpack_data, size_t *unpack_len,
 
    if (my_uncompress(data, complen, &orglen))
    {
-     my_free(data);
+     my_free(data, MYF(0));
      DBUG_RETURN(3);
    }
 

@@ -1,4 +1,4 @@
-/* Copyright (C) 2000 MySQL AB, 2008-2009 Sun Microsystems, Inc
+/* Copyright (C) 2000 MySQL AB
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
   More functions to be used with IO_CACHE files
 */
 
+#define MAP_TO_USE_RAID
 #include "mysys_priv.h"
 #include <m_string.h>
 #include <stdarg.h>
@@ -70,16 +71,6 @@ my_b_copy_to_file(IO_CACHE *cache, FILE *file)
 my_off_t my_b_append_tell(IO_CACHE* info)
 {
   /*
-    Sometimes we want to make sure that the variable is not put into
-    a register in debugging mode so we can see its value in the core
-  */
-#ifndef DBUG_OFF
-# define dbug_volatile volatile
-#else
-# define dbug_volatile
-#endif
-
-  /*
     Prevent optimizer from putting res in a register when debugging
     we need this to be able to see the value of res when the assert fails
   */
@@ -90,8 +81,9 @@ my_off_t my_b_append_tell(IO_CACHE* info)
     from messing with the variables that we need in order to provide the
     answer to the question.
   */
-  mysql_mutex_lock(&info->append_buffer_lock);
-
+#ifdef THREAD
+  pthread_mutex_lock(&info->append_buffer_lock);
+#endif
 #ifndef DBUG_OFF
   /*
     Make sure EOF is where we think it is. Note that we cannot just use
@@ -111,7 +103,9 @@ my_off_t my_b_append_tell(IO_CACHE* info)
   }
 #endif  
   res = info->end_of_file + (info->write_pos-info->append_read_pos);
-  mysql_mutex_unlock(&info->append_buffer_lock);
+#ifdef THREAD
+  pthread_mutex_unlock(&info->append_buffer_lock);
+#endif
   return res;
 }
 
@@ -141,7 +135,7 @@ void my_b_seek(IO_CACHE *info,my_off_t pos)
      b) see if there is a better way to make it work
   */
   if (info->type == SEQ_READ_APPEND)
-    (void) flush_io_cache(info);
+    VOID(flush_io_cache(info));
 
   offset=(pos - info->pos_in_file);
 
@@ -169,7 +163,7 @@ void my_b_seek(IO_CACHE *info,my_off_t pos)
       info->write_pos = info->write_buffer + offset;
       DBUG_VOID_RETURN;
     }
-    (void) flush_io_cache(info);
+    VOID(flush_io_cache(info));
     /* Correct buffer end so that we write in increments of IO_SIZE */
     info->write_end=(info->write_buffer+info->buffer_length-
 		     (pos & (IO_SIZE-1)));

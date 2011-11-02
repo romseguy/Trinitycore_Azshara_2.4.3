@@ -1,6 +1,3 @@
-#ifndef SSLOPT_VARS_INCLUDED
-#define SSLOPT_VARS_INCLUDED
-
 /* Copyright (C) 2000 MySQL AB
 
    This program is free software; you can redistribute it and/or modify
@@ -16,7 +13,7 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-#if defined(HAVE_OPENSSL) && !defined(EMBEDDED_LIBRARY)
+#ifdef HAVE_OPENSSL
 #ifdef SSL_VARS_NOT_STATIC
 #define SSL_STATIC
 #else
@@ -32,4 +29,3 @@ SSL_STATIC char *opt_ssl_key    = 0;
 SSL_STATIC my_bool opt_ssl_verify_server_cert= 0;
 #endif
 #endif
-#endif /* SSLOPT_VARS_INCLUDED */

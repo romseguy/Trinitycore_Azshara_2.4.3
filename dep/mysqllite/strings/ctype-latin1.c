@@ -678,12 +678,13 @@ void my_hash_sort_latin1_de(CHARSET_INFO *cs __attribute__((unused)),
 			    const uchar *key, size_t len,
 			    ulong *nr1, ulong *nr2)
 {
-  const uchar *end;
+  const uchar *end= key+len;
   /*
     Remove end space. We have to do this to be able to compare
     'AE' and 'Ä' as identical
   */
-  end= skip_trailing_space(key, len);
+  while (end > key && end[-1] == ' ')
+    end--;
 
   for (; key < end ; key++)
   {

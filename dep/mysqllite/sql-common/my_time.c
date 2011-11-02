@@ -76,7 +76,7 @@ uint calc_days_in_year(uint year)
 */
 
 my_bool check_date(const MYSQL_TIME *ltime, my_bool not_zero_date,
-                   ulonglong flags, int *was_cut)
+                   ulong flags, int *was_cut)
 {
   if (not_zero_date)
   {
@@ -158,7 +158,7 @@ my_bool check_date(const MYSQL_TIME *ltime, my_bool not_zero_date,
 
 enum enum_mysql_timestamp_type
 str_to_datetime(const char *str, uint length, MYSQL_TIME *l_time,
-                ulonglong flags, int *was_cut)
+                uint flags, int *was_cut)
 {
   uint field_length, UNINIT_VAR(year_length), digits, i, number_of_fields;
   uint date[MAX_DATE_PARTS], date_len[MAX_DATE_PARTS];
@@ -1100,7 +1100,7 @@ int my_TIME_to_str(const MYSQL_TIME *l_time, char *to)
 */
 
 longlong number_to_datetime(longlong nr, MYSQL_TIME *time_res,
-                            ulonglong flags, int *was_cut)
+                            uint flags, int *was_cut)
 {
   long part1,part2;
 
@@ -1127,12 +1127,7 @@ longlong number_to_datetime(longlong nr, MYSQL_TIME *time_res,
     nr= (nr+19000000L)*1000000L;                 /* YYMMDD, year: 1970-1999 */
     goto ok;
   }
-  /*
-    Though officially we support DATE values from 1000-01-01 only, one can
-    easily insert a value like 1-1-1. So, for consistency reasons such dates
-    are allowed when TIME_FUZZY_DATE is set.
-  */
-  if (nr < 10000101L && !(flags & TIME_FUZZY_DATE))
+  if (nr < 10000101L)
     goto err;
   if (nr <= 99991231L)
   {

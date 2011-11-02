@@ -113,12 +113,14 @@ int my_is_symlink(const char *filename __attribute__((unused)))
 #endif
 }
 
+
 /*
   Resolve all symbolic links in path
   'to' may be equal to 'filename'
 */
 
-int my_realpath(char *to, const char *filename, myf MyFlags)
+int my_realpath(char *to, const char *filename,
+		myf MyFlags __attribute__((unused)))
 {
 #if defined(HAVE_REALPATH) && !defined(HAVE_BROKEN_REALPATH)
   int result=0;
@@ -145,23 +147,7 @@ int my_realpath(char *to, const char *filename, myf MyFlags)
   }
   DBUG_RETURN(result);
 #else
-#ifdef _WIN32
-  int ret= GetFullPathName(filename,FN_REFLEN,
-                           to,
-                           NULL);
-  if (ret == 0 || ret > FN_REFLEN)
-  {
-    if (ret > FN_REFLEN)
-      my_errno= ENAMETOOLONG;
-    else
-      my_errno= EACCES;
-    if (MyFlags & MY_WME)
-      my_error(EE_REALPATH, MYF(0), filename, my_errno);
-	  return -1;
-  }
-#else
   my_load_path(to, filename, NullS);
-#endif
   return 0;
 #endif
 }

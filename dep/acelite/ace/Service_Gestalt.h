@@ -4,7 +4,7 @@
 /**
  *  @file    Service_Gestalt.h
  *
- *  $Id: Service_Gestalt.h 91626 2010-09-07 10:59:20Z johnnyw $
+ *  $Id: Service_Gestalt.h 91158 2010-07-21 15:54:12Z mesnier_p $
  *
  *  @author Iliyan Jeliazkov <iliyan@ociweb.com>
  */
@@ -67,8 +67,15 @@ class ACE_Svc_Conf_Param;
  * Service Config in particular.
  *
  */
-class ACE_Export ACE_Service_Gestalt : private ACE_Copy_Disabled
+class ACE_Export ACE_Service_Gestalt
 {
+private:
+  ///
+  /// Not implemented to enforce no copying
+  //
+  ACE_UNIMPLEMENTED_FUNC (ACE_Service_Gestalt(const ACE_Service_Gestalt&))
+  ACE_UNIMPLEMENTED_FUNC (ACE_Service_Gestalt& operator=(const ACE_Service_Gestalt&))
+
 public:
   enum
   {
@@ -505,10 +512,8 @@ private:
   size_t repo_begin_;
   ACE_TCHAR const * const name_;
 
-#if defined (ACE_MT_SAFE) && (ACE_MT_SAFE != 0)
-// FUZZ: disable check_for_ACE_Guard
+# if defined (ACE_MT_SAFE) && (ACE_MT_SAFE != 0)
   ACE_Guard< ACE_Recursive_Thread_Mutex > repo_monitor_;
-// FUZZ: enable check_for_ACE_Guard
 #endif
 };
 

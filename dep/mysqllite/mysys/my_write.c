@@ -20,14 +20,14 @@
 
 	/* Write a chunk of bytes to a file */
 
-size_t my_write(File Filedes, const uchar *Buffer, size_t Count, myf MyFlags)
+size_t my_write(int Filedes, const uchar *Buffer, size_t Count, myf MyFlags)
 {
-  size_t writtenbytes, written;
+  size_t writenbytes, written;
   uint errors;
   DBUG_ENTER("my_write");
-  DBUG_PRINT("my",("fd: %d  Buffer: %p  Count: %lu  MyFlags: %d",
-		   Filedes, Buffer, (ulong) Count, MyFlags));
-  errors= 0; written= 0;
+  DBUG_PRINT("my",("Fd: %d  Buffer: 0x%lx  Count: %lu  MyFlags: %d",
+		   Filedes, (long) Buffer, (ulong) Count, MyFlags));
+  errors=0; written=0;
 
   /* The behavior of write(fd, buf, 0) is not portable */
   if (unlikely(!Count))
@@ -35,26 +35,22 @@ size_t my_write(File Filedes, const uchar *Buffer, size_t Count, myf MyFlags)
   
   for (;;)
   {
-#ifdef _WIN32
-    writtenbytes= my_win_write(Filedes, Buffer, Count);
-#else
-    writtenbytes= write(Filedes, Buffer, Count);
-#endif
-    if (writtenbytes == Count)
+    if ((writenbytes= write(Filedes, Buffer, Count)) == Count)
       break;
-    if (writtenbytes != (size_t) -1)
+    if (writenbytes != (size_t) -1)
     {						/* Safeguard */
-      written+= writtenbytes;
-      Buffer+= writtenbytes;
-      Count-= writtenbytes;
+      written+=writenbytes;
+      Buffer+=writenbytes;
+      Count-=writenbytes;
     }
-    my_errno= errno;
+    my_errno=errno;
     DBUG_PRINT("error",("Write only %ld bytes, error: %d",
-			(long) writtenbytes, my_errno));
+			(long) writenbytes, my_errno));
 #ifndef NO_BACKGROUND
+#ifdef THREAD
     if (my_thread_var->abort)
       MyFlags&= ~ MY_WAIT_IF_FULL;		/* End if aborted by user */
-
+#endif
     if ((my_errno == ENOSPC || my_errno == EDQUOT) &&
         (MyFlags & MY_WAIT_IF_FULL))
     {
@@ -63,19 +59,19 @@ size_t my_write(File Filedes, const uchar *Buffer, size_t Count, myf MyFlags)
       continue;
     }
 
-    if ((writtenbytes == 0 || writtenbytes == (size_t) -1))
+    if ((writenbytes == 0 || writenbytes == (size_t) -1))
     {
       if (my_errno == EINTR)
       {
         DBUG_PRINT("debug", ("my_write() was interrupted and returned %ld",
-                             (long) writtenbytes));
+                             (long) writenbytes));
         continue;                               /* Interrupted */
       }
 
-      if (!writtenbytes && !errors++)		/* Retry once */
+      if (!writenbytes && !errors++)		/* Retry once */
       {
         /* We may come here if the file quota is exeeded */
-        errno= EFBIG;				/* Assume this is the error */
+        errno=EFBIG;				/* Assume this is the error */
         continue;
       }
     }
@@ -96,5 +92,5 @@ size_t my_write(File Filedes, const uchar *Buffer, size_t Count, myf MyFlags)
   }
   if (MyFlags & (MY_NABP | MY_FNABP))
     DBUG_RETURN(0);			/* Want only errors */
-  DBUG_RETURN(writtenbytes+written);
+  DBUG_RETURN(writenbytes+written);
 } /* my_write */

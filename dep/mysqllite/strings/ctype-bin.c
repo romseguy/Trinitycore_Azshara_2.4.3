@@ -278,11 +278,14 @@ void my_hash_sort_8bit_bin(CHARSET_INFO *cs __attribute__((unused)),
 {
   const uchar *pos = key;
   
+  key+= len;
+  
   /*
      Remove trailing spaces. We have to do this to be able to compare
     'A ' and 'A' as identical
   */
-  key= skip_trailing_space(key, len);
+  while (key > pos && key[-1] == ' ')
+    key--;
 
   for (; pos < (uchar*) key ; pos++)
   {

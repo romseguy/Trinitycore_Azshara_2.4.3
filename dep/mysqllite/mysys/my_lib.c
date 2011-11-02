@@ -1,4 +1,4 @@
-/* Copyright (C) 2000 MySQL AB, 2008-2009 Sun Microsystems, Inc
+/* Copyright (C) 2000 MySQL AB
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 /* TODO: check for overun of memory for names. */
+/*	 Convert MSDOS-TIME to standar time_t (still needed?) */
 
 #include	"mysys_priv.h"
 #include	<m_string.h>
@@ -34,14 +35,20 @@
 # if defined(HAVE_NDIR_H)
 #  include <ndir.h>
 # endif
-# if defined(_WIN32)
+# if defined(__WIN__)
+# include <dos.h>
 # ifdef __BORLANDC__
 # include <dir.h>
 # endif
 # endif
 #endif
+#ifdef VMS
+#include <rms.h>
+#include <iodef.h>
+#include <descrip.h>
+#endif
 
-#if defined(HAVE_READDIR_R)
+#if defined(THREAD) && defined(HAVE_READDIR_R)
 #define READDIR(A,B,C) ((errno=readdir_r(A,B,&C)) != 0 || !C)
 #else
 #define READDIR(A,B,C) (!(C=readdir(A)))
@@ -71,7 +78,7 @@ void my_dirend(MY_DIR *buffer)
                                     ALIGN_SIZE(sizeof(MY_DIR))));
     free_root((MEM_ROOT*)((char*)buffer + ALIGN_SIZE(sizeof(MY_DIR)) + 
                           ALIGN_SIZE(sizeof(DYNAMIC_ARRAY))), MYF(0));
-    my_free(buffer);
+    my_free((uchar*) buffer,MYF(0));
   }
   DBUG_VOID_RETURN;
 } /* my_dirend */
@@ -85,7 +92,7 @@ static int comp_names(struct fileinfo *a, struct fileinfo *b)
 } /* comp_names */
 
 
-#if !defined(_WIN32)
+#if !defined(__WIN__)
 
 MY_DIR	*my_dir(const char *path, myf MyFlags)
 {
@@ -97,13 +104,14 @@ MY_DIR	*my_dir(const char *path, myf MyFlags)
   DIR		*dirp;
   struct dirent *dp;
   char		tmp_path[FN_REFLEN+1],*tmp_file;
+#ifdef THREAD
   char	dirent_tmp[sizeof(struct dirent)+_POSIX_PATH_MAX+1];
-
+#endif
   DBUG_ENTER("my_dir");
   DBUG_PRINT("my",("path: '%s' MyFlags: %d",path,MyFlags));
 
-#if !defined(HAVE_READDIR_R)
-  mysql_mutex_lock(&THR_LOCK_open);
+#if defined(THREAD) && !defined(HAVE_READDIR_R)
+  pthread_mutex_lock(&THR_LOCK_open);
 #endif
 
   dirp = opendir(directory_file_name(tmp_path,(char *) path));
@@ -124,7 +132,7 @@ MY_DIR	*my_dir(const char *path, myf MyFlags)
   if (my_init_dynamic_array(dir_entries_storage, sizeof(FILEINFO),
                             ENTRIES_START_SIZE, ENTRIES_INCREMENT))
   {
-    my_free(buffer);
+    my_free((uchar*) buffer,MYF(0));
     goto error;
   }
   init_alloc_root(names_storage, NAMES_START_SIZE, NAMES_START_SIZE);
@@ -134,7 +142,11 @@ MY_DIR	*my_dir(const char *path, myf MyFlags)
 
   tmp_file=strend(tmp_path);
 
+#ifdef THREAD
   dp= (struct dirent*) dirent_tmp;
+#else
+  dp=0;
+#endif
   
   while (!(READDIR(dirp,(struct dirent*) dirent_tmp,dp)))
   {
@@ -148,8 +160,8 @@ MY_DIR	*my_dir(const char *path, myf MyFlags)
         goto error;
       
       bzero(finfo.mystat, sizeof(MY_STAT));
-      (void) strmov(tmp_file,dp->d_name);
-      (void) my_stat(tmp_path, finfo.mystat, MyFlags);
+      VOID(strmov(tmp_file,dp->d_name));
+      VOID(my_stat(tmp_path, finfo.mystat, MyFlags));
       if (!(finfo.mystat->st_mode & MY_S_IREAD))
         continue;
     }
@@ -161,8 +173,8 @@ MY_DIR	*my_dir(const char *path, myf MyFlags)
   }
 
   (void) closedir(dirp);
-#if !defined(HAVE_READDIR_R)
-  mysql_mutex_unlock(&THR_LOCK_open);
+#if defined(THREAD) && !defined(HAVE_READDIR_R)
+  pthread_mutex_unlock(&THR_LOCK_open);
 #endif
   result->dir_entry= (FILEINFO *)dir_entries_storage->buffer;
   result->number_off_files= dir_entries_storage->elements;
@@ -173,8 +185,8 @@ MY_DIR	*my_dir(const char *path, myf MyFlags)
   DBUG_RETURN(result);
 
  error:
-#if !defined(HAVE_READDIR_R)
-  mysql_mutex_unlock(&THR_LOCK_open);
+#if defined(THREAD) && !defined(HAVE_READDIR_R)
+  pthread_mutex_unlock(&THR_LOCK_open);
 #endif
   my_errno=errno;
   if (dirp)
@@ -188,6 +200,9 @@ MY_DIR	*my_dir(const char *path, myf MyFlags)
 
 /*
  * Convert from directory name to filename.
+ * On VMS:
+ *	 xyzzy:[mukesh.emacs] => xyzzy:[mukesh]emacs.dir.1
+ *	 xyzzy:[mukesh] => xyzzy:[000000]mukesh.dir.1
  * On UNIX, it's simple: just make sure there is a terminating /
 
  * Returns pointer to dst;
@@ -195,8 +210,11 @@ MY_DIR	*my_dir(const char *path, myf MyFlags)
 
 char * directory_file_name (char * dst, const char *src)
 {
+#ifndef VMS
+
   /* Process as Unix format: just remove test the final slash. */
-  char *end;
+
+  char * end;
 
   if (src[0] == 0)
     src= (char*) ".";				/* Use empty as current */
@@ -207,7 +225,125 @@ char * directory_file_name (char * dst, const char *src)
     end[1]='\0';
   }
   return dst;
-}
+
+#else	/* VMS */
+
+  long slen;
+  long rlen;
+  char * ptr, rptr;
+  char bracket;
+  struct FAB fab = cc$rms_fab;
+  struct NAM nam = cc$rms_nam;
+  char esa[NAM$C_MAXRSS];
+
+  if (! src[0])
+    src="[.]";					/* Empty is == current dir */
+
+  slen = strlen (src) - 1;
+  if (src[slen] == FN_C_AFTER_DIR || src[slen] == FN_C_AFTER_DIR_2 ||
+      src[slen] == FN_DEVCHAR)
+  {
+	/* VMS style - convert [x.y.z] to [x.y]z, [x] to [000000]x */
+    fab.fab$l_fna = src;
+    fab.fab$b_fns = slen + 1;
+    fab.fab$l_nam = &nam;
+    fab.fab$l_fop = FAB$M_NAM;
+
+    nam.nam$l_esa = esa;
+    nam.nam$b_ess = sizeof esa;
+    nam.nam$b_nop |= NAM$M_SYNCHK;
+
+    /* We call SYS$PARSE to handle such things as [--] for us. */
+    if (SYS$PARSE(&fab, 0, 0) == RMS$_NORMAL)
+    {
+      slen = nam.nam$b_esl - 1;
+      if (esa[slen] == ';' && esa[slen - 1] == '.')
+	slen -= 2;
+      esa[slen + 1] = '\0';
+      src = esa;
+    }
+    if (src[slen] != FN_C_AFTER_DIR && src[slen] != FN_C_AFTER_DIR_2)
+    {
+	/* what about when we have logical_name:???? */
+      if (src[slen] == FN_DEVCHAR)
+      {				/* Xlate logical name and see what we get */
+	VOID(strmov(dst,src));
+	dst[slen] = 0;				/* remove colon */
+	if (!(src = getenv (dst)))
+	  return dst;				/* Can't translate */
+
+	/* should we jump to the beginning of this procedure?
+	   Good points: allows us to use logical names that xlate
+	   to Unix names,
+	   Bad points: can be a problem if we just translated to a device
+	   name...
+	   For now, I'll punt and always expect VMS names, and hope for
+	   the best! */
+
+	slen = strlen (src) - 1;
+	if (src[slen] != FN_C_AFTER_DIR && src[slen] != FN_C_AFTER_DIR_2)
+	{					/* no recursion here! */
+	  VOID(strmov(dst, src));
+	  return(dst);
+	}
+      }
+      else
+      {						/* not a directory spec */
+	VOID(strmov(dst, src));
+	return(dst);
+      }
+    }
+
+    bracket = src[slen];			/* End char */
+    if (!(ptr = strchr (src, bracket - 2)))
+    {						/* no opening bracket */
+      VOID(strmov (dst, src));
+      return dst;
+    }
+    if (!(rptr = strrchr (src, '.')))
+      rptr = ptr;
+    slen = rptr - src;
+    VOID(strmake (dst, src, slen));
+
+    if (*rptr == '.')
+    {						/* Put bracket and add */
+      dst[slen++] = bracket;			/* (rptr+1) after this */
+    }
+    else
+    {
+      /* If we have the top-level of a rooted directory (i.e. xx:[000000]),
+	 then translate the device and recurse. */
+
+      if (dst[slen - 1] == ':'
+	  && dst[slen - 2] != ':' 	/* skip decnet nodes */
+	  && strcmp(src + slen, "[000000]") == 0)
+      {
+	dst[slen - 1] = '\0';
+	if ((ptr = getenv (dst))
+	    && (rlen = strlen (ptr) - 1) > 0
+	    && (ptr[rlen] == FN_C_AFTER_DIR || ptr[rlen] == FN_C_AFTER_DIR_2)
+	    && ptr[rlen - 1] == '.')
+	{
+	  VOID(strmov(esa,ptr));
+	  esa[rlen - 1] = FN_C_AFTER_DIR;
+	  esa[rlen] = '\0';
+	  return (directory_file_name (dst, esa));
+	}
+	else
+	  dst[slen - 1] = ':';
+      }
+      VOID(strmov(dst+slen,"[000000]"));
+      slen += 8;
+    }
+    VOID(strmov(strmov(dst+slen,rptr+1)-1,".DIR.1"));
+    return dst;
+  }
+  VOID(strmov(dst, src));
+  if (dst[slen] == '/' && slen > 1)
+    dst[slen] = 0;
+  return dst;
+#endif	/* VMS */
+} /* directory_file_name */
 
 #else
 
@@ -265,7 +401,7 @@ MY_DIR	*my_dir(const char *path, myf MyFlags)
   if (my_init_dynamic_array(dir_entries_storage, sizeof(FILEINFO),
                             ENTRIES_START_SIZE, ENTRIES_INCREMENT))
   {
-    my_free(buffer);
+    my_free((uchar*) buffer,MYF(0));
     goto error;
   }
   init_alloc_root(names_storage, NAMES_START_SIZE, NAMES_START_SIZE);
@@ -371,24 +507,19 @@ error:
   DBUG_RETURN((MY_DIR *) NULL);
 } /* my_dir */
 
-#endif /* _WIN32 */
+#endif /* __WIN__ */
 
 /****************************************************************************
 ** File status
 ** Note that MY_STAT is assumed to be same as struct stat
 ****************************************************************************/ 
 
-
-int my_fstat(File Filedes, MY_STAT *stat_area,
+int my_fstat(int Filedes, MY_STAT *stat_area,
              myf MyFlags __attribute__((unused)))
 {
   DBUG_ENTER("my_fstat");
   DBUG_PRINT("my",("fd: %d  MyFlags: %d", Filedes, MyFlags));
-#ifdef _WIN32
-  DBUG_RETURN(my_win_fstat(Filedes, stat_area));
-#else
   DBUG_RETURN(fstat(Filedes, (struct stat *) stat_area));
-#endif
 }
 
 
@@ -400,19 +531,15 @@ MY_STAT *my_stat(const char *path, MY_STAT *stat_area, myf my_flags)
                     (long) stat_area, my_flags));
 
   if ((m_used= (stat_area == NULL)))
-    if (!(stat_area= (MY_STAT *) my_malloc(sizeof(MY_STAT), my_flags)))
+    if (!(stat_area = (MY_STAT *) my_malloc(sizeof(MY_STAT), my_flags)))
       goto error;
-#ifndef _WIN32
-    if (! stat((char *) path, (struct stat *) stat_area) )
-      DBUG_RETURN(stat_area);
-#else
-    if (! my_win_stat(path, stat_area) )
-      DBUG_RETURN(stat_area);
-#endif
+  if (! stat((char *) path, (struct stat *) stat_area) )
+    DBUG_RETURN(stat_area);
+
   DBUG_PRINT("error",("Got errno: %d from stat", errno));
   my_errno= errno;
   if (m_used)					/* Free if new area */
-    my_free(stat_area);
+    my_free((uchar*) stat_area,MYF(0));
 
 error:
   if (my_flags & (MY_FAE+MY_WME))
