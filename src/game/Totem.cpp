@@ -114,6 +114,7 @@ void Totem::InitSummon()
     {       
         case 5923: CastSpell(this, 8168, true); break; // Poison Cleansing
         case 5924: CastSpell(this, 8171, true); break; // Disease Cleansing
+		case 2630: CastSpell(this, 3600, true); break; // Earthbind
             default:
         break;
     }       
