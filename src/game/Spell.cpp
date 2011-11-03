@@ -2775,6 +2775,7 @@ void Spell::finish(bool ok)
         if (Unit *target = m_targets.getUnitTarget())
             if (m_spellInfo->Mechanic == MECHANIC_CHARM && target->HasAuraType(SPELL_AURA_REFLECT_SPELLS))
                 target->RemoveAuraTypeByCaster(SPELL_AURA_REFLECT_SPELLS, target->GetGUID());
+				m_caster->RemoveAurasDueToSpell(10912);
     }
 
     // Okay to remove extra attacks
