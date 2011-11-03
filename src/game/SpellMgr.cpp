@@ -2586,6 +2586,7 @@ void SpellMgr::LoadSpellCustomAttr()
 			break;
         case 38699:
             spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+            spellInfo->Attributes &= ~SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY;
             break;
 		case 1787:
 		case 1786:
