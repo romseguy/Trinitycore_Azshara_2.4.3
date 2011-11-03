@@ -6481,8 +6481,12 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const *
 		
 		if(summon->GetEntry() == 19668)
 		{
-			Unit *newTarget = summon->SelectNearestTarget(100);
-			summon->Attack(newTarget,true);
+			Unit *newTarget = summon->SelectNearestTarget(30);
+			if(newTarget)
+			{
+				summon->Attack(newTarget,true);
+				summon->GetMotionMaster()->MoveFollow(newTarget,PET_FOLLOW_DIST,summon->GetFollowAngle());
+			}
 		}
     }
 }
