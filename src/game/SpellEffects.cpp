@@ -1513,7 +1513,7 @@ void Spell::EffectDummy(uint32 i)
                             sLog.outError("Spell::EffectDummy: Spell 28598 triggered by unhandled spell %u",m_triggeredByAuraSpell->Id);
                             return;
                     }
-                    m_caster->CastSpell(unitTarget, spellid, true, NULL);
+                    unitTarget->CastSpell(unitTarget, spellid, true, NULL);
                     return;
                 }
             }
