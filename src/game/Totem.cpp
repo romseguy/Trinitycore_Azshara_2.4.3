@@ -115,6 +115,16 @@ void Totem::InitSummon()
         case 5923: CastSpell(this, 8168, true); break; // Poison Cleansing
         case 5924: CastSpell(this, 8171, true); break; // Disease Cleansing
 		case 2630: CastSpell(this, 3600, true); break; // Earthbind
+		case 6112: CastSpell(this, 8514, true); break; // Windfury I
+		case 7483: CastSpell(this, 10607, true); break; // Windfury II
+		case 7484: CastSpell(this, 10611, true); break; // Windfury III
+		case 15496: CastSpell(this, 25581, true); break; // Windfury IV
+		case 15497: CastSpell(this, 25580, true); break; // Windfury V
+		case 5950: CastSpell(this, 8230, true); break; // Flametongue I
+		case 6012: CastSpell(this, 8250, true); break; // Flametongue II
+		case 7423: CastSpell(this, 10521, true); break; // Flametongue III
+		case 10557: CastSpell(this, 15036, true); break; // Flametongue IV
+		case 15485: CastSpell(this, 25554, true); break; // Flametongue V
             default:
         break;
     }       
