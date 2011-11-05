@@ -129,6 +129,14 @@ dtPolyRef PathInfo::getPathPolyByPosition(const dtPolyRef *polyPath, uint32 poly
     for (uint32 i = 0; i < polyPathSize; ++i)
     {
         ASSERT(polyPath[i] != INVALID_POLYREF);
+		
+        const dtMeshTile* tile = 0;
+        const dtPoly* poly = 0;
+        if (m_navMesh->getTileAndPolyByRef(polyPath[i], &tile, &poly) != DT_SUCCESS)
+            continue;
+
+        if (poly->getType() == DT_POLYTYPE_OFFMESH_CONNECTION)
+            continue;
 
         float closestPoint[VERTEX_SIZE];
         if (DT_SUCCESS != m_navMeshQuery->closestPointOnPoly(polyPath[i], point, closestPoint))
