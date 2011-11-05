@@ -5324,6 +5324,18 @@ void Player::SetSkill(uint32 id, uint16 currVal, uint16 maxVal)
             SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(i),MAKE_SKILL_VALUE(currVal,maxVal));
         else                                                //remove
         {
+            if (m_nextProfessionReset > time(NULL))
+            {
+                time_t rawtime = time_t(m_nextProfessionReset);
+                struct tm *timeinfo = localtime(&rawtime);
+                char buffer [80];
+                strftime(buffer, 80, "Prochain oubli possible : %d/%m %H:%M", timeinfo);
+
+                GetSession()->SendNotification("Vous ne pouvez oublier qu'un seul metier par semaine.");
+                ChatHandler(this).PSendSysMessage(buffer);
+                return;
+            }
+
             // clear skill fields
             SetUInt32Value(PLAYER_SKILL_INDEX(i),0);
             SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(i),0);
@@ -5350,6 +5362,10 @@ void Player::SetSkill(uint32 id, uint16 currVal, uint16 maxVal)
                     }
                 }
             }
+
+            uint32 nextProfessionReset = time(NULL) + 3600*24*7;
+            CharacterDatabase.PExecute("UPDATE characters SET nextProfessionReset = %u WHERE guid = %u", nextProfessionReset, GetGUIDLow());
+            m_nextProfessionReset = nextProfessionReset;
         }
     }
     else if (currVal)                                        //add
@@ -14667,8 +14683,8 @@ bool Player::LoadFromDB(uint32 guid, SqlQueryHolder *holder)
     //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty,"
     // 39           40                41                42                    43          44          45              46           47               48              49
     //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk,"
-    // 50      51         52         53          54           55             56
-    //"health, powerMana, powerRage, powerFocus, powerEnergy, powerHapiness, instance_id FROM characters WHERE guid = '%u'", guid);
+    // 50      51         52         53          54           55             56           57
+    //"health, powerMana, powerRage, powerFocus, powerEnergy, powerHapiness, instance_id, nextProfessionReset FROM characters WHERE guid = '%u'", guid);
     QueryResult_AutoPtr result = holder->GetResult(PLAYER_LOGIN_QUERY_LOADFROM);
 
     if (!result)
@@ -15048,6 +15064,7 @@ bool Player::LoadFromDB(uint32 guid, SqlQueryHolder *holder)
 
     m_resetTalentsCost = fields[25].GetUInt32();
     m_resetTalentsTime = time_t(fields[26].GetUInt64());
+    m_nextProfessionReset = fields[57].GetUInt32();
 
     // reserve some flags
     uint32 old_safe_flags = GetUInt32Value(PLAYER_FLAGS) & (PLAYER_FLAGS_HIDE_CLOAK | PLAYER_FLAGS_HIDE_HELM);
@@ -16317,7 +16334,7 @@ void Player::SaveToDB()
         "trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, "
         "death_expire_time, taxi_path, arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, "
         "totalKills, todayKills, yesterdayKills, chosenTitle, watchedFaction, drunk, health, "
-        "powerMana, powerRage, powerFocus, powerEnergy, powerHappiness, latency) VALUES ("
+        "powerMana, powerRage, powerFocus, powerEnergy, powerHappiness, latency, nextProfessionReset) VALUES ("
         << GetGUIDLow() << ", "
         << GetSession()->GetAccountId() << ", '"
         << sql_name << "', "
@@ -16424,7 +16441,8 @@ void Player::SaveToDB()
         ss << ", " << GetPower(Powers(i));
     ss << ", '";
 
-    ss << GetSession()->GetLatency();
+    ss << GetSession()->GetLatency() << "', '";
+    ss << m_nextProfessionReset;
     ss << "')";
 
     CharacterDatabase.BeginTransaction();

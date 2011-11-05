@@ -2318,6 +2318,7 @@ class Player : public Unit, public GridObject<Player>
         uint32 m_resetTalentsCost;
         time_t m_resetTalentsTime;
         uint32 m_usedTalentCount;
+        uint32 m_nextProfessionReset;
 
         // Social
         PlayerSocial *m_social;
