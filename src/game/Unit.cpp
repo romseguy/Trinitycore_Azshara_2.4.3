@@ -4331,7 +4331,7 @@ void Unit::RemoveNegativeAuras()
 {
     for (AuraMap::iterator iter = m_Auras.begin(); iter != m_Auras.end();)
     {
-        if (!iter->second->IsPositive() || iter->second->GetId() == 25228)  
+        if (!iter->second->IsPositive() || iter->second->GetId() == 25228 || iter->second->GetId() == 28509)  
             RemoveAura(iter);
         else
             ++iter;
