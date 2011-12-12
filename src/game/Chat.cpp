@@ -683,6 +683,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "playall",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandlePlayAllCommand,             "", NULL },
         { "repairitems",    SEC_GAMEMASTER,     false, &ChatHandler::HandleRepairitemsCommand,         "", NULL },
         { "freeze",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleFreezeCommand,              "", NULL },
+		{ "ready",			SEC_PLAYER,         false, &ChatHandler::HandleReadyCommand,               "", NULL },
         { "unfreeze",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleUnFreezeCommand,            "", NULL },
         { "listfreeze",     SEC_ADMINISTRATOR,  false, &ChatHandler::HandleListFreezeCommand,          "", NULL },
         { "possess",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandlePossessCommand,             "", NULL },

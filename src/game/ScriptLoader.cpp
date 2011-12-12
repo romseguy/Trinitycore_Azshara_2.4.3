@@ -8,13 +8,15 @@
  */
 
 #include "ScriptPCH.h"
-
 #ifdef SCRIPTS
 
 //examples
 //void AddSC_custom_example();
 //void AddSC_custom_gossip_codebox();
 //void AddSC_test();
+
+//void AddSC_ArenaSpectator();
+void AddSC_npc_arenaspectate();
 
 //world
 void AddSC_areatrigger_scripts();
@@ -29,7 +31,6 @@ void AddSC_npc_professions();
 void AddSC_npc_innkeeper();
 void AddSC_npcs_special();
 void AddSC_npc_taxi();
-void AddSC_npc_profession();
 
 //eastern kingdoms
 void AddSC_alterac_valley();                 //Alterac Valley
@@ -382,10 +383,8 @@ void AddScripts()
 {
 #ifdef SCRIPTS
 
-//    AddSC_custom_example();
-//    AddSC_custom_gossip_codebox();
-//    AddSC_test();
 //      AddSC_ArenaSpectator();
+      AddSC_npc_arenaspectate();
 
     AddSC_areatrigger_scripts();
     AddSC_boss_emeriss();
@@ -399,7 +398,6 @@ void AddScripts()
     AddSC_npc_innkeeper();
     AddSC_npcs_special();
     AddSC_npc_taxi();
-    AddSC_npc_profession();
 
     //eastern kingdoms
     AddSC_alterac_valley();                 //Alterac Valley

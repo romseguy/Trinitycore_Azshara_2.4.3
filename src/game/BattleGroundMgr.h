@@ -190,6 +190,7 @@ class BattleGroundMgr
 
         /* Battlegrounds */
         BattleGroundSet::iterator GetBattleGroundsBegin() { return m_BattleGrounds.begin(); };
+        uint32 GetBattleGroundsCount() { return m_BattleGrounds.size(); };
         BattleGroundSet::iterator GetBattleGroundsEnd() { return m_BattleGrounds.end(); };
 
         BattleGround* GetBattleGround(uint32 InstanceID)

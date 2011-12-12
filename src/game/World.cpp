@@ -554,6 +554,8 @@ void World::LoadConfigSettings(bool reload)
     m_configs[CONFIG_GRID_UNLOAD] = sConfig.GetBoolDefault("GridUnload", true);
     m_configs[CONFIG_INTERVAL_SAVE] = sConfig.GetIntDefault("PlayerSaveInterval", 900000);
     m_configs[CONFIG_INTERVAL_DISCONNECT_TOLERANCE] = sConfig.GetIntDefault("DisconnectToleranceInterval", 0);
+	
+	m_configs[CONFIG_ARENA_SPECTATOR_UPDATES] = sConfig.GetBoolDefault("ArenaSpectatorUpdates", false); // add value to config file
 
     m_configs[CONFIG_INTERVAL_GRIDCLEAN] = sConfig.GetIntDefault("GridCleanUpDelay", 300000);
     if (m_configs[CONFIG_INTERVAL_GRIDCLEAN] < MIN_GRID_DELAY)

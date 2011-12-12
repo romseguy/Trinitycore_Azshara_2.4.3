@@ -154,6 +154,9 @@ BattleGround::BattleGround()
     m_MapId             = 0;
     m_Map               = NULL;
 
+    m_TeamOneReadyCount = 0;
+	m_TeamTwoReadyCount = 0;
+
     m_TeamStartLocX[BG_TEAM_ALLIANCE]   = 0;
     m_TeamStartLocX[BG_TEAM_HORDE]      = 0;
 
@@ -1097,6 +1100,17 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
 			//plr->setFactionForRace(plr->getRace());
             plr->TeleportToBGEntryPoint();
 		}
+        if(plr->m_isArenaSpectator == true)
+        {
+            plr->m_isArenaSpectator = false;
+            plr->UpdateSpeed(MOVE_RUN,true);
+            plr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
+            plr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+            plr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            WorldPacket status;
+            sBattleGroundMgr.BuildBattleGroundStatusPacket(&status, NULL, 0, 0, STATUS_NONE, 0, 0, 0, 0);
+            plr->GetSession()->SendPacket(&status); // remove minimap PvP icon
+        }
         sLog.outDetail("BATTLEGROUND: Removed player %s from BattleGround.", plr->GetName());
     }
 
@@ -1181,6 +1195,7 @@ void BattleGround::AddPlayer(Player *plr)
     // add arena specific auras
     if (isArena())
     {
+		ChatHandler(plr).PSendSysMessage("Tapez .ready pour commencer le match plus tot !");
         plr->RemoveArenaSpellCooldowns();
         plr->RemoveArenaAuras();
         plr->RemoveAllEnchantments(TEMP_ENCHANTMENT_SLOT, true);
@@ -1803,7 +1818,7 @@ void BattleGround::PlayerRelogin(uint64 guid)
 {
     if (GetStatus() != STATUS_WAIT_LEAVE)
         return;
-
+	
     Player *plr = objmgr.GetPlayer(guid);
     if (!plr)
     {
@@ -1811,16 +1826,17 @@ void BattleGround::PlayerRelogin(uint64 guid)
         return;
     }
 
-    WorldPacket data;
-    uint32 bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType());
+	WorldPacket data;
+	uint32 bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType());
 
-    BlockMovement(plr);
+	BlockMovement(plr);
+	sBattleGroundMgr.BuildPvpLogDataPacket(&data, this);
+	plr->GetSession()->SendPacket(&data);
 
-    sBattleGroundMgr.BuildPvpLogDataPacket(&data, this);
-    plr->GetSession()->SendPacket(&data);
+	sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, this, plr->GetBGTeam(), plr->GetBattleGroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, TIME_TO_AUTOREMOVE, GetStartTime());
+	plr->GetSession()->SendPacket(&data);
 
-    sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, this, plr->GetTeam(), plr->GetBattleGroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, TIME_TO_AUTOREMOVE, GetStartTime());
-    plr->GetSession()->SendPacket(&data);
+
 }
 
 uint32 BattleGround::GetAlivePlayersCountByTeam(uint32 Team) const

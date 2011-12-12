@@ -1744,8 +1744,9 @@ void BattleGroundMgr::SendToBattleGround(Player *pl, uint32 instanceId)
 		if (team == 0)
 		    team = pl->GetTeam();
 		bg->GetTeamStartLoc(team, x, y, z, O);
-		
-		pl->ClearComboPoints();
+
+	    pl->ClearComboPoints();
+        pl->m_usedReady = false;
 
 		sLog.outDetail("BATTLEGROUND: Sending %s to map %u, X %f, Y %f, Z %f, O %f", pl->GetName(), mapid, x, y, z, O);
 		pl->TeleportTo(mapid, x, y, z, O);

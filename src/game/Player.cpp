@@ -126,7 +126,7 @@ enum CharacterFlags
 #define DEATH_EXPIRE_STEP (5*MINUTE)
 #define MAX_DEATH_COUNT 3
 
-static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
+static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 15, 15, 15 };
 
 //== PlayerTaxi ================================================
 
@@ -258,6 +258,9 @@ UpdateMask Player::updateVisualBits;
 
 Player::Player (WorldSession *session): Unit()
 {
+    m_usedReady = false;
+    m_isArenaSpectator = false;
+
     m_transport = 0;
 
     m_speakTime = 0;
@@ -293,6 +296,7 @@ Player::Player (WorldSession *session): Unit()
     m_zoneUpdateTimer = 0;
 
     m_areaUpdateId = 0;
+	m_arenaSpectatorFlags = 0;
 
     m_nextSave = sWorld.getConfig(CONFIG_INTERVAL_SAVE);
 
@@ -1254,7 +1258,7 @@ void Player::Update(uint32 p_time)
         else
             m_zoneUpdateTimer -= p_time;
     }
-	
+
 	if (m_invisibilityUpdateTimer > 0)
 	{
 		if (p_time >= m_invisibilityUpdateTimer)
@@ -1346,6 +1350,8 @@ void Player::Update(uint32 p_time)
     // group update
     SendUpdateToOutOfRangeGroupMembers();
 
+    BuildArenaSpectatorUpdate();
+
     Pet* pet = GetPet();
     if (pet && !pet->IsWithinDistInMap(this, GetMap()->GetVisibilityDistance()) && !pet->isPossessed())
         RemovePet(pet, PET_SAVE_NOT_IN_SLOT, true);
@@ -1357,6 +1363,8 @@ void Player::Update(uint32 p_time)
 void Player::setDeathState(DeathState s)
 {
     uint32 ressSpellId = 0;
+
+	m_arenaSpectatorFlags |= ARENASPEC_STATUS;
 
     bool cur = isAlive();
 
@@ -3450,7 +3458,7 @@ bool Player::resetTalents(bool no_cost)
                 // unlearn if first rank is talent or learned by talent
                 if (itrFirstId == talentInfo->RankID[j] || spellmgr.IsSpellLearnToSpell(talentInfo->RankID[j],itrFirstId))
                 {
-					RemoveArenaAuras(); // Combustion fix
+                    RemoveArenaAuras(); // Combustion fix
                     removeSpell(itr->first,!IsPassiveSpell(itr->first));
                     itr = GetSpellMap().begin();
                     continue;
@@ -5324,17 +5332,17 @@ void Player::SetSkill(uint32 id, uint16 currVal, uint16 maxVal)
             SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(i),MAKE_SKILL_VALUE(currVal,maxVal));
         else                                                //remove
         {
-            if (m_nextProfessionReset > time(NULL))
-            {
-                time_t rawtime = time_t(m_nextProfessionReset);
-                struct tm *timeinfo = localtime(&rawtime);
-                char buffer [80];
-                strftime(buffer, 80, "Prochain oubli possible : %d/%m %H:%M", timeinfo);
+           if (m_nextProfessionReset > time(NULL))
+           {
+               time_t rawtime = time_t(m_nextProfessionReset);
+               struct tm *timeinfo = localtime(&rawtime);
+               char buffer [80];
+               strftime(buffer, 80, "Prochain oubli possible : %d/%m %H:%M", timeinfo);
 
-                GetSession()->SendNotification("Vous ne pouvez oublier qu'un seul metier par semaine.");
-                ChatHandler(this).PSendSysMessage(buffer);
-                return;
-            }
+               GetSession()->SendNotification("Vous ne pouvez oublier qu'un seul metier par semaine.");
+               ChatHandler(this).PSendSysMessage(buffer);
+               return;
+           }
 
             // clear skill fields
             SetUInt32Value(PLAYER_SKILL_INDEX(i),0);
@@ -5362,7 +5370,6 @@ void Player::SetSkill(uint32 id, uint16 currVal, uint16 maxVal)
                     }
                 }
             }
-
             uint32 nextProfessionReset = time(NULL) + 3600*24*7;
             CharacterDatabase.PExecute("UPDATE characters SET nextProfessionReset = %u WHERE guid = %u", nextProfessionReset, GetGUIDLow());
             m_nextProfessionReset = nextProfessionReset;
@@ -7399,11 +7406,11 @@ void Player::CastItemCombatSpell(Unit *target, WeaponAttackType attType, uint32 
             if(spellData.SpellId == 34510)
                 chance = 2.5f;
 
+            if(spellData.SpellId == 36070)
+                chance = 2.5f;
+
             if(spellData.SpellId == 15600)
                 chance = 1.0f;
-				
-			if(spellData.SpellId == 36070) //Rod of the Sun King fix
-			chance = 4.5f;
 
             if (roll_chance_f(chance))
                 CastSpell(target, spellInfo->Id, true, item);
@@ -10795,7 +10802,7 @@ Item* Player::EquipItem(uint16 pos, Item *pItem, bool update)
 
             _ApplyItemMods(pItem, slot, true);
 
-           if (pProto && isInCombat() && (pProto->Class == ITEM_CLASS_WEAPON) || (pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer == 0)
+            if (pProto && isInCombat() && (pProto->Class == ITEM_CLASS_WEAPON) || (pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer == 0)
             {
                 uint32 cooldownSpell = SPELL_ID_WEAPON_SWITCH_COOLDOWN_1_5s;
 
@@ -14683,7 +14690,7 @@ bool Player::LoadFromDB(uint32 guid, SqlQueryHolder *holder)
     //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty,"
     // 39           40                41                42                    43          44          45              46           47               48              49
     //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk,"
-    // 50      51         52         53          54           55             56           57
+	// 50      51         52         53          54           55             56           57
     //"health, powerMana, powerRage, powerFocus, powerEnergy, powerHapiness, instance_id, nextProfessionReset FROM characters WHERE guid = '%u'", guid);
     QueryResult_AutoPtr result = holder->GetResult(PLAYER_LOGIN_QUERY_LOADFROM);
 
@@ -15064,7 +15071,7 @@ bool Player::LoadFromDB(uint32 guid, SqlQueryHolder *holder)
 
     m_resetTalentsCost = fields[25].GetUInt32();
     m_resetTalentsTime = time_t(fields[26].GetUInt64());
-    m_nextProfessionReset = fields[57].GetUInt32();
+	m_nextProfessionReset = fields[57].GetUInt32();
 
     // reserve some flags
     uint32 old_safe_flags = GetUInt32Value(PLAYER_FLAGS) & (PLAYER_FLAGS_HIDE_CLOAK | PLAYER_FLAGS_HIDE_HELM);
@@ -16470,7 +16477,7 @@ void Player::SaveToDB()
     SetUInt32Value(UNIT_FIELD_BYTES_1, tmp_bytes);
     SetUInt32Value(UNIT_FIELD_BYTES_2, tmp_bytes2);
     SetUInt32Value(UNIT_FIELD_FLAGS, tmp_flags);
-    SetUInt32Value(PLAYER_FLAGS, tmp_pflags);	
+    SetUInt32Value(PLAYER_FLAGS, tmp_pflags);
 
     // save pet (hunter pet level and experience and all type pets health/mana).
     if (Pet* pet = GetPet())
@@ -18675,16 +18682,19 @@ void Player::ReportedAfkBy(Player* reporter)
 
 bool Player::canSeeOrDetect(Unit const* u, bool detect, bool inVisibleList, bool is3dDistance) const
 {
+    if(u->GetTypeId() == TYPEID_PLAYER && u->ToPlayer()->m_isArenaSpectator == true)
+        return false;
+
     // Always can see self
     if (m_mover == u || this == u)
         return true;
 
-    // Game masters should always see the players
-    if (isGameMaster())
+    //Gamemaster should always see the players
+    if(isGameMaster())
         return true;
 
     // Arena visibility before arena start
-    if (InArena() && GetBattleGround() && GetBattleGround()->GetStatus() == STATUS_WAIT_JOIN)
+    if (InArena() && GetBattleGround() && GetBattleGround()->GetStatus() == STATUS_WAIT_JOIN && m_isArenaSpectator == false)
         if (const Player* target = u->GetCharmerOrOwnerPlayerOrPlayerItself())
             return GetBGTeam() == target->GetBGTeam() && target->isGMVisible();
 
@@ -18778,10 +18788,8 @@ bool Player::canSeeOrDetect(Unit const* u, bool detect, bool inVisibleList, bool
             else
                 return true;
         }
-		
-		 if (u->canDetectInvisibilityOf(m_mover))
-                                return true;
-
+	if (u->canDetectInvisibilityOf(m_mover))
+		return true;
 
         // player see other player with stealth/invisibility only if he in same group or raid or same team (raid/team case dependent from conf setting)
         if (!m_mover->canDetectInvisibilityOf(u))
@@ -20674,14 +20682,15 @@ void Player::AddGlobalCooldown(SpellEntry const *spellInfo, Spell const *spell)
        case 27103:
 	   cdTime = 50;
 	   break;
-       default:
-
-    if (!(spellInfo->Attributes & (SPELL_ATTR_UNK4|SPELL_ATTR_TRADESPELL)))
+       default: 
+	   
+	if (!(spellInfo->Attributes & (SPELL_ATTR_UNK4|SPELL_ATTR_TRADESPELL)))
 		 cdTime *= GetFloatValue(UNIT_MOD_CAST_SPEED);
     else if (spell->IsRangedSpell() && !spell->IsAutoRepeat())
-         cdTime *= m_modAttackSpeedPct[RANGED_ATTACK];
-    if(cdTime < 1000)
-         cdTime = 1000;
+        cdTime *= m_modAttackSpeedPct[RANGED_ATTACK];
+	if(cdTime < 1000)
+        cdTime = 1000;
+
      break;
 	 if (cdTime > 1500)
          cdTime = 1500;
@@ -20779,4 +20788,130 @@ void Player::SetMap(Map * map)
 {
     Unit::SetMap(map);
     m_mapRef.link(map, this);
+}
+
+class ArenaSpecUpdate
+{
+public:
+    std::string msg;
+
+    ArenaSpecUpdate(Player *p)
+    {
+        msg = "";
+        msg.append(p->GetName());
+        msg.push_back(';');
+    }
+
+    void Append(char* prefix, uint32 data)
+    {
+        msg.append(prefix);
+        msg.push_back('=');
+        std::ostringstream os;
+        os << data;
+        msg.append(os.str());
+        msg.push_back(';');
+    }
+
+    void Append(char* prefix, char* data)
+    {
+        msg.append(prefix);
+        msg.push_back('=');
+        msg.append(data);
+        msg.push_back(';');
+    }
+
+	void Append(char* prefix, uint32 data, uint32 extended)
+	{
+		msg.append(prefix);
+		msg.push_back('=');
+		std::ostringstream os;
+		os << data << ',' << extended;
+		msg.append(os.str());
+		msg.push_back(';');
+	}
+};
+
+void Player::BuildArenaSpectatorUpdate()
+{
+	if (!sWorld.getConfig(CONFIG_ARENA_SPECTATOR_UPDATES) || !m_arenaSpectatorFlags)
+		return;
+
+	if (!InArena() || GetBattleGround()->GetStatus() != STATUS_IN_PROGRESS || isGameMaster())
+		return;
+	
+    ArenaSpecUpdate update(this);
+
+	if (m_arenaSpectatorFlags & ARENASPEC_STATUS)
+        update.Append("STA", isAlive() ? 1 : 0);
+
+    if (m_arenaSpectatorFlags & ARENASPEC_MAXHEALTH)
+        update.Append("MHP", GetMaxHealth());
+    if (m_arenaSpectatorFlags & ARENASPEC_HEALTH)
+        update.Append("CHP", GetHealth());
+
+    if (m_arenaSpectatorFlags & ARENASPEC_MAXPOWER)
+        update.Append("MPW", GetMaxPower(getPowerType()));
+    if (m_arenaSpectatorFlags & ARENASPEC_POWER)
+        update.Append("CPW", GetPower(getPowerType()));
+    if (m_arenaSpectatorFlags & ARENASPEC_POWERTYPE)
+        update.Append("PWT", uint32(getPowerType()));
+
+    // Unit *selection = GetUnit(*m_session->GetPlayer(),GetSelection());
+
+    // if (m_arenaSpectatorFlags & ARENASPEC_TARGET)
+    //    update.Append("TRG", selection ? (selection)->GetName() : "0");
+
+    // Gives a compile error:
+    // /home/server/TBC/Oregontest/source/src/game/Player.cpp: In member function ‚void Player::BuildArenaSpectatorUpdate()‚:
+    // /home/server/TBC/Oregontest/source/src/game/Player.cpp:20666: error: call of overloaded ‚Append(const char [4], const char*)‚ is ambiguous
+    // /home/server/TBC/Oregontest/source/src/game/Player.cpp:20609: note: candidates are: void ArenaSpecUpdate::Append(char*, uint32) <near match>
+    // /home/server/TBC/Oregontest/source/src/game/Player.cpp:20619: note:                 void ArenaSpecUpdate::Append(char*, char*) <near match>
+    // make[2]: *** [src/game/CMakeFiles/game.dir/Player.cpp.o] Error 1
+    // make[2]: *** Waiting for unfinished jobs....
+    // make[1]: *** [src/game/CMakeFiles/game.dir/all] Error 2
+    // make: *** [all] Error 2
+
+    // ill just comment it for now, the arena spectator doesnt work flawlessly so kerhong needs to take a look at it sometime.
+
+    if (m_arenaSpectatorFlags & ARENASPEC_TEAM)
+        update.Append("TEM", GetBGTeam());
+
+	if (m_arenaSpectatorFlags & ARENASPEC_CLASS)
+        update.Append("CLA", uint32(getClass()));
+
+    m_arenaSpectatorFlags = 0;
+    SendAddonMessage(update.msg, "ARENASPEC");
+}
+
+void Player::SendArenaSpectatorSpell(uint32 id, uint32 time)
+{
+    if (!sWorld.getConfig(CONFIG_ARENA_SPECTATOR_UPDATES))
+        return;
+
+    if (!InArena() || GetBattleGround()->GetStatus() != STATUS_IN_PROGRESS || isGameMaster())
+        return;
+
+    ArenaSpecUpdate update(this);
+    update.Append("SPE", id, time);
+    SendAddonMessage(update.msg, "ARENASPEC");
+}
+
+void Player::SendAddonMessage(std::string& text, char* prefix)
+{
+    std::string message;
+    message.append(prefix);
+    message.push_back(9);
+    message.append(text);
+
+    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    data << uint8(CHAT_MSG_WHISPER);
+    data << uint32(LANG_ADDON);
+    data << uint64(0); // guid
+    data << uint32(LANG_ADDON);                               //language 2.1.0 ?
+    data << uint64(0); // guid
+    data << uint32(message.length() + 1);
+    data << message;
+    data << uint8(0);
+
+    SendMessageToSetInRange(&data, MAX_VISIBILITY_DISTANCE, false, false);
 }

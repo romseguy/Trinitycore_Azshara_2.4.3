@@ -339,20 +339,38 @@ void GameObject::Update(uint32 diff)
                     // search unfriendly creature
                     if (owner)                    // hunter trap
                     {
-						Oregon::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
-                        Oregon::UnitSearcher<Oregon::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(ok, checker);
-                        VisitNearbyGridObject(radius, searcher);
-                        if (!ok) VisitNearbyWorldObject(radius, searcher);
+                        std::list<Unit*> units;
+                        Oregon::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
+                        Oregon::UnitListSearcher<Oregon::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(units, checker);
+                        VisitNearbyWorldObject(radius, searcher);
+
+                        for (std::list<Unit*>::iterator itr = units.begin(); itr != units.end(); ++itr)
+                        {
+                            if (((*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->ToPlayer()->m_isArenaSpectator == false) || (*itr)->GetTypeId() != TYPEID_PLAYER) // not arena spectator
+                            {
+                                ok = *itr;
+                                break;
+                            }
+                        }
+
                     }
                     else                                        // environmental trap
                     {
                         // environmental damage spells already have around enemies targeting but this not help in case not existed GO casting support
                         // affect only players
-                        Player* player = NULL;
+                        std::list<Player*> players;
                         Oregon::AnyPlayerInObjectRangeCheck checker(this, radius);
-                        Oregon::PlayerSearcher<Oregon::AnyPlayerInObjectRangeCheck> searcher(player, checker);
+                        Oregon::PlayerListSearcher<Oregon::AnyPlayerInObjectRangeCheck> searcher(players, checker);
                         VisitNearbyWorldObject(radius, searcher);
-                        ok = player;
+
+                        for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
+                        {
+                            if ((*itr)->m_isArenaSpectator == false)
+                            {
+                                ok = *itr;
+                                break;
+                            }
+                        }
                     }
 
                     if (ok)
@@ -769,9 +787,8 @@ bool GameObject::isVisibleForInState(Player const* u, bool inVisibleList) const
         if (GetEntry() == 187039 && ((u->m_detectInvisibilityMask | u->m_invisibilityMask) & (1<<10)) == 0)
             return false;
     }
-	
-	if(u->InArena()) // In arenas, game objects are now visible everytime nvm at what distance you are
-		return true;
+    if(u->InArena()) // Always see all objects in arena (Fix to always see arena doors)
+        return true;
 
     // check distance
     return IsWithinDistInMap(u->m_seer, World::GetMaxVisibleDistanceForObject() +

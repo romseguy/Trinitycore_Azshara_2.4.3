@@ -967,6 +967,10 @@ class Player : public Unit, public GridObject<Player>
         void Whisper(const std::string& text, const uint32 language,uint64 receiver);
         void BuildPlayerChat(WorldPacket *data, uint8 msgtype, const std::string& text, uint32 language) const;
 
+		uint16 m_arenaSpectatorFlags;
+        void BuildArenaSpectatorUpdate();
+		void SendArenaSpectatorSpell(uint32 id, uint32 time);
+		void SendAddonMessage(std::string& text, char* prefix);	
         /*********************************************************/
         /***                    STORAGE SYSTEM                 ***/
         /*********************************************************/
@@ -1306,7 +1310,7 @@ class Player : public Unit, public GridObject<Player>
         QuestStatusMap& getQuestStatusMap() { return mQuestStatus; };
 
         const uint64& GetSelection() const { return m_curSelection; }
-		void SetSelection(const uint64 &guid) { m_curSelection = guid; SetUInt64Value(UNIT_FIELD_TARGET, guid); }
+        void SetSelection(const uint64 &guid) { m_curSelection = guid; SetUInt64Value(UNIT_FIELD_TARGET, guid); m_arenaSpectatorFlags |= ARENASPEC_TARGET; }
 
         uint8 GetComboPoints() { return m_comboPoints; }
         uint64 GetComboTarget() { return m_comboTarget; }
@@ -1576,8 +1580,7 @@ class Player : public Unit, public GridObject<Player>
         void UpdateSpellCritChance(uint32 school);
         void UpdateExpertise(WeaponAttackType attType);
         void UpdateManaRegen();
-		
-		uint32 m_invisibilityUpdateTimer;
+        uint32 m_invisibilityUpdateTimer;
 
         const uint64& GetLootGUID() const { return m_lootGuid; }
         void SetLootGUID(const uint64 &guid) { m_lootGuid = guid; }
@@ -1733,7 +1736,6 @@ class Player : public Unit, public GridObject<Player>
         void ModifyHonorPoints(int32 value);
         void ModifyArenaPoints(int32 value);
         uint32 GetMaxPersonalArenaRatingRequirement();
-		
         //End of PvP System
 
         void SetDrunkValue(uint16 newDrunkValue, uint32 itemid=0);
@@ -1800,6 +1802,9 @@ class Player : public Unit, public GridObject<Player>
         /***               BATTLEGROUND SYSTEM                 ***/
         /*********************************************************/
 
+        bool m_usedReady;
+        bool m_isArenaSpectator;
+
         bool InBattleGround()       const                { return m_bgData.bgInstanceID != 0; }
         bool InArena()              const;
         uint32 GetBattleGroundId()  const                { return m_bgData.bgInstanceID; }
@@ -1820,6 +1825,8 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetBattleGroundQueueId(uint32 index) const { return m_bgBattleGroundQueueID[index].bgQueueType; }
         uint32 GetBattleGroundQueueIndex(uint32 bgQueueType) const
         {
+            if(m_isArenaSpectator)
+                return 0; // spectator queue slot is always 0
             for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
                 if (m_bgBattleGroundQueueID[i].bgQueueType == bgQueueType)
                     return i;
@@ -2317,7 +2324,7 @@ class Player : public Unit, public GridObject<Player>
 
         uint32 m_resetTalentsCost;
         time_t m_resetTalentsTime;
-        uint32 m_usedTalentCount;
+		uint32 m_usedTalentCount;
         uint32 m_nextProfessionReset;
 
         // Social

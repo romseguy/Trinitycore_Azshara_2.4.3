@@ -3284,6 +3284,9 @@ void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool wi
                 ToPlayer()->SendAutoRepeatCancel();
         }
 		
+		if (GetTypeId() == TYPEID_PLAYER)
+            ToPlayer()->SendArenaSpectatorSpell(spell->m_spellInfo->Id, (fromspell ? 99999 : 99998));
+		
 		//spell->GetSpellInfo()->Id
 		// to 
 		//spell->m_spellInfo->Id
@@ -6629,6 +6632,7 @@ void Unit::setPowerType(Powers new_powertype)
     {
         if (ToPlayer()->GetGroup())
             ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POWER_TYPE);
+			ToPlayer()->m_arenaSpectatorFlags |= (ARENASPEC_POWERTYPE | ARENASPEC_MAXPOWER) ;
     }
     else if (ToCreature()->isPet())
     {
@@ -9134,6 +9138,9 @@ bool Unit::canSeeOrDetect(Unit const* /*u*/, bool /*detect*/, bool /*inVisibleLi
 
 bool Unit::canDetectInvisibilityOf(Unit const* u) const
 {
+    if(GetTypeId() == TYPEID_PLAYER && ToPlayer()->m_isArenaSpectator) // if arena spectator, not do not show invis players
+        return false;
+	
     if (m_invisibilityMask & u->m_invisibilityMask) // same group
         return true;
     AuraList const& auras = u->GetAurasByType(SPELL_AURA_MOD_STALKED); // Hunter mark
@@ -9179,6 +9186,9 @@ bool Unit::canDetectInvisibilityOf(Unit const* u) const
 
 bool Unit::canDetectStealthOf(Unit const* target, float distance) const
 {
+    if(GetTypeId() == TYPEID_PLAYER && ToPlayer()->m_isArenaSpectator) // if arena spectator, not do not show stealth players
+        return false;
+
     if (hasUnitState(UNIT_STAT_STUNNED))
         return false;
     if (distance < 0.24f) //collision
@@ -10170,6 +10180,7 @@ void Unit::SetHealth(uint32 val)
     {
         if (ToPlayer()->GetGroup())
             ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_CUR_HP);
+			ToPlayer()->m_arenaSpectatorFlags |= ARENASPEC_HEALTH;
     }
     else if (ToCreature()->isPet())
     {
@@ -10193,6 +10204,7 @@ void Unit::SetMaxHealth(uint32 val)
     {
         if (ToPlayer()->GetGroup())
             ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_MAX_HP);
+			ToPlayer()->m_arenaSpectatorFlags |= ARENASPEC_MAXHEALTH;
     }
     else if (ToCreature()->isPet())
     {
@@ -10225,6 +10237,7 @@ void Unit::SetPower(Powers power, uint32 val)
     {
         if (ToPlayer()->GetGroup())
             ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_CUR_POWER);
+			ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_CUR_POWER);
     }
     else if (ToCreature()->isPet())
     {

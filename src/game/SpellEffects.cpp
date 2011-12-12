@@ -3623,6 +3623,8 @@ void Spell::EffectDistract(uint32 /*i*/)
     {
         // For players just turn them
         WorldPacket data;
+        if (unitTarget->ToPlayer()->IsSitState())
+			unitTarget->ToPlayer()->SetStandState(UNIT_STAND_STATE_STAND);
         unitTarget->ToPlayer()->BuildTeleportAckMsg(&data, unitTarget->GetPositionX(), unitTarget->GetPositionY(), unitTarget->GetPositionZ(), angle);
         unitTarget->ToPlayer()->GetSession()->SendPacket(&data);
         unitTarget->ToPlayer()->SetPosition(unitTarget->GetPositionX(), unitTarget->GetPositionY(), unitTarget->GetPositionZ(), angle, false);

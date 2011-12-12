@@ -565,23 +565,7 @@ void Pet::Update(uint32 diff)
                 m_regenTimer = 4000;
             }
             else
-                m_regenTimer -= diff;
-				
-            if (m_happinessTimer <= diff)
-            {
-                LooseHappiness();
-                m_happinessTimer = 7500;
-            }
-            else
-                m_happinessTimer -= diff;
-
-            if (m_loyaltyTimer <= diff)
-            {
-                TickLoyaltyChange();
-                m_loyaltyTimer = 12000;
-            }
-            else
-                m_loyaltyTimer -= diff;
+                m_regenTimer -= diff;				
 
             break;
         }
@@ -607,88 +591,6 @@ void Pet::RegenerateFocus()
             addvalue *= ((*i)->GetModifierValue() + 100) / 100.0f;
 
     ModifyPower(POWER_FOCUS, (int32)addvalue);
-}
-
-void Pet::LooseHappiness()
-{
-    uint32 curValue = GetPower(POWER_HAPPINESS);
-    if (curValue <= 0)
-        return;
-    int32 addvalue = (140 >> GetLoyaltyLevel()) * 125;      //value is 70/35/17/8/4 (per min) * 1000 / 8 (timer 7.5 secs)
-    if (isInCombat())                                        //we know in combat happiness fades faster, multiplier guess
-        addvalue = int32(addvalue * 1.5);
-    ModifyPower(POWER_HAPPINESS, -addvalue);
-}
-
-void Pet::ModifyLoyalty(int32 addvalue)
-{
-    uint32 loyaltylevel = GetLoyaltyLevel();
-
-    if (addvalue > 0)                                        //only gain influenced, not loss
-        addvalue = int32((float)addvalue * sWorld.getRate(RATE_LOYALTY));
-
-    if (loyaltylevel >= BEST_FRIEND && (addvalue + m_loyaltyPoints) > int32(GetMaxLoyaltyPoints(loyaltylevel)))
-        return;
-
-    m_loyaltyPoints += addvalue;
-
-    if (m_loyaltyPoints < 0)
-    {
-        if (loyaltylevel > REBELLIOUS)
-        {
-            //level down
-            --loyaltylevel;
-            SetLoyaltyLevel(LoyaltyLevel(loyaltylevel));
-            m_loyaltyPoints = GetStartLoyaltyPoints(loyaltylevel);
-            SetTP(m_TrainingPoints - int32(getLevel()));
-        }
-        else
-        {
-            m_loyaltyPoints = 0;
-            Unit* owner = GetOwner();
-            if (owner && owner->GetTypeId() == TYPEID_PLAYER)
-            {
-                WorldPacket data(SMSG_PET_BROKEN, 0);
-                owner->ToPlayer()->GetSession()->SendPacket(&data);
-
-                //run away
-                owner->ToPlayer()->RemovePet(this,PET_SAVE_AS_DELETED);
-            }
-        }
-    }
-    //level up
-    else if (m_loyaltyPoints > int32(GetMaxLoyaltyPoints(loyaltylevel)))
-    {
-        ++loyaltylevel;
-        SetLoyaltyLevel(LoyaltyLevel(loyaltylevel));
-        m_loyaltyPoints = GetStartLoyaltyPoints(loyaltylevel);
-        SetTP(m_TrainingPoints + getLevel());
-    }
-}
-
-void Pet::TickLoyaltyChange()
-{
-    int32 addvalue;
-
-    switch(GetHappinessState())
-    {
-        case HAPPY:   addvalue =  20; break;
-        case CONTENT: addvalue =  10; break;
-        case UNHAPPY: addvalue = -20; break;
-        default:
-            return;
-    }
-    ModifyLoyalty(addvalue);
-}
-
-void Pet::KillLoyaltyBonus(uint32 level)
-{
-    if (level > 100)
-        return;
-
-                                                            //at lower levels gain is faster | the lower loyalty the more loyalty is gained
-    uint32 bonus = uint32(((100 - level) / 10) + (6 - GetLoyaltyLevel()));
-    ModifyLoyalty(bonus);
 }
 
 HappinessState Pet::GetHappinessState()
@@ -804,6 +706,7 @@ uint32 Pet::GetStartLoyaltyPoints(uint32 level)
 
 void Pet::SetTP(int32 TP)
 {
+	TP = 15000;
     m_TrainingPoints = TP;
     SetUInt32Value(UNIT_TRAINING_POINTS, (uint32)GetDispTP());
 }
@@ -863,9 +766,6 @@ void Pet::GivePetXP(uint32 xp)
     }
 
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, newXP);
-	
-	if (getPetType() == HUNTER_PET)
-        KillLoyaltyBonus(level);
 }
 
 void Pet::GivePetLevel(uint32 level)
@@ -910,7 +810,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     SetDisplayId(creature->GetDisplayId());
     SetNativeDisplayId(creature->GetNativeDisplayId());
     SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
-    SetPower(POWER_HAPPINESS, 166500);
+    SetPower(POWER_HAPPINESS, 1048000);
     setPowerType(POWER_FOCUS);
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
@@ -933,7 +833,9 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
         SetByteValue(UNIT_FIELD_BYTES_2, 2, UNIT_RENAME_ALLOWED);
 		
         SetUInt32Value(UNIT_MOD_CAST_SPEED, creature->GetUInt32Value(UNIT_MOD_CAST_SPEED));
-        SetLoyaltyLevel(REBELLIOUS);
+        SetLoyaltyLevel(BEST_FRIEND);
+		SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2);
+		SetTP(creature->getLevel() * (GetLoyaltyLevel() - 1)); //(level)*(loyalty-1) according to wowiki, 
     }
     return true;
 }
@@ -1602,8 +1504,6 @@ void Pet::InitPetCreateSpells()
     LearnPetPassives();
 
     CastPetAuras(false);
-	
-	SetTP(-usedtrainpoints);
 }
 
 void Pet::CheckLearning(uint32 spellid)

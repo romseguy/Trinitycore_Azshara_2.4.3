@@ -164,13 +164,9 @@ class Pet : public Guardian
         }
 
         void RegenerateFocus();
-        void LooseHappiness();
-        void TickLoyaltyChange();
-        void ModifyLoyalty(int32 addvalue);
         HappinessState GetHappinessState();
         uint32 GetMaxLoyaltyPoints(uint32 level);
         uint32 GetStartLoyaltyPoints(uint32 level);
-		void KillLoyaltyBonus(uint32 level);
         uint32 GetLoyaltyLevel() { return GetByteValue(UNIT_FIELD_BYTES_1, 1); }
         void SetLoyaltyLevel(LoyaltyLevel level);
         void GivePetXP(uint32 xp);

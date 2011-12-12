@@ -33,6 +33,7 @@
 #include "ObjectAccessor.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
+#include "BattleGroundMgr.h"
 #include "MoveMap.h"
 
 #define DEFAULT_GRID_EXPIRY     300
@@ -2670,9 +2671,21 @@ void BattleGroundMap::RemoveAllPlayers()
     if (HavePlayers())
         for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
             if (Player* plr = itr->getSource())
+            {
+                if(plr->m_isArenaSpectator == true)
+                {
+                    plr->m_isArenaSpectator = false;
+                    plr->UpdateSpeed(MOVE_RUN,true);
+                    plr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
+                    plr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                    plr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    WorldPacket status;
+                    sBattleGroundMgr.BuildBattleGroundStatusPacket(&status, NULL, 0, 0, STATUS_NONE, 0, 0, 0, 0);
+                    plr->GetSession()->SendPacket(&status); // remove minimap PvP icon
+                }
                 if (!plr->IsBeingTeleportedFar())
                     plr->TeleportTo(plr->GetBattleGroundEntryPoint());
-
+            }
 }
 
 Creature*

@@ -381,6 +381,9 @@ class BattleGround
         uint32 GetPlayerScoresSize() const { return m_PlayerScores.size(); }
 
         uint32 GetReviveQueueSize() const { return m_ReviveQueue.size(); }
+		
+		uint8 m_TeamOneReadyCount;
+        uint8 m_TeamTwoReadyCount;
 
         void AddPlayerToResurrectQueue(uint64 npc_guid, uint64 player_guid);
         void RemovePlayerFromResurrectQueue(uint64 player_guid);

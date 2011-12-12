@@ -255,8 +255,9 @@ enum WorldConfigs
     CONFIG_AUTOBROADCAST_TIMER,
     CONFIG_AUTOBROADCAST_ENABLED,
     CONFIG_AUTOBROADCAST_CENTER,
-	CONFIG_BOOL_MMAP_ENABLED,
+    CONFIG_BOOL_MMAP_ENABLED,
     CONFIG_BOOL_WARDEN_KICK,
+	CONFIG_ARENA_SPECTATOR_UPDATES,
 	CONFIG_VALUE_COUNT
 };
 
@@ -517,6 +518,7 @@ class World
         void SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
         void SendZoneText(uint32 zone, const char *text, WorldSession *self = 0, uint32 team = 0);
         void SendServerMessage(ServerMessageType type, const char *text = "", Player* player = NULL);
+
 
         // Are we in the middle of a shutdown?
         bool IsShutdowning() const { return m_ShutdownTimer > 0; }

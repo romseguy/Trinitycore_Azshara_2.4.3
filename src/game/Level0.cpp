@@ -21,6 +21,7 @@
  */
 
 #include "Common.h"
+#include "BattleGround.h"
 #include "Database/DatabaseEnv.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -57,6 +58,70 @@ bool ChatHandler::HandleCommandsCommand(const char* args)
 {
     ShowHelpForCommand(getCommandTable(), "");
     return true;
+}
+
+bool ChatHandler::HandleReadyCommand(const char* /*args*/)
+{
+    // 20000 = Both teams are ready, starting arena in 15 seconds!
+    // 20001 = Gold team is ready, if both teams use .ready the arena will soon begin.
+    // 20002 = Green team is ready, if both teams use .ready the arena will soon begin.
+	Player *plr = m_session->GetPlayer();
+	BattleGround *bg = plr->GetBattleGround();
+	// MIGHT WANNA ADD A IS_RATED()? HERE, MIGHT BE ANOYING IN SKIRMISH???
+	if (!bg || !bg->isArena()) // is player in arena? 
+	{
+		PSendSysMessage("Vous n'etes pas en arene !");
+		return true;
+	}
+	if(bg->GetStartDelayTime() <= 15000)
+	{
+		PSendSysMessage("Le match d'arene a deja commence ou commence bientot.");
+		return true;
+	}
+	if(bg->GetPlayersCountByTeam(plr->GetBGTeam()) < bg->GetMaxPlayersPerTeam())
+	{
+		PSendSysMessage("Vous ne pourrez utiliser .ready que lorsque vos coequipiers auront rejoint l'arene.");
+		return true;
+	}
+	if(plr->GetBGTeam() == ALLIANCE)
+	{
+		if(plr->m_usedReady == false)
+		{
+            ChatHandler(plr).PSendSysMessage("Vous etes maintenant pret");
+			plr->m_usedReady = true;
+            bg->m_TeamOneReadyCount++;
+            if(bg->m_TeamOneReadyCount >= bg->GetMaxPlayersPerTeam()) 
+                bg->SendMessageToAll(20001,CHAT_MSG_SYSTEM);
+        }
+        else
+		{
+			ChatHandler(plr).PSendSysMessage("Vous avez deja utilise la commande .ready");
+		}
+	}
+	else
+	{
+		if(plr->GetBGTeam() == HORDE)
+		{
+			if(plr->m_usedReady == false)
+			{
+                ChatHandler(plr).PSendSysMessage("Vous etes maintenant pret");
+				plr->m_usedReady = true;
+                bg->m_TeamTwoReadyCount++;
+                if(bg->m_TeamTwoReadyCount >= bg->GetMaxPlayersPerTeam()) 
+                    bg->SendMessageToAll(20002,CHAT_MSG_SYSTEM);
+            }
+            else
+			{
+				ChatHandler(plr).PSendSysMessage("Vous avez deja utilise la commande .ready");
+			}
+		}
+	}
+	if(bg->m_TeamOneReadyCount >= bg->GetMaxPlayersPerTeam() && bg->m_TeamTwoReadyCount >= bg->GetMaxPlayersPerTeam()) // for safety, check both teams and dont add them up.
+	{
+        bg->SendMessageToAll(20000,CHAT_MSG_SYSTEM);
+		bg->SetStartDelayTime(15000);
+	}
+	return true; // coulnt find out what returning false or true does, so ill just always return false.
 }
 
 bool ChatHandler::HandleAccountCommand(const char* /*args*/)

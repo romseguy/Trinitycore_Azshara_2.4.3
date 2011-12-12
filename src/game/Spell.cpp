@@ -768,11 +768,11 @@ void Spell::AddUnitTarget(Unit* pVictim, uint32 effIndex)
     }
     else
         target.timeDelay = 0LL;
-		
+
     // some spells have no speed but are delayed
 	// this includes Blind, Charge and Intercept
 	if (m_spellInfo->Id == 2094 || m_spellInfo->Id == 11578 || m_spellInfo->Id == 25275)
-		m_delayMoment = 200;		
+		m_delayMoment = 200;
 
     // If target reflect spell back to caster
     if (target.missCondition == SPELL_MISS_REFLECT)
@@ -945,11 +945,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     else if (missInfo == SPELL_MISS_REFLECT)                // In case spell reflect from target, do all effect on caster (if hit)
     {
         if (target->reflectResult == SPELL_MISS_NONE)       // If reflected spell hit caster -> do all effect on him
-		{
-				// Start triggers for remove charges if need (trigger only for victim, and mark as active spell)
-				m_caster->ProcDamageAndSpell(unit, PROC_FLAG_NONE, PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT, PROC_EX_REFLECT, 1, BASE_ATTACK, m_spellInfo);
-				DoSpellHitOnUnit(m_caster, mask);
-		}
+        {
+            // Start triggers for remove charges if need (trigger only for victim, and mark as active spell)
+            m_caster->ProcDamageAndSpell(unitTarget, PROC_FLAG_NONE, PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT, PROC_EX_REFLECT, 1, BASE_ATTACK, m_spellInfo);
+            DoSpellHitOnUnit(m_caster, mask);
+    }
     }
 
     // All calculated do it!
@@ -1010,21 +1010,18 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             int32 damagePoint  = damageInfo.damage * 33 / 100;
             m_caster->CastCustomSpell(m_caster, 32220, &damagePoint, NULL, NULL, true);
         }
-				
 		// Molten Shields - rank 1
 		if(unitTarget->HasSpell(11094) && unitTarget->HasAura(30482,1))
 		{
 			if(urand(0,1) == 1 || unitTarget != m_caster)
-			unitTarget->CastCustomSpell(m_caster, 34913, NULL, NULL, NULL, true);
+				unitTarget->CastCustomSpell(m_caster, 34913, NULL, NULL, NULL, true);
 		}
-		
 		//Molten Shields - rank 2
 		if(unitTarget->HasSpell(13043) && unitTarget->HasAura(30482,1))
 		{
 			if(unitTarget != m_caster)
 				unitTarget->CastCustomSpell(m_caster, 34913, NULL, NULL, NULL, true);
 		}
-		
         // Bloodthirst
         else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && m_spellInfo->SpellFamilyFlags & 0x40000000000LL)
         {
@@ -1077,6 +1074,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     // if target is flagged for pvp also flag caster if a player
     if (unit->IsPvP())
     {
+
         if ((m_caster->GetTypeId() == TYPEID_PLAYER) && (m_caster != unit))
             m_caster->ToPlayer()->UpdatePvP(true);
     }
@@ -1120,20 +1118,18 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
                 // that was causing CombatLog errors
                 m_caster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
                 m_damage = 0;
-				
-				if (m_spellInfo->Id == 2094)
+ 				if (m_spellInfo->Id == 2094)
 				{
 					unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
 					unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
 				}
                 return;
             }
+	if (m_spellInfo->SpellIconID != 2267 && m_spellInfo->Id != 3600 && m_spellInfo->Id != 1725 && m_spellInfo->Id != 36554 && m_spellInfo->Id != 14185)
+            unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
 
-            if (m_spellInfo->SpellIconID != 2267 && m_spellInfo->Id != 3600 && m_spellInfo->Id != 1725 && m_spellInfo->Id != 14183 && m_spellInfo->Id != 36554)
-                unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
-			
-            if ((m_customAttr & SPELL_ATTR_CU_AURA_CC) && m_spellInfo->Mechanic != MECHANIC_ROOT && m_spellInfo->SchoolMask != SPELL_SCHOOL_MASK_FROST)
-				unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CC);
+			if ((m_customAttr & SPELL_ATTR_CU_AURA_CC) && m_spellInfo->Mechanic != MECHANIC_ROOT && m_spellInfo->SchoolMask != SPELL_SCHOOL_MASK_FROST)
+                unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CC);
         }
         else
         {
@@ -1599,7 +1595,7 @@ void Spell::SetTargetMap(uint32 i, uint32 cur)
                     if (Unit *magnet = m_caster->SelectMagnetTarget(target, m_spellInfo))
                         {
                             if (magnet->GetTypeId() == TYPEID_UNIT && magnet->ToCreature()->isTotem() && magnet->ToCreature()->GetEntry() == 5925 && m_spellInfo->Effect[0] != SPELL_EFFECT_SCHOOL_DAMAGE && m_spellInfo->Effect[1] != SPELL_EFFECT_SCHOOL_DAMAGE && m_spellInfo->Effect[2] != SPELL_EFFECT_SCHOOL_DAMAGE)
-                                magnet->setDeathState(DEAD);
+                                 magnet->setDeathState(DEAD);
                             m_targets.setUnitTarget(magnet);
                         }
                     pushType = PUSH_CHAIN;
@@ -2146,7 +2142,12 @@ void Spell::prepare(SpellCastTargets * targets, Aura* triggeredByAura)
         SendSpellStart();
 
 		if (m_caster->GetTypeId() == TYPEID_PLAYER)
+		{
 			m_caster->ToPlayer()->AddGlobalCooldown(m_spellInfo,this);
+
+			if (!m_IsTriggeredSpell)
+				m_caster->ToPlayer()->SendArenaSpectatorSpell(m_spellInfo->Id, GetCastTime());
+		}
 
 		if (!m_casttime && !m_spellInfo->StartRecoveryTime
             && !m_castItemGUID     //item: first cast may destroy item and second cast causes crash
@@ -2772,13 +2773,14 @@ void Spell::finish(bool ok)
     //remove spell mods
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
-        m_caster->ToPlayer()->RemoveSpellMods(this);
-
+         m_caster->ToPlayer()->RemoveSpellMods(this);
+ 
         if (Unit *target = m_targets.getUnitTarget())
             if (m_spellInfo->Mechanic == MECHANIC_CHARM && target->HasAuraType(SPELL_AURA_REFLECT_SPELLS))
                 target->RemoveAuraTypeByCaster(SPELL_AURA_REFLECT_SPELLS, target->GetGUID());
-				m_caster->RemoveAurasDueToSpell(10912);
+	m_caster->RemoveAurasDueToSpell(10912);
     }
+
 
     // Okay to remove extra attacks
     if (IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_ADD_EXTRA_ATTACKS))
@@ -3464,6 +3466,9 @@ uint8 Spell::CanCast(bool strict)
             return SPELL_FAILED_NOT_READY;
     }
 
+    if(m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->ToPlayer()->m_isArenaSpectator)
+        return SPELL_FAILED_PACIFIED; // may not cast as spectator
+
     // only allow triggered spells if at an ended battleground
     if (!m_IsTriggeredSpell && m_caster->GetTypeId() == TYPEID_PLAYER)
         if (BattleGround * bg = m_caster->ToPlayer()->GetBattleGround())
@@ -3512,9 +3517,9 @@ uint8 Spell::CanCast(bool strict)
     }
 
     Unit *target = m_targets.getUnitTarget();
-	
-	if(((m_spellInfo->Id == 45438) || (m_spellInfo->Id == 498) || (m_spellInfo->Id == 5573) || (m_spellInfo->Id == 642) || (m_spellInfo->Id == 1020)) && m_caster->HasAura(33786, 0))
-		return SPELL_FAILED_TARGET_AURASTATE;
+    
+    if(((m_spellInfo->Id == 45438) || (m_spellInfo->Id == 498) || (m_spellInfo->Id == 5573) || (m_spellInfo->Id == 642) || (m_spellInfo->Id == 1020))  && m_caster->HasAura(33786, 0))
+            return SPELL_FAILED_TARGET_AURASTATE;
 
     if (target)
     {
@@ -3812,13 +3817,11 @@ uint8 Spell::CanCast(bool strict)
 
         if (uint8 castResult = CheckCasterAuras())
             return castResult;
-	}
-		else if(m_spellInfo->Id == 33395) 
-		{ // water elemental freeze range check.
-			m_caster->GetMotionMaster()->MoveFollow(m_caster->GetOwner(),PET_FOLLOW_DIST,PET_FOLLOW_ANGLE);
-			if (uint8 castResult = CheckRange(strict))
-				return castResult;
-		}
+    }
+    else if(m_spellInfo->Id == 33395) { // water elemental freeze range check, doesnt seem to be any other way to fix this as it must be a triggered spell.
+        if (uint8 castResult = CheckRange(strict))
+            return castResult;
+    }
 
     for (int i = 0; i < 3; i++)
     {

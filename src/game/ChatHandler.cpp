@@ -201,6 +201,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             if (ChatHandler(this).ParseCommands(msg.c_str()) > 0)
                 break;
 
+            if(GetPlayer()->m_isArenaSpectator == true) // do not allow arena spectators to /say /emote or /yell
+                return;
+
             if (!processChatmessageFurtherAfterSecurityChecks(msg, lang))
                 return;
 
@@ -597,6 +600,9 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket & recv_data)
         SendNotification(GetOregonString(LANG_WAIT_BEFORE_SPEAKING),timeStr.c_str());
         return;
     }
+
+    if(GetPlayer()->m_isArenaSpectator == true) // /laugh /rofl nor other predifined emotes
+        return;
 
     uint32 text_emote, emoteNum;
     uint64 guid;
