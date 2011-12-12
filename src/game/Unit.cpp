@@ -1070,7 +1070,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
                             uint32 interruptFlags = spell->m_spellInfo->InterruptFlags;
                             if (interruptFlags & SPELL_INTERRUPT_FLAG_DAMAGE)
                                 pVictim->InterruptNonMeleeSpells(false);
-                            else if (interruptFlags & SPELL_INTERRUPT_FLAG_PUSH_BACK)
+                            else if ((interruptFlags & SPELL_INTERRUPT_FLAG_PUSH_BACK) && spellProto->Id != 33619)
                                 spell->Delayed();
                         }
                     }
@@ -1081,7 +1081,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
                     if (spell->getState() == SPELL_STATE_CASTING)
                     {
                         uint32 channelInterruptFlags = spell->m_spellInfo->ChannelInterruptFlags;
-                        if (((channelInterruptFlags & CHANNEL_FLAG_DELAY) != 0) && (damagetype != DOT))
+                        if ((channelInterruptFlags & CHANNEL_FLAG_DELAY) != 0 && damagetype != DOT && spellProto->Id != 34913)
                             spell->DelayedChannel();
                     }
                 }
