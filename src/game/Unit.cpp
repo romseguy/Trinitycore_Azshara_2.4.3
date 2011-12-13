@@ -3615,8 +3615,16 @@ bool Unit::AddAura(Aura *Aur)
         Unit* target = Aur->GetTarget();
         Unit* caster = Aur->GetCaster();
         if(caster->HasAura(44835,0))
-            CastSpell(target,32747,true,0,0,0);
+            CastSpell(target,32747,false);
 	}
+	
+    if(aurSpellInfo->Id == 32453 || aurSpellInfo->Id == 29450 || aurSpellInfo->Id == 34780 || aurSpellInfo->Id == 29448 || aurSpellInfo->Id == 29451 ||
+        aurSpellInfo->Id == 29452 || aurSpellInfo->Id == 29453 || aurSpellInfo->Id == 32685 || aurSpellInfo->Id == 30355 || aurSpellInfo->Id == 33042 || aurSpellInfo->Id == 29395 || aurSpellInfo->Id == 30610)
+    {
+        Unit* caster = Aur->GetCaster();
+        caster->RemoveAura(768,1,0);
+        caster->RemoveAura(9634,1,0);
+    }
 	
     bool stackModified=false;
     // passive and persistent auras can stack with themselves any number of times
