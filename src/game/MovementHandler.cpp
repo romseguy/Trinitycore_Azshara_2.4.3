@@ -701,7 +701,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
 
             if (opcode == MSG_MOVE_FALL_LAND || plMover->m_lastFallTime > movementInfo.GetFallTime() || plMover->m_lastFallZ < movementInfo.GetPos()->GetPositionZ())
                 plMover->SetFallInformation(movementInfo.GetFallTime(), movementInfo.GetPos()->GetPositionZ());
-            if(!updateOrientationOnly)
+            if(movementInfo.HasMovementFlag(MOVEFLAG_MOVING) && GetPlayer()->HasUnitMovementFlag(MOVEFLAG_MOVING))
                 plMover->InterruptSpell(CURRENT_GENERIC_SPELL,false,false,false);
             // we should add the check only for class hunter
             if (plMover->isMovingOrTurning())

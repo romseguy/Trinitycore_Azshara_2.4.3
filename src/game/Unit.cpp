@@ -4041,7 +4041,11 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit 
 			++iter;
             }
             else
-				RemoveAura(iter, AURA_REMOVE_BY_DISPEL);
+            {
+                RemoveAura(iter,AURA_REMOVE_BY_DISPEL);
+                if(aur->GetId() == 33763)
+			        RemoveAurasDueToSpell(33763);
+            }
 		}
 		else
 			++iter;
