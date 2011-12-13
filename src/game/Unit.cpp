@@ -3600,7 +3600,7 @@ bool Unit::AddAura(Aura *Aur)
     SpellEntry const* aurSpellInfo = Aur->GetSpellProto();
 
     spellEffectPair spair = spellEffectPair(Aur->GetId(), Aur->GetEffIndex());
-    if(this->HasAura(1044,0) || this->HasAura(34471,0))
+    if((this->HasAura(1044,0) || this->HasAura(34471,0)) && (spair.first != 31661 && spair.first != 33041 && spair.first != 33042 && spair.first != 33043))
     {
         if(aurSpellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOD_DECREASE_SPEED || aurSpellInfo->EffectApplyAuraName[1] == SPELL_AURA_MOD_DECREASE_SPEED || aurSpellInfo->EffectApplyAuraName[2] == SPELL_AURA_MOD_DECREASE_SPEED)
         {
