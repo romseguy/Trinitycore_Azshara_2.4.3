@@ -1479,6 +1479,8 @@ class Unit : public WorldObject
         virtual bool canSeeOrDetect(Unit const* u, bool detect, bool inVisibleList = false, bool is3dDistance = true) const;
         bool isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList = false, bool is3dDistance = true) const;
         bool canDetectInvisibilityOf(Unit const* u) const;
+        float GetStealthDetectionValue() const;
+        float GetStealthModifierValue() const;
         bool canDetectStealthOf(Unit const* u, float distance) const;
         void UpdateObjectVisibility(bool forced = true);
 
