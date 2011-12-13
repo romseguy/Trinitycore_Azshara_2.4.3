@@ -2588,7 +2588,7 @@ void SpellMgr::LoadSpellCustomAttr()
             break;
 	    case 1543: // Flare
 	    case 26679: // Deadly Throw
-	        spellInfo->speed = 0;
+	        // spellInfo->speed = 0;
 	        break;
 		case 27892:     // To Anchor 1
 		case 27928:     // To Anchor 1
