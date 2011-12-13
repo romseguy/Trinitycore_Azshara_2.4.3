@@ -290,7 +290,7 @@ class Object
         const Player* ToPlayer() const { if (GetTypeId() == TYPEID_PLAYER)  return (const Player*)((Player*)this); else return NULL;  }
         Creature* ToCreature(){ if (GetTypeId() == TYPEID_UNIT) return reinterpret_cast<Creature*>(this); else return NULL; }
         const Creature* ToCreature() const {if (GetTypeId() == TYPEID_UNIT) return (const Creature*)((Creature*)this); else return NULL; }
-		Unit* ToUnit(){ if (GetTypeId() == TYPEID_UNIT || GetTypeId() == TYPEID_PLAYER) return reinterpret_cast<Unit*>(this); else return NULL; }
+        Unit* ToUnit(){ if (GetTypeId() == TYPEID_UNIT || GetTypeId() == TYPEID_PLAYER) return reinterpret_cast<Unit*>(this); else return NULL; }
         const Unit* ToUnit() const {if (GetTypeId() == TYPEID_UNIT || GetTypeId() == TYPEID_PLAYER) return (const Unit*)((Unit*)this); else return NULL; }
 
     protected:
@@ -454,6 +454,12 @@ class WorldObject : public Object, public WorldLocation
             GetPosition(&pos);
             MovePosition(pos, dist, angle);
         }
+	       void MovePositionToFirstCollision(Position &pos, float dist, float angle);
+	       void GetFirstCollisionPosition(Position &pos, float dist, float angle)
+	        {
+	                GetPosition(&pos);
+	                MovePositionToFirstCollision(pos, dist, angle);
+	        }
         void GetRandomNearPosition(Position &pos, float radius)
         {
             GetPosition(&pos);
@@ -479,7 +485,7 @@ class WorldObject : public Object, public WorldLocation
             GetRandomPoint(srcPos, distance, x, y, z);
             pos.Relocate(x, y, z, GetOrientation());
         }
-		
+
         float GetDistanceSqr(float x, float y, float z) const;
         bool HasInArc(float arcangle, const Position *pos) const;
         bool HasInArc(const float arcangle, const float x, const float y) const;

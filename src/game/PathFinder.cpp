@@ -128,16 +128,6 @@ dtPolyRef PathInfo::getPathPolyByPosition(const dtPolyRef *polyPath, uint32 poly
 
     for (uint32 i = 0; i < polyPathSize; ++i)
     {
-        ASSERT(polyPath[i] != INVALID_POLYREF);
-		
-        const dtMeshTile* tile = 0;
-        const dtPoly* poly = 0;
-        if (m_navMesh->getTileAndPolyByRef(polyPath[i], &tile, &poly) != DT_SUCCESS)
-            continue;
-
-        if (poly->getType() == DT_POLYTYPE_OFFMESH_CONNECTION)
-            continue;
-
         float closestPoint[VERTEX_SIZE];
         if (DT_SUCCESS != m_navMeshQuery->closestPointOnPoly(polyPath[i], point, closestPoint))
             continue;
@@ -146,7 +136,7 @@ dtPolyRef PathInfo::getPathPolyByPosition(const dtPolyRef *polyPath, uint32 poly
         if (d < minDist2d)
         {
             minDist2d = d;
-            nearestPoly = m_pathPolyRefs[i];
+            nearestPoly = polyPath[i];
             minDist3d = dtVdistSqr(point, closestPoint);
         }
 
@@ -345,12 +335,17 @@ void PathInfo::BuildPolyPath(const PathNode &startPos, const PathNode &endPos)
         float suffixEndPoint[VERTEX_SIZE];
         if (DT_SUCCESS != m_navMeshQuery->closestPointOnPoly(suffixStartPoly, endPoint, suffixEndPoint))
         {
-            // suffixStartPoly is invalid somehow, or the navmesh is broken => error state
-            sLog.outError("%u's Path Build failed: invalid polyRef in path", m_sourceUnit->GetGUIDLow());
-
-            BuildShortcut();
-            m_type = PATHFIND_NOPATH;
-            return;
+            // we can hit offmesh connection as last poly - closestPointOnPoly() don't like that
+            // try to recover by using prev polyref
+            --prefixPolyLength;
+            suffixStartPoly = m_pathPolyRefs[prefixPolyLength-1];
+            if (DT_SUCCESS != m_navMeshQuery->closestPointOnPoly(suffixStartPoly, endPoint, suffixEndPoint))
+            {
+                // suffixStartPoly is still invalid, error state
+                BuildShortcut();
+                m_type = PATHFIND_NOPATH;
+                return;
+            }
         }
 
         // generate suffix
@@ -424,7 +419,6 @@ void PathInfo::BuildPointPath(const float *startPoint, const float *endPoint)
     float pathPoints[MAX_POINT_PATH_LENGTH*VERTEX_SIZE];
     uint32 pointCount = 0;
     dtStatus dtResult = DT_FAILURE;
-    bool usedOffmesh = false;
     if (m_useStraightPath)
     {
         dtResult = m_navMeshQuery->findStraightPath(
@@ -447,7 +441,6 @@ void PathInfo::BuildPointPath(const float *startPoint, const float *endPoint)
                 m_polyLength,       // length of current path
                 pathPoints,         // [out] path corner points
                 (int*)&pointCount,
-                usedOffmesh,
                 m_pointPathLimit);    // maximum number of points
     }
 
@@ -461,11 +454,6 @@ void PathInfo::BuildPointPath(const float *startPoint, const float *endPoint)
         m_type = PATHFIND_NOPATH;
         return;
     }
-
-    // we need to flash our poly path to prevent it being used as subpath next cycle
-    // in case of off mesh connection was used
-    if(usedOffmesh)
-        m_polyLength = 0;
 
     m_pathPoints.resize(pointCount);
     for (uint32 i = 0; i < pointCount; ++i)
@@ -670,12 +658,10 @@ bool PathInfo::getSteerTarget(const float* startPos, const float* endPos,
 
 dtStatus PathInfo::findSmoothPath(const float* startPos, const float* endPos,
                                      const dtPolyRef* polyPath, uint32 polyPathSize,
-                                     float* smoothPath, int* smoothPathSize,
-                                     bool &usedOffmesh, uint32 maxSmoothPathSize)
+                                     float* smoothPath, int* smoothPathSize, uint32 maxSmoothPathSize)
 {
     *smoothPathSize = 0;
     uint32 nsmoothPath = 0;
-    usedOffmesh = false;
 
     dtPolyRef polys[MAX_PATH_LENGTH];
     memcpy(polys, polyPath, sizeof(dtPolyRef)*polyPathSize);
@@ -746,9 +732,6 @@ dtStatus PathInfo::findSmoothPath(const float* startPos, const float* endPos,
         }
         else if (offMeshConnection && inRangeYZX(iterPos, steerPos, SMOOTH_PATH_SLOP, 1.0f))
         {
-            // Reached off-mesh connection.
-            usedOffmesh = true;
-
             // Advance the path up to and over the off-mesh connection.
             dtPolyRef prevRef = INVALID_POLYREF;
             dtPolyRef polyRef = polys[0];
