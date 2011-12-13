@@ -3633,7 +3633,7 @@ bool Unit::AddAura(Aura *Aur)
         for (AuraMap::iterator i2 = m_Auras.lower_bound(spair); i2 != m_Auras.upper_bound(spair);)
         {
             Aura* aur2 = i2->second;
-            if (aur2->GetCasterGUID() == Aur->GetCasterGUID())
+            if (aur2->GetCasterGUID() == Aur->GetCasterGUID() || Aur->ShouldShareStackFromDiffCasters())
             {
                 if (!stackModified)
                 {

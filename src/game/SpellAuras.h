@@ -286,6 +286,7 @@ class Aura
         bool IsRemoved() const { return m_isRemoved; }
         bool IsInUse() const { return m_in_use;}
         void CleanupTriggeredSpells();
+		bool ShouldShareStackFromDiffCasters();
 
         virtual void Update(uint32 diff);
         void ApplyModifier(bool apply, bool Real = false);

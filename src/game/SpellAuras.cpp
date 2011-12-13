@@ -5614,6 +5614,17 @@ void Aura::CleanupTriggeredSpells()
     m_target->RemoveAurasDueToSpell(tSpellId);
 }
 
+bool Aura::ShouldShareStackFromDiffCasters()
+{
+    const SpellEntry* spellInfo = GetSpellProto();
+    if(spellInfo->SpellIconID == 1496 && spellInfo->AttributesEx & SPELL_ATTR_EX_NEGATIVE) // Uniquement poison douloureux.
+        return true;
+		
+	if (spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && spellInfo->SpellFamilyFlags == SPELLFAMILYFLAG_WARRIOR_SUNDERARMOR) // Fracasser l'armure.
+		return true;
+    return false;
+}
+
 void Aura::HandleAuraPowerBurn(bool apply, bool Real)
 {
     if (m_periodicTimer <= 0)
