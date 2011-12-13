@@ -1013,13 +1013,13 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 		// Molten Shields - rank 1
 		if(unitTarget->HasSpell(11094) && unitTarget->HasAura(30482,1))
 		{
-			if(urand(0,1) == 1 || unitTarget != m_caster)
+			if(urand(0,1) == 1 && unitTarget != m_caster && m_spellInfo->Id != 34913)
 				unitTarget->CastCustomSpell(m_caster, 34913, NULL, NULL, NULL, true);
 		}
 		//Molten Shields - rank 2
 		if(unitTarget->HasSpell(13043) && unitTarget->HasAura(30482,1))
 		{
-			if(unitTarget != m_caster)
+			if(unitTarget != m_caster && m_spellInfo->Id != 34913)
 				unitTarget->CastCustomSpell(m_caster, 34913, NULL, NULL, NULL, true);
 		}
         // Bloodthirst
