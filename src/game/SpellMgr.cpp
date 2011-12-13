@@ -2571,6 +2571,21 @@ void SpellMgr::LoadSpellCustomAttr()
         case 17116:
             spellInfo->Dispel = 1;
             break;
+        case 12815: // sword spec lvl 5
+            spellInfo->procChance = 3;
+            break;
+        case 12814: // sword spec lvl 4
+            spellInfo->procChance = 2;
+            break;
+        case 12813: // sword spec lvl 3
+            spellInfo->procChance = 2;
+            break;
+        case 12812: // sword spec lvl 2
+            spellInfo->procChance = 1;
+            break;
+        case 12281: //sword spec lvl 1
+            spellInfo->procChance = 1;
+            break;
 	    case 1543: // Flare
 	    case 26679: // Deadly Throw
 	        spellInfo->speed = 0;
