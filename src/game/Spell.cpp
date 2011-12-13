@@ -3559,7 +3559,7 @@ uint8 Spell::CanCast(bool strict)
             if(!m_caster->MonsterChargeByPath(target, 25, GetSpellMaxRange(m_spellInfo)*2, false, true))
                 return SPELL_FAILED_NOPATH;
 
-        if (m_spellInfo->Mechanic == MECHANIC_BANDAGE && m_caster->HasAura(11196,0))
+        if (m_spellInfo->Mechanic == MECHANIC_BANDAGE && target->HasAura(11196,0))
             return SPELL_FAILED_TARGET_AURASTATE;
 
         if((!IsPositiveSpell(m_spellInfo->Id) && !(m_spellInfo->Id == 7266)) && target->GetTypeId() == TYPEID_PLAYER 
