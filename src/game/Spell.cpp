@@ -3555,10 +3555,6 @@ uint8 Spell::CanCast(bool strict)
 
     if (target)
     {
-        if (m_customAttr & SPELL_ATTR_CU_CHARGE)
-            if(!m_caster->MonsterChargeByPath(target, 25, GetSpellMaxRange(m_spellInfo)*2, false, true))
-                return SPELL_FAILED_NOPATH;
-
         if (m_spellInfo->Mechanic == MECHANIC_BANDAGE && target->HasAura(11196,0))
             return SPELL_FAILED_TARGET_AURASTATE;
 

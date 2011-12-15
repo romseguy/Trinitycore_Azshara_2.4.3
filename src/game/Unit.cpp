@@ -3615,7 +3615,7 @@ bool Unit::AddAura(Aura *Aur)
         Unit* target = Aur->GetTarget();
         Unit* caster = Aur->GetCaster();
         if(caster->HasAura(44835,0))
-            CastSpell(target,32747,false);
+            CastSpell(target,32747,true,0,0,0);
 	}
 	
     if(aurSpellInfo->Id == 32453 || aurSpellInfo->Id == 29450 || aurSpellInfo->Id == 34780 || aurSpellInfo->Id == 29448 || aurSpellInfo->Id == 29451 ||
