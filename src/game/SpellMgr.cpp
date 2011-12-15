@@ -2614,6 +2614,12 @@ void SpellMgr::LoadSpellCustomAttr()
 		case 9913:
 			spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL;
 			break;
+		case 28878:
+		case 6562:
+		case 23034:
+		case 23035:
+			spellInfo->AttributesEx |= SPELL_ATTR_CANT_CANCEL;
+			break;
         default:
             break;
 		}
