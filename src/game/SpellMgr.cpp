@@ -2618,7 +2618,7 @@ void SpellMgr::LoadSpellCustomAttr()
 		case 6562:
 		case 23034:
 		case 23035:
-			spellInfo->AttributesEx |= SPELL_ATTR_CANT_CANCEL;
+			spellInfo->Attributes |= SPELL_ATTR_CANT_CANCEL;
 			break;
         default:
             break;
