@@ -2620,6 +2620,42 @@ void SpellMgr::LoadSpellCustomAttr()
 		case 23035:
 			spellInfo->Attributes |= SPELL_ATTR_CANT_CANCEL;
 			break;
+		case 2117:
+		case 34411:
+		case 34412:
+		case 34413:
+		case 53:
+		case 2589:
+		case 2590:
+		case 2591:
+		case 8721:
+		case 11279:
+		case 11280:
+		case 11281:
+		case 25300:
+		case 26863:
+		case 8676:
+		case 8724:
+		case 8725:
+		case 11267:
+		case 11268:
+		case 11269:
+		case 27441:
+		case 6785:
+		case 6787:
+		case 9866:
+		case 9867:
+		case 27005:
+		case 5221:
+		case 6800:
+		case 8992:
+		case 9829:
+		case 9830:
+		case 27001:
+		case 27002:
+		case 9823:
+			spellInfo->Attributes |= SPELL_ATTR_IMPOSSIBLE_DODGE_PARRY_BLOCK;
+			break;
         default:
             break;
 		}
