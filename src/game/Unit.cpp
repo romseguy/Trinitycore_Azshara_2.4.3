@@ -4297,6 +4297,27 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
     m_removedAuras.push_back(Aur);
 
     Aur->_RemoveAura();
+	
+	if(Aur->GetTarget()->HasAura(32390,0) || Aur->GetTarget()->HasAura(32391,0) || Aur->GetTarget()->HasAura(32386,0) || Aur->GetTarget()->HasAura(32388,0) || Aur->GetTarget()->HasAura(32389,0))
+    {
+
+        Unit* target = Aur->GetTarget();
+
+        if (!(target->HasAura(172,0) || target->HasAura(6222,0) || target->HasAura(6223,0) || target->HasAura(7648,0) || target->HasAura(11671,0) || target->HasAura(11672,0) ||
+            target->HasAura(25311,0) || target->HasAura(27218,0) || //corruption
+            target->HasAura(980,0) || target->HasAura(1014,0) || target->HasAura(6217,0) || target->HasAura(11711,0) || target->HasAura(11712,0) || target->HasAura(11713,0) ||
+            target->HasAura(27218,0) || // curse of agony
+            target->HasAura(18265,0) || target->HasAura(18879,0) || target->HasAura(18880,0) || target->HasAura(18881,0) || target->HasAura(27264,0) ||
+            target->HasAura(30911,0) || target->HasAura(18265,0) || // Siphon Life
+            target->HasAura(27243,0))) // Seed of Corruption
+        {
+            target->RemoveAura(32390,0);
+            target->RemoveAura(32391,0);
+            target->RemoveAura(32386,0);
+            target->RemoveAura(32388,0);
+            target->RemoveAura(32389,0);
+        }
+    }
 
     bool stack = false;
     spellEffectPair spair = spellEffectPair(Aur->GetId(), Aur->GetEffIndex());
