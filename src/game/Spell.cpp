@@ -2808,9 +2808,9 @@ void Spell::finish(bool ok)
          m_caster->ToPlayer()->RemoveSpellMods(this);
  
         if (Unit *target = m_targets.getUnitTarget())
-            if (m_spellInfo->Mechanic == MECHANIC_CHARM && target->HasAuraType(SPELL_AURA_REFLECT_SPELLS))
+            if ((m_spellInfo->Mechanic == MECHANIC_CHARM || m_spellInfo->Id == 988 || m_spellInfo->Id == 527) && target->HasAuraType(SPELL_AURA_REFLECT_SPELLS))
                 target->RemoveAuraTypeByCaster(SPELL_AURA_REFLECT_SPELLS, target->GetGUID());
-	m_caster->RemoveAurasDueToSpell(10912);
+				m_caster->RemoveAurasDueToSpell(10912);
     }
 
 

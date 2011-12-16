@@ -3543,7 +3543,7 @@ void Aura::HandleAuraReflect(bool apply, bool Real)
     if (!Real)
         return;
 
-    m_target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_CHARM, apply);
+	m_target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_CHARM, apply);
 }
 
 void Aura::HandleModThreat(bool apply, bool Real)

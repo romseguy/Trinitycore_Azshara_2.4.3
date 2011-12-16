@@ -2682,7 +2682,7 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell)
 			if (urand(0,99) < 15)
 				return SPELL_MISS_RESIST;
 		}
-	}
+	}	
 
     SpellSchoolMask schoolMask = GetSpellSchoolMask(spell);
     // PvP - PvE spell misschances per leveldif > 2
@@ -2751,6 +2751,13 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
     // Check for immune (use charges)
     if (pVictim->IsImmunedToSpell(spell,true))
         return SPELL_MISS_IMMUNE;
+	
+		
+	if (spell->Id == 988 || spell->Id == 527)
+	{
+		if (pVictim->HasAuraType(SPELL_AURA_REFLECT_SPELLS))
+			return SPELL_MISS_IMMUNE;
+	}
 
     // All positive spells can`t miss
     // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
@@ -4002,7 +4009,7 @@ void Unit::RemoveAurasDueToSpellByDispel(uint32 spellId, uint64 casterGUID, Unit
                 dispeler->CastCustomSpell(dispeler, 31117, &damage, NULL, NULL, true, NULL, NULL,caster_guid);
 
                 iter = m_Auras.begin();                     // iterator can be invalidate at cast if self-dispel
-            }
+            }			 
             else
                 RemoveAura(iter, AURA_REMOVE_BY_DISPEL);
         }
