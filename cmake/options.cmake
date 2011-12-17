@@ -15,3 +15,6 @@ option(USE_SCRIPTPCH    "Use precompiled headers when compiling scripts"        
 option(USE_COREPCH      "Use precompiled headers when compiling servers"              1)
 option(WITH_WARNINGS    "Show all warnings during compile"                            0)
 option(WITH_COREDEBUG   "Include additional debug-code in core"                       0)
+option(CMAKE_C_FLAGS         "Custom C Flags for NIX compilation"                          "-m64 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -O3 -DFD_SETSIZE=4096 -pipe")
+option(CMAKE_CXX_FLAGS         "Custom CXX Flags for NIX compilation"                          "-m64 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -O3 -DFD_SETSIZE=4096 -pipe")
+
