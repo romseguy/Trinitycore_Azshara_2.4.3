@@ -1064,7 +1064,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
     if (!m_caster->IsFriendlyTo(unit) && !IsPositiveSpell(m_spellInfo->Id))
     {
-        m_caster->CombatStart(unit, !(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO));
+        if(missInfo != SPELL_MISS_REFLECT)
+			m_caster->CombatStart(unit, !(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO));
+        else
+            m_caster->CombatStart(m_caster, !(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO));
 
         if (m_customAttr & SPELL_ATTR_CU_AURA_CC)
             if (!unit->IsStandState())
