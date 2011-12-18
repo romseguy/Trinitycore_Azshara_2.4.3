@@ -11408,49 +11408,12 @@ void Unit::MonsterMoveByPath(float x, float y, float z, uint32 speed, bool force
 
 bool Unit::MonsterChargeByPath(Unit *target, uint32 speed, uint32 maxDistance, bool smoothPath, bool justcheck)
 {
-    // BE Arena doesnt have mmaps on the rope, so you are able to charge up and down the pillar, hackfix
-/*    if(target->GetZoneId() == 3702) // if in BE arena
-    {
-        if((target->GetPositionY() > 267 || target->GetPositionY() < 255) && target->GetPositionZ() > 8) // if target on pillar
-        {
-            if(GetPositionZ() < 8) // and caster on ground
-                return false;
-        }
-        else if((GetPositionY() > 267 || GetPositionY() < 255) 
-            && GetMap()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ()) > 8) // caster on pillar(check ground coordinates as he might be jumping off)
-        {
-            if(target->GetPositionZ() < 8) // and target on ground
-                return false;
-        }
-    }*/
     PathInfo path(this, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), true);
     PointPath pointPath = path.getFullPath();
 
     if(pointPath.GetTotalLength() > maxDistance)
         return false;
 
-    if (justcheck) //used for checking if a path is possible.
-        return true; 
-
-    float angle = target->GetAngle(pointPath[pointPath.size()-2].x, pointPath[pointPath.size()-2].y);
-    float distance = CONTACT_DISTANCE+GetObjectSize();
-
-    pointPath[pointPath.size()-1].x = target->GetPositionX() + distance * cos(angle);
-    pointPath[pointPath.size()-1].y = target->GetPositionY() + distance * sin(angle);
-
-    Oregon::NormalizeMapCoord(pointPath[pointPath.size()-1].x);
-    Oregon::NormalizeMapCoord(pointPath[pointPath.size()-1].y);
-
-    pointPath[pointPath.size()-1].z = target->GetPositionZ();
-
-    float new_z = GetBaseMap()->GetHeight(pointPath[pointPath.size()-1].x, pointPath[pointPath.size()-1].y, pointPath[pointPath.size()-1].z, true);
-    if (new_z > INVALID_HEIGHT)
-        pointPath[pointPath.size()-1].z = new_z+ 0.20f;  
-
-    uint32 traveltime = uint32(pointPath.GetTotalLength() / float(speed));
-    if(!justcheck)
-        this->Relocate(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ());
-    MonsterMoveByPath(pointPath, 1, pointPath.size(), traveltime);
     return true;
 }
 
