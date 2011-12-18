@@ -2560,8 +2560,12 @@ void SpellMgr::LoadSpellCustomAttr()
 	        break;
         case 7922:                        // Charge stun
         case 25274:                       // Intercept stun
+			spellInfo->speed = 200.0f;    // Minor delay
             break;
-		 case 6358:
+		case 2094:                        // Blind
+            spellInfo->speed = 600.0f;    // Minor delay
+			break;
+		case 6358:
 			spellInfo->Mechanic = MECHANIC_FEAR;
             break;
         case 27066:
