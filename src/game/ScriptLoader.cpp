@@ -17,6 +17,7 @@
 
 //void AddSC_ArenaSpectator();
 void AddSC_npc_arenaspectate();
+void AddSC_barber();
 
 //world
 void AddSC_areatrigger_scripts();
@@ -383,9 +384,10 @@ void AddScripts()
 {
 #ifdef SCRIPTS
 
-//      AddSC_ArenaSpectator();
-      AddSC_npc_arenaspectate();
 
+    AddSC_npc_arenaspectate();
+	AddSC_barber();
+	
     AddSC_areatrigger_scripts();
     AddSC_boss_emeriss();
     AddSC_boss_taerar();
