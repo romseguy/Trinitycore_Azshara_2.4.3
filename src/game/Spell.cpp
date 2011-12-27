@@ -1128,8 +1128,9 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
 				}
                 return;
             }
-	if (m_spellInfo->SpellIconID != 2267 && m_spellInfo->Id != 3600 && m_spellInfo->Id != 1725 && m_spellInfo->Id != 36554 && m_spellInfo->Id != 14185)
-            unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
+			
+			if (m_spellInfo->SpellIconID != 2267 && m_spellInfo->Id != 3600 && m_spellInfo->Id != 1725 && m_spellInfo->Id != 36554 && m_spellInfo->Id != 14185)
+				unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
 
 			if ((m_customAttr & SPELL_ATTR_CU_AURA_CC) && m_spellInfo->Mechanic != MECHANIC_ROOT && m_spellInfo->SchoolMask != SPELL_SCHOOL_MASK_FROST)
                 unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CC);
@@ -3857,7 +3858,9 @@ uint8 Spell::CanCast(bool strict)
         if (uint8 castResult = CheckCasterAuras())
             return castResult;
     }
-    else if(m_spellInfo->Id == 33395) { // water elemental freeze range check, doesnt seem to be any other way to fix this as it must be a triggered spell.
+    else if(m_spellInfo->Id == 33395) 
+	{ 
+		// water elemental freeze range check, doesnt seem to be any other way to fix this as it must be a triggered spell.
         if (uint8 castResult = CheckRange(strict))
             return castResult;
     }
