@@ -2478,10 +2478,22 @@ float Unit::MeleeSpellMissChance(const Unit *pVictim, WeaponAttackType attType, 
         HitChance = 95 - leveldif;
     else
         HitChance = 93 - (leveldif - 2) * lchance;*/
-    if (spellId || attType == RANGED_ATTACK || !haveOffhandWeapon())
-        HitChance = 95.0f;
-    else
-        HitChance = 76.0f;
+	if (pVictim->GetTypeId() == TYPEID_PLAYER && m_modMeleeHitChance >= 4.8f)
+	{
+		if (spellId)
+			HitChance = 1000.0f;
+		else if (attType == RANGED_ATTACK || !haveOffhandWeapon()) 
+			HitChance = 95.0f;
+		else
+			HitChance = 76.0f;
+	}
+	else
+	{
+		if (spellId || attType == RANGED_ATTACK || !haveOffhandWeapon()) 
+			HitChance = 95.0f;
+		else
+			HitChance = 76.0f;
+	}
 
     // Hit chance depends from victim auras
     if (attType == RANGED_ATTACK)
