@@ -1094,8 +1094,16 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
         && (unit->IsImmunedToDamage(GetSpellSchoolMask(m_spellInfo),true) ||
         unit->IsImmunedToSpell(m_spellInfo,true)))
     {
-        m_caster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_IMMUNE);
-        m_damage = 0;
+		if (m_spellInfo->Id != 2094) 
+		{
+			m_damage = 0;
+			m_caster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_IMMUNE);
+		}              
+		else	// If blind is vanished, no immunity message should be displayed
+		{
+			m_damage = 0;
+			unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
+		}
         return;
     }
 
@@ -1121,11 +1129,6 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
                 // that was causing CombatLog errors
                 m_caster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
                 m_damage = 0;
- 				if (m_spellInfo->Id == 2094)
-				{
-					unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-					unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
-				}
                 return;
             }
 			

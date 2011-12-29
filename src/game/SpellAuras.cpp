@@ -920,7 +920,7 @@ void Aura::_AddAura()
     {
         if (!secondaura)                                     // new slot need
         {
-            if (IsPositive())                               // empty positive slot
+            if (IsPositive() && m_spellProto->Id != 42432)   // empty positive slot & 42432 is to hide the custom Vanish / Blind aura
             {
                 for (uint8 i = 0; i < MAX_POSITIVE_AURAS; i++)
                 {
@@ -931,7 +931,7 @@ void Aura::_AddAura()
                     }
                 }
             }
-            else                                            // empty negative slot
+            else if (m_spellProto->Id != 42432)              // empty positive slot & 42432 is to hide the custom Vanish / Blind aura
             {
                 for (uint8 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; i++)
                 {
@@ -1309,14 +1309,6 @@ void Aura::TriggerSpell()
 //                    case 23184: break;
                     // Piercing Howl
                     case 12323:
-                    {
-                        m_target->RemoveAurasDueToSpell(26889);
-                        m_target->RemoveAurasDueToSpell(26888);
-                        m_target->RemoveAurasDueToSpell(1787);
-                            return;
-                    }
-                    // Blind
-                    case 2094:
                     {
                         m_target->RemoveAurasDueToSpell(26889);
                         m_target->RemoveAurasDueToSpell(26888);
@@ -2043,6 +2035,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
     {
         switch(GetId())
         {
+			case 42432:                                      // Custom aura triggered by vanish to allow Vanish / Blind
+				m_target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_CONFUSED, apply);
+                return;
             case 1515:                                      // Tame beast
                 // FIX_ME: this is 2.0.12 threat effect replaced in 2.1.x by dummy aura, must be checked for correctness
                 if (caster && m_target->CanHaveThreatList())
@@ -2149,6 +2144,10 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
         switch(GetId())
         {
+			case 42432:                                      // Blind immunity fade
+				m_target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_CONFUSED, apply);
+				return;
+				
             case 2584:                                     // Waiting to Resurrect
             {
                 // Waiting to resurrect spell cancel, we must remove player from resurrect queue

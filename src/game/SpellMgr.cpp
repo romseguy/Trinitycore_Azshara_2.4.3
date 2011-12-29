@@ -2514,6 +2514,13 @@ void SpellMgr::LoadSpellCustomAttr()
 		case 66:
             spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
             break;
+		case 42432: // Interrupt flags for Vanish / Blind custom aura.
+			spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_DAMAGE;
+			spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CC;
+			spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_ATTACK;
+			spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
+			spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_DIRECT_DAMAGE;
+			break;
 		case 24905: // Moonkin form -> elune's touch
 			spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_CASTER;
 			break;

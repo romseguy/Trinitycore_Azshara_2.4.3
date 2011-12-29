@@ -2762,7 +2762,16 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
 
     // Check for immune (use charges)
     if (pVictim->IsImmunedToSpell(spell,true))
-        return SPELL_MISS_IMMUNE;
+	{	
+		if (spell->Id == 2094) // Vanished Blind removes stealth 
+		{
+			pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
+		}
+		else
+		{
+			return SPELL_MISS_IMMUNE;
+		}
+	}
 	
 		
 	if (spell->Id == 988 || spell->Id == 527)
@@ -8957,6 +8966,10 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
 {
     // only alive units can be in combat
     if (!isAlive())
+        return;
+	
+	// Vanishing a blind should not trigger combat
+	if (HasAura(42432, 0))
         return;
 
     if (PvP)
