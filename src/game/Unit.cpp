@@ -9256,15 +9256,15 @@ float Unit::GetStealthDetectionValue() const
         level += 30;
     if (HasAura(20600, 0)) // Perception (Racial
         level += 50;
-    if (HasAura(30894, 0)) // Heightened Senses (Rank 1)
+    if (HasAura(30894, 1)) // Heightened Senses (Rank 1)
         level += 3;
-    if (HasAura(30895, 0)) // Heightened Senses (Rank 2)
+    if (HasAura(30895, 1)) // Heightened Senses (Rank 2)
         level += 6;
-    if(HasAura(40273, 0)) // Stealth Detection (googles)
+    if(HasAura(40273, 1)) // Stealth Detection (googles)
         level += 5;
-    if(HasAura(23217, 0)) // Bloodvine Lens
+    if(HasAura(23217, 1)) // Bloodvine Lens
         level += 10;
-    if(HasAura(12418, 0)) // Catseye Ultra Goggles
+    if(HasAura(12418, 1)) // Catseye Ultra Goggles
         level += 18;
     if(HasAura(12608, 0)) // Cats elixir
         level += 10;
@@ -9283,29 +9283,28 @@ float Unit::GetStealthModifierValue() const
 {
     float level = 0;
     if (HasAura(11327, 0)) // Vanish (Rank 1)
-
         level += 170;
     if (HasAura(11329, 0)) // Vanish (Rank 2)
         level += 270;
     if (HasAura(26888, 0)) // Vanish (Rank 3)
         level += 370;
-    if (HasAura(13958, 0)) // Master of Deception (Rank 1)
+    if (HasAura(13958, 1)) // Master of Deception (Rank 1)
         level += 3;
-    if (HasAura(13970, 0)) // Master of Deception (Rank 2)
+    if (HasAura(13970, 1)) // Master of Deception (Rank 2)
         level += 6;
-    if (HasAura(13971, 0)) // Master of Deception (Rank 3)
+    if (HasAura(13971, 1)) // Master of Deception (Rank 3)
         level += 9;
-    if (HasAura(13972, 0)) // Master of Deception (Rank 4)
+    if (HasAura(13972, 1)) // Master of Deception (Rank 4)
         level += 12;
-    if (HasAura(13973, 0)) // Master of Deception (Rank 5)
+    if (HasAura(13973, 1)) // Master of Deception (Rank 5)
         level += 15;
-    if (HasAura(16947, 0)) // Feral Instinct (Rank 1)
+    if (HasAura(16947, 1)) // Feral Instinct (Rank 1)
         level += 5;
-    if (HasAura(16948, 0)) // Feral Instinct (Rank 2)
+    if (HasAura(16948, 1)) // Feral Instinct (Rank 2)
         level += 10;
-    if (HasAura(16949, 0)) // Feral Instinct (Rank 3)
+    if (HasAura(16949, 1)) // Feral Instinct (Rank 3)
         level += 15;
-    if (HasAura(21009, 0)) // Shadowmeld Passive (Racial Passive)
+    if (HasAura(21009, 1)) // Shadowmeld Passive (Racial Passive)
         level += 5;
  
     return level;
