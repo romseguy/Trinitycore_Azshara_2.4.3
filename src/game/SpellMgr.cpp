@@ -2572,6 +2572,14 @@ void SpellMgr::LoadSpellCustomAttr()
 		case 2094:                        // Blind
             spellInfo->speed = 600.0f;    // Minor delay
 			break;
+		case 1776:						  // Gouge delay
+		case 1777:
+		case 8629:
+		case 11285:
+		case 11286:
+		case 38764:
+			spellInfo->speed = 300.0f;
+			break;        
 		case 6358:
 			spellInfo->Mechanic = MECHANIC_FEAR;
             break;
@@ -2599,7 +2607,7 @@ void SpellMgr::LoadSpellCustomAttr()
             break;
 	    case 1543: // Flare
 	    case 26679: // Deadly Throw
-	        // spellInfo->speed = 0;
+	        spellInfo->speed = 0;
 	        break;
 		case 27892:     // To Anchor 1
 		case 27928:     // To Anchor 1
