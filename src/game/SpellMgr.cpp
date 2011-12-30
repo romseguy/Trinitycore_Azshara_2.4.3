@@ -2514,6 +2514,9 @@ void SpellMgr::LoadSpellCustomAttr()
 		case 66:
             spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
             break;
+		case 1842: 														// disarm trap real range (5 yards)
+            spellInfo->rangeIndex = 100;
+            break;					
 		case 42432: // Interrupt flags for Vanish / Blind custom aura.
 			spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_DAMAGE;
 			spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CC;
