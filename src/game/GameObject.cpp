@@ -211,7 +211,7 @@ void GameObject::Update(uint32 diff)
                     // Arming Time for GAMEOBJECT_TYPE_TRAP (6)
                     Unit* owner = GetOwner();
                     if (owner)// && owner->isInCombat()) // we dont want to activate traps rigth after feign death
-                        m_cooldownTime = time(NULL) + GetGOInfo()->trap.startDelay;
+                        m_cooldownTime = time(NULL) + (GetGOInfo()->trap.startDelay)/2;
                     m_lootState = GO_READY;
                     break;
                 }
