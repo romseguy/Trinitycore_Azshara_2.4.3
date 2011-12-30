@@ -317,7 +317,7 @@ void Guardian::InitStats(uint32 duration)
         m_charmInfo->InitCharmCreateSpells();
 
     if (ToCreature()->GetEntry() == 510)
-		SetReactState(REACT_PASSIVE);
+		SetReactState(REACT_DEFENSIVE);
 	else
 		SetReactState(REACT_AGGRESSIVE);
 }
