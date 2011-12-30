@@ -339,20 +339,10 @@ void GameObject::Update(uint32 diff)
                     // search unfriendly creature
                     if (owner)                    // hunter trap
                     {
-                        std::list<Unit*> units;
                         Oregon::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
-                        Oregon::UnitListSearcher<Oregon::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(units, checker);
-                        VisitNearbyWorldObject(radius, searcher);
-
-                        for (std::list<Unit*>::iterator itr = units.begin(); itr != units.end(); ++itr)
-                        {
-                            if (((*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->ToPlayer()->m_isArenaSpectator == false) || (*itr)->GetTypeId() != TYPEID_PLAYER) // not arena spectator
-                            {
-                                ok = *itr;
-                                break;
-                            }
-                        }
-
+                        Oregon::UnitSearcher<Oregon::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(ok, checker);
+                        VisitNearbyGridObject(radius, searcher);
+                        if (!ok) VisitNearbyWorldObject(radius, searcher);
                     }
                     else                                        // environmental trap
                     {

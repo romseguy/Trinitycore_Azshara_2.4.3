@@ -678,6 +678,9 @@ namespace Oregon
 
                 if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->isTotem())
                     return false;
+					
+				if (u->GetTypeId() == TYPEID_PLAYER && u->ToPlayer()->m_isArenaSpectator) 
+                    return false;
 
                 return i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u);
             }
