@@ -1127,7 +1127,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
             if (m_delayMoment && unit == m_targets.getUnitTarget() && !isVisibleForHit)
             {
                 // that was causing CombatLog errors
-                m_caster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
+                // m_caster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
                 m_damage = 0;
                 return;
             }

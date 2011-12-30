@@ -3322,7 +3322,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
 			
 			Player* target = (Player*)m_target;
             if (target)
-                target->m_invisibilityUpdateTimer = 300;
+                target->m_invisibilityUpdateTimer = 150;
 
             // for RACE_NIGHTELF stealth
             if (m_target->GetTypeId() == TYPEID_PLAYER && GetId() == 20580)
