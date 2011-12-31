@@ -9315,12 +9315,8 @@ bool Unit::canDetectStealthOf(Unit const* target, float distance) const
     if(GetTypeId() == TYPEID_PLAYER && ToPlayer()->m_isArenaSpectator) // if arena spectator, not do not show stealth players
         return false;
 
-    if (hasUnitState(UNIT_STAT_STUNNED))
-        return false;
-    if (distance < 0.24f) //collision
+    if (distance < 5.0f) //collision
         return true;
-    if (!HasInArc(M_PI, target)) //behind
-        return false;
     if (HasAuraType(SPELL_AURA_DETECT_STEALTH))
         return true;
 
@@ -9329,18 +9325,21 @@ bool Unit::canDetectStealthOf(Unit const* target, float distance) const
         if ((*iter)->GetCasterGUID() == GetGUID())
             return true;
 
-    //Visible distance based on stealth value (stealth rank 4 300MOD, 10.5 - 3 = 7.5)
-    float visibleDistance = 7.5f - target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH) / 100.0f;
+    //Visible distance based on stealth value (stealth hunter pet 300MOD, 10.5 - 3 = 7.5) new values for rogue stealth and druid prowl 400MOD 10.5 - 4 = 6.5f
+    float visibleDistance = 15.5f;
     //Visible distance is modified by -Level Diff (every level diff = 1.0f in visible distance)
-    visibleDistance += int32(getLevelForTarget(target)) - int32(target->getLevelForTarget(this));
+    visibleDistance -= target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH)/100.0f;
+
+    visibleDistance += float(getLevel() - target->getLevel()); // every level difference will give you 1 yard detection or subtlety
     //-Stealth Mod(positive like Master of Deception) and Stealth Detection(negative like paranoia)
     //based on wowwiki every 5 mod we have 1 more level diff in calculation
-    visibleDistance += (float)(GetStealthDetectionValue() - target->GetStealthModifierValue()) / 5.0f;
- 
-    if (visibleDistance < 0.0f)
-        return false;
+    visibleDistance += (float) GetStealthDetectionValue() / 5.0f - target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL) / 5.0f; 
+    visibleDistance = visibleDistance > MAX_PLAYER_STEALTH_DETECT_RANGE ? MAX_PLAYER_STEALTH_DETECT_RANGE : visibleDistance;
 
-    return distance < visibleDistance;
+    if (!HasInArc(M_PI, target)) //behind
+        visibleDistance /= 4; 
+
+	 return distance < visibleDistance;
 }
 
 void Unit::SetVisibility(UnitVisibility x)
