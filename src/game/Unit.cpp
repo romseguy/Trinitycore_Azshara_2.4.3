@@ -2480,7 +2480,7 @@ float Unit::MeleeSpellMissChance(const Unit *pVictim, WeaponAttackType attType, 
         HitChance = 93 - (leveldif - 2) * lchance;*/
 	if (pVictim->GetTypeId() == TYPEID_PLAYER && m_modMeleeHitChance >= 4.8f)
 	{
-		if (spellId)
+		if (spellId && attType != RANGED_ATTACK)
 			HitChance = 1000.0f;
 		else if (attType == RANGED_ATTACK || !haveOffhandWeapon()) 
 			HitChance = 95.0f;
