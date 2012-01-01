@@ -254,7 +254,7 @@ void DynamicObjectUpdater::VisitHelper(Unit* target)
     if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->isTotem())
         return;
 
-    if (!i_dynobject.IsWithinDistInMap(target, i_dynobject.GetRadius()))
+    if (!i_dynobject.IsWithinDistInMap(target, i_dynobject.GetRadius()) || !i_dynobject.IsWithinLOSInMap(target))
         return;
 
     //Check targets for not_selectable unit flag and remove
