@@ -6568,13 +6568,6 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
     // dummy basepoints or other customs
     switch(trigger_spell_id)
     {
-		case 15269: // Blackout
-		{
-			if (procSpell->SpellIconID == 502 || procSpell->Id == 34650 || procSpell->Id == 41967 || procSpell->Id == 34433 || procSpell->SpellIconID == 76 || procSpell->SpellIconID == 19 || procSpell->SpellIconID == 1591 || procSpell->Id == 15487 || !pVictim || pVictim == this) // Blackout self-stun fix AND now it can't proc from mind vision/ hex of weakness/ silence
-			return false;
-            break;
-		}
-		
         // Cast positive spell on enemy target
         case 7099:  // Curse of Mending
         case 39647: // Curse of Mending
@@ -6595,8 +6588,8 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
         case 14189: // Seal Fate (Netherblade set)
         case 14157: // Ruthlessness
         {
-	    if(procSpell->Id == 26679)
-		return false;
+	        if (procSpell->Id == 26679 || procSpell->Id == 5171 || procSpell->Id == 6774)
+		        return false;
 
             if (!pVictim || pVictim == this)
                 return false;
@@ -8208,6 +8201,11 @@ bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
                 crit_chance = GetUnitCriticalChance(attackType, pVictim);
                 crit_chance+= (int32(GetMaxSkillValueForLevel(pVictim)) - int32(pVictim->GetDefenseSkillValue(this))) * 0.04f;
                 crit_chance+= GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL, schoolMask);
+                // always crit against a sitting target (except 0 crit chance)
+                if (crit_chance > 0 && !pVictim->IsStandState())
+                {
+                   return true;
+                }
             }
             break;
         }
