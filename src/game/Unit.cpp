@@ -6550,8 +6550,21 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
             break;
         }
     }
+	
+    // Enrage 
+	case 12317:
+	case 13045:
+	case 13046:
+	case 13047:
+	case 13048:
+    {
+		// if not Death Wish
+		if (HasAura(12292,0))
+			return false;
+		break;
+    }
 
-    // Costum basepoints/target for exist spell
+    // Custom basepoints/target for exist spell
     // dummy basepoints or other customs
     switch(trigger_spell_id)
     {
