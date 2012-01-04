@@ -8233,6 +8233,35 @@ uint32 Unit::SpellCriticalBonus(SpellEntry const *spellProto, uint32 damage, Uni
         case SPELL_DAMAGE_CLASS_RANGED:
             // TODO: write here full calculation for melee/ranged spells
             crit_bonus = damage;
+            if (GetTypeId() == TYPEID_PLAYER)
+            {
+                switch(spellProto->SpellFamilyName)
+                {
+                    case SPELLFAMILY_ROGUE: // Mutilate lethality crit bonus to poisoned targets
+                        if (spellProto->SpellFamilyFlags & 0x600000000LL)
+                        {
+                            bool poisoned = false;
+                            uint32 arr[] = { 14137, 14136, 14135, 14132, 14128 }; // Lethality Spell IDs
+                            uint8 rank = GetMaxRankSpellFromArray(arr, 5);
+
+                            if (pVictim && rank)
+                            {
+                                Unit::AuraMap const& auras = pVictim->GetAuras();
+                                for(Unit::AuraMap::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
+                                {
+                                    if (itr->second->GetSpellProto()->Dispel == DISPEL_POISON)
+                                    {
+                                        poisoned = true; // poisoned
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (poisoned)
+                                crit_bonus = damage * (1 + 0.06f * rank);
+                        }
+                }
+            }
             break;
         default:
             crit_bonus = damage / 2;                        // for spells is 50%
