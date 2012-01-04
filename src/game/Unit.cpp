@@ -6583,20 +6583,21 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 return false;
             break;
         }
-    }
+    	
+		// Enrage 
+		case 12317:
+		case 13045:
+		case 13046:
+		case 13047:
+		case 13048:
+		{
+			// if not Death Wish
+			if (HasAura(12292,0))
+				return false;
+			break;
+		}
+	}
 	
-    // Enrage 
-	case 12317:
-	case 13045:
-	case 13046:
-	case 13047:
-	case 13048:
-    {
-		// if not Death Wish
-		if (HasAura(12292,0))
-			return false;
-		break;
-    }
 
     // Custom basepoints/target for exist spell
     // dummy basepoints or other customs
@@ -9151,7 +9152,7 @@ void Unit::ClearInCombat()
     if (GetTypeId() != TYPEID_PLAYER && ToCreature()->isPet())
     {
         if (Unit *owner = GetOwner())
-            for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)              
+            for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i);              
     }
     else if (!isCharmed())
         return;
