@@ -9117,8 +9117,7 @@ void Unit::ClearInCombat()
     if (GetTypeId() != TYPEID_PLAYER && ToCreature()->isPet())
     {
         if (Unit *owner = GetOwner())
-            for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
-                SetSpeed(UnitMoveType(i), owner->GetSpeedRate(UnitMoveType(i)), true);
+            for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)              
     }
     else if (!isCharmed())
         return;
@@ -9599,10 +9598,6 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
         // and do it only for real sent packets and use run for run/mounted as client expected
         ++ToPlayer()->m_forced_speed_changes[mtype];
 
-        if (!isInCombat())
-            if (Pet* pet = ToPlayer()->GetPet())
-                pet->SetSpeed(mtype, m_speed_rate[mtype], forced);
-
         switch(mtype)
         {
             case MOVE_WALK:
@@ -9639,6 +9634,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
             data << uint8(0);                               // new 2.1.0
         data << float(GetSpeed(mtype));
         SendMessageToSet(&data, true);
+    }
+    if (GetPetGUID())
+    {
+		if (Pet* pet = ToPlayer()->GetPet())
+        {
+			if (!pet->isInCombat() && pet->GetSpeedRate(mtype) < m_speed_rate[mtype])
+                pet->SetSpeed(mtype, m_speed_rate[mtype], forced);
+        }
     }
 }
 
@@ -12928,3 +12931,18 @@ bool CharmInfo::IsReturning()
     return m_isReturning;
 }
 
+// This function get high ranked spelld from array
+// found in spells learned/talented by player
+// info: spells must be sorted from high ranks to low
+// ex: array[] = {rank3, rank2, rank1 };
+uint8 Unit::GetMaxRankSpellFromArray(uint32 array[], uint8 count)
+{
+    // if array is empty return no rank
+    if (!count) return 0;
+
+    for(uint8 i = 0; i < count; i++)
+        if (HasSpell(array[i])) return count-i; // return rank
+
+    // no spell found, return no rank
+    return 0;
+}

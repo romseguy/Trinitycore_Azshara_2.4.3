@@ -1754,6 +1754,7 @@ class Unit : public WorldObject
 
         uint32 m_reducedThreatPercent;
         uint64 m_misdirectionTargetGUID;
+		uint8 GetMaxRankSpellFromArray(uint32 array[], uint8 count);
 
         uint32 m_procDeep;
 };
