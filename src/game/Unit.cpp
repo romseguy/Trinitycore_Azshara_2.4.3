@@ -5409,6 +5409,20 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 basepoints0 = triggeredByAura->GetModifier()->m_amount*damage/100;
                 pVictim->CastCustomSpell(pVictim,34919,&basepoints0,NULL,NULL,true,castItem,triggeredByAura);
                 return true;                                // no hidden cooldown
+            }			
+            // Blackout
+            if (dummySpell->SpellIconID == 173 && dummySpell->SpellFamilyFlags & 0x0000100000000000LL)
+            {
+                if (procFlag & (PROC_FLAG_ON_DO_PERIODIC | PROC_FLAG_ON_TAKE_PERIODIC))
+                    return false;
+
+                // should not proc on self due to shadow word death backlash
+                if (procSpell && procSpell->Id == 32409)
+                    return false;
+
+                // touch of weakness
+                if (dummySpell->SpellIconID == 1591)
+                    return false;
             }
             switch(dummySpell->Id)
             {
