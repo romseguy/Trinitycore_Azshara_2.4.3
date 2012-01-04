@@ -3325,6 +3325,40 @@ void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool wi
     }
 }
 
+void Unit::InterruptSpellNotGrenade(CurrentSpellTypes spellType, bool withDelayed, bool withInstant, bool fromspell)
+{
+    ASSERT(spellType < CURRENT_MAX_SPELL);
+
+    Spell *spell = m_currentSpells[spellType];
+    if (spell
+        && (withDelayed || spell->getState() != SPELL_STATE_DELAYED)
+        && (withInstant || spell->GetCastTime() > 0))
+    {
+        // for example, do not let self-stun aura interrupt itself
+        if (!spell->IsInterruptable())
+            return;
+
+        m_currentSpells[spellType] = NULL;
+
+        // send autorepeat cancel message for autorepeat spells
+        if (spellType == CURRENT_AUTOREPEAT_SPELL)
+        {
+            if (GetTypeId() == TYPEID_PLAYER)
+                ToPlayer()->SendAutoRepeatCancel();
+        }
+
+		if (GetTypeId() == TYPEID_PLAYER)
+            ToPlayer()->SendArenaSpectatorSpell(spell->m_spellInfo->Id, (fromspell ? 99999 : 99998));
+		//spell->GetSpellInfo()->Id
+		// to 
+		//spell->m_spellInfo->Id
+
+        if (spell->getState() != SPELL_STATE_FINISHED)
+            spell->cancel();
+        spell->SetReferencedFromCurrent(false);
+    }
+}
+
 void Unit::FinishSpell(CurrentSpellTypes spellType, bool ok /*= true*/)
 {
     Spell* spell = m_currentSpells[spellType];
