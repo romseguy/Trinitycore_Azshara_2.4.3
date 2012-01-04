@@ -223,15 +223,12 @@ void PetAI::UpdateAI(const uint32 diff)
             SpellCastTargets targets;
             targets.setUnitTarget(target);
 
-            if (!me->HasInArc(M_PI, target))
-            {
-                me->SetInFront(target);
-                if (target && target->GetTypeId() == TYPEID_PLAYER)
-                    me->SendUpdateToPlayer(target->ToPlayer());
+            me->SetInFront(target);
+            if (target && target->GetTypeId() == TYPEID_PLAYER)
+				me->SendUpdateToPlayer(target->ToPlayer());
 
-                if (owner && owner->GetTypeId() == TYPEID_PLAYER)
-                    me->SendUpdateToPlayer(owner->ToPlayer());
-            }
+            if (owner && owner->GetTypeId() == TYPEID_PLAYER)
+				me->SendUpdateToPlayer(owner->ToPlayer());
 
             me->AddCreatureSpellCooldown(spell->m_spellInfo->Id);
             if (me->isPet())
