@@ -8447,8 +8447,7 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, 
                 // Health Funnel
                 if ((spellProto->SpellFamilyFlags & 0x1000000LL) && spellProto->SpellIconID == 153)
                 {
-                    CastingTime = 3500;
-                    DotFactor = 2.875f;
+                    DotFactor = 0.548f;
                 }
                 break;
             case SPELLFAMILY_WARRIOR:
