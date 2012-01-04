@@ -5153,6 +5153,20 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
         }
         case SPELLFAMILY_MAGE:
         {
+            // Clearcasting
+            if (dummySpell->SpellIconID == 212)
+            {
+                // Can not proc from Ignite tick
+                if (procFlag & (PROC_FLAG_ON_DO_PERIODIC | PROC_FLAG_ON_TAKE_PERIODIC))
+                    return false;
+
+                // Can not proc from Blizzard and Arcane Missles triggered spell
+                if ((procSpell->SpellFamilyFlags == 0x0000000000200000LL) && procSpell->SpellIconID == 225)
+                    return false;
+                if ((procSpell->SpellFamilyFlags & 0x0000000000080080LL) && procSpell->SpellIconID == 285)
+                    return false;
+            }
+
             // Magic Absorption
             if (dummySpell->SpellIconID == 459)             // only this spell have SpellIconID == 459 and dummy aura
             {
