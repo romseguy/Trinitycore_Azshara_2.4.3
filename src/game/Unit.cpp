@@ -5817,6 +5817,17 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                     // custom cooldown processing case
                     if (cooldown && ToPlayer()->HasSpellCooldown(dummySpell->Id))
                         return false;
+						
+                    if (castItem->GetGUID() !=  triggeredByAura->GetCastItemGUID())
+						return false;
+
+                    // No ninja wolves
+                    if (((Player*)this)->m_form == FORM_GHOSTWOLF)
+						return false;
+
+                    // Not while disarmed
+                    if (!((Player*)this)->IsUseEquippedWeapon(castItem->GetSlot() == EQUIPMENT_SLOT_MAINHAND))
+						return false;
 
                     uint32 spellId;
                     switch (castItem->GetEnchantmentId(EnchantmentSlot(TEMP_ENCHANTMENT_SLOT)))
