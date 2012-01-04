@@ -2278,6 +2278,11 @@ void Spell::EffectApplyAura(uint32 i)
     DEBUG_LOG("Spell: Aura is: %u", m_spellInfo->EffectApplyAuraName[i]);
 
     Aura* Aur = CreateAura(m_spellInfo, i, &damage, unitTarget, caster, m_CastItem);
+	
+    if(Aur->GetId() == 10 || Aur->GetId() == 27212)
+    {
+        caster->SetInCombatState(true,unitTarget);
+    }
 
     // Now Reduce spell duration using data received at spell hit
     int32 duration = Aur->GetAuraMaxDuration();
