@@ -661,6 +661,19 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
     // original spells
     learnDefaultSpells(true);
 
+    // profession spells
+    // cooking
+    learnSpell(33359, false);
+    SetSkill(185, 375, 375);
+
+    // fishing
+    learnSpell(33095, false);
+    SetSkill(356, 375, 375);
+
+    // first aid
+    learnSpell(27028, false);
+    SetSkill(129, 375, 375);
+
     // original action bar
     std::list<uint16>::const_iterator action_itr[4];
     for (int i=0; i<4; i++)
@@ -6720,7 +6733,9 @@ void Player::UpdateZone(uint32 newZone)
     }
 
     pvpInfo.inNoPvPArea = false;
-    if (zone->flags & AREA_FLAG_SANCTUARY) 					 // in sanctuary
+    if (zone->flags & AREA_FLAG_SANCTUARY
+            || newZone == 1637
+            || newZone == 1519) 					 // in sanctuary
     {
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_SANCTUARY);
         pvpInfo.inNoPvPArea = true;
