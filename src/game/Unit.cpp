@@ -9591,7 +9591,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
         rate = 0.0f;
 
     if(GetTypeId() == TYPEID_PLAYER)
-	ToPlayer()->m_anti_skipspeed = 1;
+	ToPlayer()->m_anti_skipspeed = 3;
 
     // Update speed only on change
     if (m_speed_rate[mtype] == rate)
