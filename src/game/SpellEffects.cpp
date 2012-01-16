@@ -6504,7 +6504,7 @@ void Spell::GetSummonPosition(uint32 i, Position &pos, float radius, uint32 coun
     if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
     {
         // Summon 1 unit in dest location
-        if (count == 0)
+        if (count == 0 && m_spellInfo->Id != 6495 && m_spellInfo->Id != 126)
         {
             bool found = false;
             float cur_radius = 3.0f;
@@ -6530,7 +6530,7 @@ void Spell::GetSummonPosition(uint32 i, Position &pos, float radius, uint32 coun
 
         }
         // Summon in random point all other units if location present
-        else
+        else if(m_spellInfo->Id != 6495 && m_spellInfo->Id != 126)
         {
             //This is a workaround. Do not have time to write much about it
             switch (m_spellInfo->EffectImplicitTargetA[i])

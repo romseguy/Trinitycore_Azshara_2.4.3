@@ -64,6 +64,13 @@ void WorldSession::HandleLearnTalentOpcode(WorldPacket & recv_data)
     // prevent skip talent ranks (cheating)
     if (requested_rank > 0 && !player->HasSpell(talentInfo->RankID[requested_rank-1]))
         return;
+		
+    // skip players who aren't alive (cheating)
+    if(!player->isAlive())
+    {
+        SendNotification("Cannot change talents while dead!");
+        return;
+    }
 
     // Check if it requires another talent
     if (talentInfo->DependsOn > 0)

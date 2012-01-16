@@ -6583,7 +6583,27 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 return false;
             break;
         }
-    	
+        //Frenzy
+        case 20784:
+        {
+            uint32 chance = 0;
+            if(Unit * owner = GetOwner())
+            {
+                if(owner->HasAura(19621, 0))
+                    chance = 20;
+                else if (owner->HasAura(19622, 0))
+                    chance = 40;
+                else if (owner->HasAura(19623, 0))
+                    chance = 60;
+                else if (owner->HasAura(19624, 0))
+                    chance = 80;
+                else if (owner->HasAura(19625, 0))
+                    chance = 100;
+            }
+            if(!roll_chance_i(chance))
+                return false;
+            break;
+        }
 		// Enrage 
 		case 12317:
 		case 13045:
@@ -8174,7 +8194,9 @@ int32 Unit::SpellBaseDamageBonusForVictim(SpellSchoolMask schoolMask, Unit *pVic
 
 bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType)
 {
-    if (IS_CREATURE_GUID(GetGUID())) // creatures cannot spell crit in TBC
+    //! Mobs can't crit with spells. Player Totems can
+    //! Fire Elemental (from totem) can too - but this part is a hack and needs more research
+    if (IS_CREATURE_GUID(GetGUID()) && !(this->ToCreature()->isTotem() && IS_PLAYER_GUID(GetOwnerGUID())) && GetEntry() != 15438)
         return false;
 
     // not critting spell
@@ -12425,6 +12447,11 @@ void Unit::SetStunned(bool apply)
         // setting MOVEMENTFLAG_ROOT	
         RemoveUnitMovementFlag(MOVEFLAG_FORWARD |MOVEFLAG_BACKWARD | MOVEFLAG_STRAFE_LEFT | MOVEFLAG_STRAFE_RIGHT | MOVEFLAG_FALLING);
         AddUnitMovementFlag(MOVEFLAG_ROOT);
+		
+        // interrupt channeled spell
+        if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
+            if (spell->getState() == SPELL_STATE_CASTING)
+                InterruptNonMeleeSpells(false);
 
         // Creature specific
         if (GetTypeId() != TYPEID_PLAYER)

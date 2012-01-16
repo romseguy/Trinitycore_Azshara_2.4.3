@@ -555,7 +555,10 @@ class BattleGround
 
         bool   m_BuffChange;
     uint32 m_score[2];                    //array that keeps general team scores, used to determine who gets most marks when bg ends prematurely
-
+		
+	    uint32 m_ratingTime;
+        uint32 m_ratingSum[2];
+        uint32 m_ratingCount[2];
         BGHonorMode m_HonorMode;
     private:
         /* Battleground */

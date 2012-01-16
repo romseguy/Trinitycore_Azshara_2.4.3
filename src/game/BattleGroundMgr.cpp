@@ -1179,7 +1179,7 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket *data, BattleGro
 		*data << uint32(bg->GetMapId());                // map id
 		*data << uint32(Time1);                         // 0 at bg start, 120000 after bg end, time to bg auto leave, milliseconds
 		*data << uint32(Time2);                         // time from bg start, milliseconds
-		*data << uint8(0x1);                            // Lua_GetBattlefieldArenaFaction (bool)
+		*data << uint8(/*bg->isArena() ? 0 :*/ 1);      // unk, possibly 0 == preparation phase, 1 == battle
 		break;
 	default:
 		sLog.outError("Unknown BG status!");
@@ -1248,14 +1248,11 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket *data, BattleGround *bg)
 		}
 		else
 		{
-			Player *plr = objmgr.GetPlayer(itr2->first);
-			uint32 team = bg->GetPlayerTeam(itr2->first);
-			if (!team && plr)
-				team = plr->GetBGTeam();
-			if ((bg->GetWinner() == 0 && team == ALLIANCE) || (bg->GetWinner() == 1 && team == HORDE))
-				*data << uint8(1);
-			else
-				*data << uint8(0);
+            Player *plr = objmgr.GetPlayer(itr->first);
+            uint32 team = bg->GetPlayerTeam(itr->first);
+            if (!team && plr)
+                team = plr->GetBGTeam();
+            *data << uint8(team == ALLIANCE ? 1 : 0); // green or yellow
 		}
 		*data << uint32(itr2->second->DamageDone);              // damage done
 		*data << uint32(itr2->second->HealingDone);             // healing done

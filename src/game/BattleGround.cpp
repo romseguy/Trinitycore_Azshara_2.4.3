@@ -198,6 +198,10 @@ BattleGround::BattleGround()
     m_StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_WS_START_ONE_MINUTE;
     m_StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_WS_START_HALF_MINUTE;
     m_StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_WS_HAS_BEGUN;
+	
+    m_ratingCount[0] = m_ratingCount[1] = 0;
+    m_ratingSum[0] = m_ratingSum[1] = 0;
+    m_ratingTime = 0;
 }
 
 BattleGround::~BattleGround()
@@ -500,6 +504,25 @@ void BattleGround::Update(time_t diff)
                 m_RemovedPlayers[itr->first] = 1;           // add to remove list (BG)
             }
             // do not change any battleground's private variables
+        }
+    }
+    if (GetStatus() == STATUS_IN_PROGRESS && !isArena())
+    {
+        m_ratingTime += diff;
+        if (m_ratingTime >= 10000)
+        {
+            m_ratingTime = 0;
+
+            //iterate through players and add ratings
+            for (std::map<uint64, BattleGroundPlayer>::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+            {
+                Player* plr = objmgr.GetPlayer(itr->first);
+                if (!plr)
+                    continue; //wat
+                
+                m_ratingSum[plr->GetTeamId()] += plr->m_bgRating;
+                m_ratingCount[plr->GetTeamId()] += 1;
+            }
         }
     }
 }
@@ -838,6 +861,32 @@ void BattleGround::EndBattleGround(uint32 winner)
         uint32 bgQueueTypeId = sBattleGroundMgr.BGQueueTypeId(GetTypeID(), GetArenaType());
         sBattleGroundMgr.BuildBattleGroundStatusPacket(&data, this, plr->GetBGTeam(), plr->GetBattleGroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, TIME_TO_AUTOREMOVE, GetStartTime());
         plr->GetSession()->SendPacket(&data);
+		
+        //Custom bg rating: update ratings
+        if (!isArena())
+        {
+            if(m_ratingCount[0] == 0 || m_ratingCount[1] == 0)
+                continue;
+            //final team ratings
+            uint16 compositeRating[2];
+            compositeRating[0] = m_ratingSum[0] / m_ratingCount[0];
+            compositeRating[1] = m_ratingSum[1] / m_ratingCount[1];
+            
+            float expectedScore[2];
+            expectedScore[0] = 1 / (1 + pow(10.0f, float(compositeRating[1] - compositeRating[0]) / 400));
+            expectedScore[1] = 1 / (1 + pow(10.0f, float(compositeRating[0] - compositeRating[1]) / 400));
+            
+            float actualScore[2];
+            actualScore[0] = winner == ALLIANCE ? 1 : 0;
+            actualScore[1] = winner == HORDE ? 1 : 0;
+            
+            float modifier[2];
+            modifier[0] = 32 * (actualScore[0] - expectedScore[0]);
+            modifier[1] = 32 * (actualScore[1] - expectedScore[1]);
+            
+            plr->m_bgRating += modifier[plr->GetTeamId()];
+            plr->SaveToDB();
+         }
     }
 
     if (isArena() && isRated() && winner_arena_team && loser_arena_team)

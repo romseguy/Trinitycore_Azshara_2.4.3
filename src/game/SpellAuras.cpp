@@ -2395,22 +2395,45 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 return;
             }
 
-            // Sentry Totem
-            if (GetId() == 6495 && caster->GetTypeId() == TYPEID_PLAYER)
+            switch(GetId())
             {
-                if (apply)
+                // Sentry Totem (Serverside)
+                case 6494:
                 {
-                    uint64 guid = caster->m_SummonSlot[3];
-                    if (guid)
+                    if(!caster) //possible to not have a caster?
+                        return;
+                    Player * pCaster = NULL;
+                    if(caster->GetTypeId() == TYPEID_PLAYER)
+                        pCaster = caster->ToPlayer();
+                    else
+                        pCaster = caster->GetOwner()->ToPlayer();
+                    if (pCaster)
                     {
-                        Creature *totem = caster->GetMap()->GetCreature(guid);
-                        if (totem && totem->isTotem())
-                            caster->ToPlayer()->CastSpell(totem, 6277, true);
+                        pCaster->StopCastingBindSight();
+                        if (apply)
+                        {
+                            uint64 guid = pCaster->m_SummonSlot[4];
+                            if (guid)
+                            {
+                                Creature * totem = pCaster->GetMap()->GetCreature(guid);
+                                if (totem && totem->isTotem())
+                                    pCaster->CastSpell(totem, 6496, true);
+                            }
+                        }
+                        else
+                            pCaster->RemoveAurasDueToSpell(6495);
+                    }
+                    break;
+                }
+                // Sentry Totem (hack for login case)
+                case 6495:
+                {
+                    if (caster->GetTypeId() == TYPEID_PLAYER && apply)
+                        if (!caster->m_SummonSlot[4])
+                            caster->RemoveAurasDueToSpell(6495);
+                    break;
                     }
                 }
-                else
-                    caster->ToPlayer()->StopCastingBindSight();
-                return;
             }
             break;
         }

@@ -15287,6 +15287,16 @@ bool Player::LoadFromDB(uint32 guid, SqlQueryHolder *holder)
     }
 
     _LoadDeclinedNames(holder->GetResult(PLAYER_LOGIN_QUERY_LOADDECLINEDNAMES));
+	
+	//Custom BG rating system
+    QueryResult_AutoPtr res = CharacterDatabase.PQuery("SELECT rating FROM character_battleground_rating WHERE guid = %u;", GetGUIDLow());
+    if (!res.count())
+        m_bgRating = 1500; //TODO: change to what the default is
+    else
+    {
+        Field* f = res->Fetch();
+        m_bgRating = f[0].GetUInt16();
+    }
 
     return true;
 }
@@ -16501,6 +16511,9 @@ void Player::SaveToDB()
     // save pet (hunter pet level and experience and all type pets health/mana).
     if (Pet* pet = GetPet())
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+	
+	//Custom BG rating
+    CharacterDatabase.PExecute("REPLACE INTO character_battleground_rating (guid, rating) VALUES (%u, %u);", GetGUIDLow(), m_bgRating);
 }
 
 // fast save function for item/money cheating preventing - save only inventory and money state
@@ -20730,7 +20743,7 @@ bool Player::HasGlobalCooldown(SpellEntry const *spellInfo) const
 
 void Player::RemoveGlobalCooldown(SpellEntry const *spellInfo)
 {
-    if (!spellInfo)
+    if (!spellInfo || !spellInfo->StartRecoveryTime)
         return;
 
     m_globalCooldowns[spellInfo->StartRecoveryCategory] = 0;
