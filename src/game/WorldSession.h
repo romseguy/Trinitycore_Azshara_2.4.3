@@ -680,6 +680,7 @@ class WorldSession
         LocaleConstant m_sessionDbcLocale;
         int m_sessionDbLocaleIndex;
         uint32 m_latency;
+		time_t timeLastWhoCommand;
 
         ACE_Based::LockedQueue<WorldPacket*,ACE_Thread_Mutex> _recvQueue;
 };
