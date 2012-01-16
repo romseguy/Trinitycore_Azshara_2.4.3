@@ -3079,6 +3079,8 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto
 				return DIMINISHING_TRIGGER_ROOT;
 			else if (spellproto->Id == 1330)
                 return DIMINISHING_GARROTE;
+			else if (spellproto->Id == 32752) // Summoning Disorientation
+                return DIMINISHING_NONE;
 			break;
 		}
 	}

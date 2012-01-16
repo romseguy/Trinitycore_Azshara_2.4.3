@@ -3373,13 +3373,13 @@ void Spell::EffectSummonType(uint32 i)
                         return;
 
                     //summon->InitPetCreateSpells();                         // e.g. disgusting oozeling has a create spell as summon...
-                    summon->SetMaxHealth(1);
-                    summon->SetHealth(1);
-                    summon->SetLevel(1);
+                    summon->SelectLevel(summon->GetCreatureInfo());       // some summoned creaters have different from 1 DB data for level/hp
+                    summon->SetUInt32Value(UNIT_NPC_FLAGS, summon->GetCreatureInfo()->npcflag);
 
                     summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
                     summon->AI()->EnterEvadeMode();
+					summon->SetReactState(REACT_PASSIVE);
 
                     std::string name = m_originalCaster->GetName();
                     name.append(petTypeSuffix[3]);

@@ -36,6 +36,9 @@ void AggressorAI::UpdateAI(const uint32 /*diff*/)
 {
     if (!UpdateVictim())
         return;
+		
+    if(Unit * owner = me->GetOwner())
+        owner->SetInCombatWith(me->getVictim());
 
     DoMeleeAttackIfReady();
 }

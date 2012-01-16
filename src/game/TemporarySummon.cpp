@@ -59,6 +59,11 @@ void TempSummon::Update(uint32 diff)
                 UnSummon();
                 return;
             }
+            if(!isAlive())
+            {
+                UnSummon();
+                return;
+            }
 
             m_timer -= diff;
             break;

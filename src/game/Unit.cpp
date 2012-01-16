@@ -9152,7 +9152,9 @@ void Unit::ClearInCombat()
     if (GetTypeId() != TYPEID_PLAYER && ToCreature()->isPet())
     {
         if (Unit *owner = GetOwner())
-            for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i);              
+            for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i);
+                if(owner->GetSpeedRate(UnitMoveType(i)) > GetSpeedRate(UnitMoveType(i)))
+                    SetSpeed(UnitMoveType(i), owner->GetSpeedRate(UnitMoveType(i)), true);			
     }
     else if (!isCharmed())
         return;
