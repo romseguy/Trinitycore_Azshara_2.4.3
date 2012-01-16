@@ -4060,6 +4060,9 @@ void Aura::HandlePeriodicEnergize(bool apply, bool /*Real*/)
         m_periodicTimer += m_modifier.periodictime;
 
     m_isPeriodic = apply;
+	
+    if (GetId() == 5229)
+        m_target->UpdateArmor();
 }
 
 void Aura::HandleAuraPeriodicDummy(bool apply, bool Real)
