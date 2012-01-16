@@ -401,7 +401,7 @@ MotionMaster::MoveFleeing(Unit* enemy, uint32 time)
     if (!enemy)
         return;
 
-    if (i_owner->HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+    if (i_owner->HasAuraType(SPELL_AURA_PREVENTS_FLEEING) && !i_owner->HasAura(20184,1) && !i_owner->HasAura(31896,1))
         return;
 
     if (i_owner->GetTypeId() == TYPEID_PLAYER)
