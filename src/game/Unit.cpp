@@ -12441,11 +12441,6 @@ void Unit::SetStunned(bool apply)
         SetUInt64Value(UNIT_FIELD_TARGET, 0);
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
         CastStop();
-        // MOVEMENTFLAG_ROOT cannot be used in conjunction with
-        // MOVEMENTFLAG_FORWARD, MOVEMENTFLAG_BACKWARD, MOVEMENTFLAG_STRAFE_LEFT, MOVEMENTFLAG_STRAFE RIGHT, MOVEMENTFLAG_FALLING  (tested 3.3.5a)
-        // this will freeze clients. That's why we remove any current movement flags before
-        // setting MOVEMENTFLAG_ROOT	
-        RemoveUnitMovementFlag(MOVEFLAG_FORWARD |MOVEFLAG_BACKWARD | MOVEFLAG_STRAFE_LEFT | MOVEFLAG_STRAFE_RIGHT | MOVEFLAG_FALLING);
         AddUnitMovementFlag(MOVEFLAG_ROOT);
 		
         // interrupt channeled spell
@@ -12490,11 +12485,6 @@ void Unit::SetRooted(bool apply)
     uint32 apply_stat = UNIT_STAT_ROOT;
     if (apply)
     {
-        // MOVEMENTFLAG_ROOT cannot be used in conjunction with
-        // MOVEMENTFLAG_FORWARD, MOVEMENTFLAG_BACKWARD, MOVEMENTFLAG_STRAFE_LEFT, MOVEMENTFLAG_STRAFE RIGHT, MOVEMENTFLAG_FALLING  (tested 3.3.5a)
-        // this will freeze clients. That's why we remove any current movement flags before
-        // setting MOVEMENTFLAG_ROOT	
-        RemoveUnitMovementFlag(MOVEFLAG_FORWARD | MOVEFLAG_BACKWARD | MOVEFLAG_STRAFE_LEFT | MOVEFLAG_STRAFE_RIGHT | MOVEFLAG_FALLING);
         AddUnitMovementFlag(MOVEFLAG_ROOT);
 
         if (GetTypeId() == TYPEID_PLAYER)
