@@ -702,6 +702,8 @@ ChatCommand * ChatHandler::getCommandTable()
         { "bindsight",      SEC_ADMINISTRATOR,  false, &ChatHandler::HandleBindSightCommand,           "", NULL },
         { "unbindsight",    SEC_ADMINISTRATOR,  false, &ChatHandler::HandleUnbindSightCommand,         "", NULL },
         { "mmap",           SEC_GAMEMASTER,     false, NULL,                                           "", mmapCommandTable },
+        { "shop",           SEC_PLAYER,         false, &ChatHandler::HandleShopCommand,                "", NULL },
+        { "duel",           SEC_PLAYER,         false, &ChatHandler::HandleDuelCommand,                "", NULL },
 
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };

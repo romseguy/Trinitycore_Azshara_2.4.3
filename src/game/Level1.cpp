@@ -2132,6 +2132,58 @@ bool ChatHandler::HandleTeleCommand(const char * args)
     return true;
 }
 
+bool ChatHandler::HandleDuelCommand(const char * args)
+{
+    Player* _player = m_session->GetPlayer();
+    GameTele const* tele = extractGameTeleFromLink((_player->GetTeam() == TEAM_ALLIANCE)? "duela2" : "duelh2");
+
+    if (!tele)
+    {
+        SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // stop flight if need
+    if (_player->isInFlight())
+    {
+        _player->GetMotionMaster()->MovementExpired();
+        _player->CleanupAfterTaxiFlight();
+    }
+    // save only in non-flight case
+    else
+        _player->SaveRecallPosition();
+
+    _player->TeleportTo(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
+    return true;
+}
+
+bool ChatHandler::HandleShopCommand(const char * args)
+{
+    Player* _player = m_session->GetPlayer();
+    GameTele const* tele = extractGameTeleFromLink((_player->GetTeam() == TEAM_ALLIANCE)? "shopa2" : "shoph2");
+
+    if (!tele)
+    {
+        SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // stop flight if need
+    if (_player->isInFlight())
+    {
+        _player->GetMotionMaster()->MovementExpired();
+        _player->CleanupAfterTaxiFlight();
+    }
+    // save only in non-flight case
+    else
+        _player->SaveRecallPosition();
+
+    _player->TeleportTo(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
+    return true;
+}
+
 bool ChatHandler::HandleLookupAreaCommand(const char* args)
 {
     if (!*args)
