@@ -2431,8 +2431,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     if (caster->GetTypeId() == TYPEID_PLAYER && apply)
                         if (!caster->m_SummonSlot[4])
                             caster->RemoveAurasDueToSpell(6495);
-                    break;
-                    }
+                    break;                    
                 }
             }
             break;

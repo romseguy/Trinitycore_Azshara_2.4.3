@@ -663,15 +663,15 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
 
     // profession spells
     // cooking
-    learnSpell(33359, false);
+    learnSpell(33359);
     SetSkill(185, 375, 375);
 
     // fishing
-    learnSpell(33095, false);
+    learnSpell(33095);
     SetSkill(356, 375, 375);
 
     // first aid
-    learnSpell(27028, false);
+    learnSpell(27028);
     SetSkill(129, 375, 375);
 
     // original action bar
