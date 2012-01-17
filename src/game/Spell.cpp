@@ -1238,7 +1238,9 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
         if (const std::vector<int32> *spell_triggered = spellmgr.GetSpellLinked(m_spellInfo->Id + SPELL_LINK_HIT))
             for (std::vector<int32>::const_iterator i = spell_triggered->begin(); i != spell_triggered->end(); ++i)
                 if (*i < 0)
+				{
                     unit->RemoveAurasDueToSpell(-(*i));
+				}
                 else
                     unit->CastSpell(unit, *i, true, 0, 0, m_caster->GetGUID());
     }
@@ -2689,7 +2691,7 @@ void Spell::update(uint32 difftime)
         //    cancel();
         // don't cancel for melee, autorepeat, triggered and instant spells
         //else
-        if (!IsNextMeleeSwingSpell() && !IsAutoRepeat() && !m_IsTriggeredSpell && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT))
+        if (!IsNextMeleeSwingSpell() && !IsAutoRepeat() && !m_IsTriggeredSpell && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT) && m_spellInfo->Id != 10912 && m_spellInfo->Id != 10911 && m_spellInfo->Id != 605)
             cancel();
     }
 

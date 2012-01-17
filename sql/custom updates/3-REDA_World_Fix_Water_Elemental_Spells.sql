@@ -1,1 +1,0 @@
-update creature_template set spell1 = '31707', spell2 = '33395' where entry = '510';

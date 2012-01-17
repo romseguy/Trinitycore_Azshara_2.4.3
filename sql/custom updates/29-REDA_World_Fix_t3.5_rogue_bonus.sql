@@ -1,0 +1,1 @@
+update spell_affect set `SpellFamilyMask`=34376646656 where `entry`=37166;

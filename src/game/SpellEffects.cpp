@@ -6531,7 +6531,13 @@ void Spell::GetSummonPosition(uint32 i, Position &pos, float radius, uint32 coun
                     break;
             }
         }
-    }
+        else if(m_spellInfo->Id == 6495 || m_spellInfo->Id == 126)
+        {
+           float x, y, z;
+           m_caster->GetClosePoint(x,y,z,1.0f);
+           pos.Relocate(x, y, z);
+		}
+}
     // Summon if dest location not present near caster
     else
     {
