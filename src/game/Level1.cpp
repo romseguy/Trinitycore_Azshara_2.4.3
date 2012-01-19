@@ -2135,7 +2135,8 @@ bool ChatHandler::HandleTeleCommand(const char * args)
 bool ChatHandler::HandleDuelCommand(const char * args)
 {
     Player* _player = m_session->GetPlayer();
-    GameTele const* tele = extractGameTeleFromLink((_player->GetTeam() == TEAM_ALLIANCE)? "duela2" : "duelh2");
+    char const* zone = (_player->GetTeam() == HORDE)? "duelh2" : "duela2";
+    GameTele const* tele = extractGameTeleFromLink((char*) zone);
 
     if (!tele)
     {
@@ -2161,7 +2162,8 @@ bool ChatHandler::HandleDuelCommand(const char * args)
 bool ChatHandler::HandleShopCommand(const char * args)
 {
     Player* _player = m_session->GetPlayer();
-    GameTele const* tele = extractGameTeleFromLink((_player->GetTeam() == TEAM_ALLIANCE)? "shopa2" : "shoph2");
+    char const* zone = (_player->GetTeam() == ALLIANCE)? "shopa2" : "shoph2";
+    GameTele const* tele = extractGameTeleFromLink((char*) zone);
 
     if (!tele)
     {
