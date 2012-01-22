@@ -2548,6 +2548,9 @@ void SpellMgr::LoadSpellCustomAttr()
             mSpellCustomAttr[i] |= SPELL_ATTR_CU_IGNORE_ARMOR;
             break;
         case 1833: // Cheap Shot
+			spellInfo->speed = 200.0f;
+			spellInfo->EffectMechanic[0] = MECHANIC_STUN;
+            break;
         case 6409:
         case 14902:
         case 30986:
@@ -2555,7 +2558,13 @@ void SpellMgr::LoadSpellCustomAttr()
         case 31843:
         case 34243:
         case 408: // Kidney Shot
+			spellInfo->speed = 200.0f;
+			spellInfo->EffectMechanic[0] = MECHANIC_STUN;
+            break;
         case 8643:
+			spellInfo->speed = 200.0f;
+			spellInfo->EffectMechanic[0] = MECHANIC_STUN;
+            break;
         case 8983: // Bash
         case 6798:
         case 5211:
@@ -2570,6 +2579,10 @@ void SpellMgr::LoadSpellCustomAttr()
 	        break;
         case 7922:                        // Charge stun
         case 25274:                       // Intercept stun
+		case 853:						  // HoJ R1
+		case 5588:						  // HoJ R2			
+		case 5589:						  // HoJ R3	
+		case 10308:						  // HoJ R4
 			spellInfo->speed = 200.0f;    // Minor delay
             break;
 		case 2094:                        // Blind
