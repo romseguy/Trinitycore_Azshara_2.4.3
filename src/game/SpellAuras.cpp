@@ -2397,45 +2397,45 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 return;
             }
 
-//            switch(GetId())
-//            {
-//                // Sentry Totem (Serverside)
-//                case 6494:
-//                {
-//                    if(!caster) //possible to not have a caster?
-//                        return;
-//                    Player * pCaster = NULL;
-//                  if(caster->GetTypeId() == TYPEID_PLAYER)
-//                      pCaster = caster->ToPlayer();
-//                  else
-//                      pCaster = caster->GetOwner()->ToPlayer();
-//                  if (pCaster)
-//                  {
-//                      pCaster->StopCastingBindSight();
-//                        if (apply)
-//                      {
-//                          uint64 guid = pCaster->m_SummonSlot[4];
-//                          if (guid)
-//                          {
-//                              Creature * totem = pCaster->GetMap()->GetCreature(guid);
-//                              if (totem && totem->isTotem())
-//                                  pCaster->CastSpell(totem, 6496, true);
-//                          }
-//                      }
-//                      else
-//                          pCaster->RemoveAurasDueToSpell(6495);
-//                  }
-//                  break;
-//               }
-//              	// Sentry Totem (hack for login case)
-//              	case 6495:
-//            		{
-//                		if (caster->GetTypeId() == TYPEID_PLAYER && apply)
-//                    		if (!caster->m_SummonSlot[4])
-//                        		caster->RemoveAurasDueToSpell(6495);
-//                  	break;                    
-//            		}
-//            }
+            switch(GetId())
+            {
+                // Sentry Totem (Serverside)
+                case 6494:
+                {
+                    if(!caster) //possible to not have a caster?
+                        return;
+                    Player * pCaster = NULL;
+                  if(caster->GetTypeId() == TYPEID_PLAYER)
+                      pCaster = caster->ToPlayer();
+                  else
+                      pCaster = caster->GetOwner()->ToPlayer();
+                  if (pCaster)
+                  {
+                      pCaster->StopCastingBindSight();
+                        if (apply)
+                      {
+                          uint64 guid = pCaster->m_SummonSlot[4];
+                          if (guid)
+                          {
+                              Creature * totem = pCaster->GetMap()->GetCreature(guid);
+                              if (totem && totem->isTotem())
+                                  pCaster->CastSpell(totem, 6496, true);
+                          }
+                      }
+                      else
+                          pCaster->RemoveAurasDueToSpell(6495);
+                  }
+                  break;
+               }
+              	// Sentry Totem (hack for login case)
+              	case 6495:
+            		{
+                		if (caster->GetTypeId() == TYPEID_PLAYER && apply)
+                    		if (!caster->m_SummonSlot[4])
+                        		caster->RemoveAurasDueToSpell(6495);
+                  	break;                    
+            		}
+            }
             break;
         }
     }
