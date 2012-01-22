@@ -1096,7 +1096,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
         && (unit->IsImmunedToDamage(GetSpellSchoolMask(m_spellInfo),true) ||
         unit->IsImmunedToSpell(m_spellInfo,true)))
     {
-		if (m_spellInfo->Id != 2094) 
+		if (m_spellInfo->Id != 2094 || m_spellInfo->Mechanic == MECHANIC_STUN) 
 		{
 			m_damage = 0;
 			m_caster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_IMMUNE);
