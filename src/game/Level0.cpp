@@ -70,24 +70,24 @@ bool ChatHandler::HandleReadyCommand(const char* /*args*/)
 	// MIGHT WANNA ADD A IS_RATED()? HERE, MIGHT BE ANOYING IN SKIRMISH???
 	if (!bg || !bg->isArena()) // is player in arena? 
 	{
-		PSendSysMessage("Vous n'etes pas en arene !");
+		PSendSysMessage("You're not in arena !");
 		return true;
 	}
 	if(bg->GetStartDelayTime() <= 15000)
 	{
-		PSendSysMessage("Le match d'arene a deja commence ou commence bientot.");
+		PSendSysMessage("Match already begun or begins soon.");
 		return true;
 	}
 	if(bg->GetPlayersCountByTeam(plr->GetBGTeam()) < bg->GetMaxPlayersPerTeam())
 	{
-		PSendSysMessage("Vous ne pourrez utiliser .ready que lorsque vos coequipiers auront rejoint l'arene.");
+		PSendSysMessage("You can't use .ready until your mates join the match");
 		return true;
 	}
 	if(plr->GetBGTeam() == ALLIANCE)
 	{
 		if(plr->m_usedReady == false)
 		{
-            ChatHandler(plr).PSendSysMessage("Vous etes maintenant pret");
+            ChatHandler(plr).PSendSysMessage("You are now ready!");
 			plr->m_usedReady = true;
             bg->m_TeamOneReadyCount++;
             if(bg->m_TeamOneReadyCount >= bg->GetMaxPlayersPerTeam()) 
@@ -95,7 +95,7 @@ bool ChatHandler::HandleReadyCommand(const char* /*args*/)
         }
         else
 		{
-			ChatHandler(plr).PSendSysMessage("Vous avez deja utilise la commande .ready");
+			ChatHandler(plr).PSendSysMessage("You already used .ready command");
 		}
 	}
 	else
@@ -104,7 +104,7 @@ bool ChatHandler::HandleReadyCommand(const char* /*args*/)
 		{
 			if(plr->m_usedReady == false)
 			{
-                ChatHandler(plr).PSendSysMessage("Vous etes maintenant pret");
+                ChatHandler(plr).PSendSysMessage("You are now ready!");
 				plr->m_usedReady = true;
                 bg->m_TeamTwoReadyCount++;
                 if(bg->m_TeamTwoReadyCount >= bg->GetMaxPlayersPerTeam()) 
@@ -112,7 +112,7 @@ bool ChatHandler::HandleReadyCommand(const char* /*args*/)
             }
             else
 			{
-				ChatHandler(plr).PSendSysMessage("Vous avez deja utilise la commande .ready");
+				ChatHandler(plr).PSendSysMessage("You already used .ready command");
 			}
 		}
 	}

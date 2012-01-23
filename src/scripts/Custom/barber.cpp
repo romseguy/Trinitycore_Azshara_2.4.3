@@ -35,7 +35,7 @@ bool GossipHello_barber(Player *player, Creature *_Creature)
     if(!sitting)
         //text = player->GetTeam() == ALLIANCE ? 50011 : 50000;
 	{
-		_Creature->Whisper("Tout d'abord, asseyez vous sur la chaise et ensuite nous pourrons vous coiffer", player->GetGUID());
+		_Creature->Whisper("First, take a sit on the chair and then we'll start !", player->GetGUID());
 		return true;
 	}
     else switch (player->getRace())
@@ -83,9 +83,9 @@ bool GossipHello_barber(Player *player, Creature *_Creature)
             player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
 
         if ( player->GetMoney() >= 50000 )
-             player->ADD_GOSSIP_ITEM(0, "Voulez-vous changer de style ? ( 5 pieces d'or )", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+             player->ADD_GOSSIP_ITEM(0, "Do you want a relooking ? ( 5 golds )", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         else 
-             player->ADD_GOSSIP_ITEM(0, "Revenez avec 5 pieces d'or", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
+             player->ADD_GOSSIP_ITEM(0, "You need 5 golds to afford our services.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
     }
     player->SEND_GOSSIP_MENU(text,_Creature->GetGUID());
     return true;
@@ -161,45 +161,45 @@ void SelectFacialFeature(Player *player, int change )
 
 bool GossipSelect_barber(Player *player, Creature *_Creature, uint32 sender, uint32 action )
 {
-    char const* FeatureGossipMenu = "Je veux changer de barbe.";
+    char const* FeatureGossipMenu = "I want to change my facial hair style.";
     switch (player->getRace())
     {
         case RACE_HUMAN:
             if ( player->getGender() == GENDER_FEMALE )
-                FeatureGossipMenu = "Je veux changer de piercings.";
+                FeatureGossipMenu = "I want to change my piercings.";
             break;
         case RACE_ORC:
             if ( player->getGender() == GENDER_FEMALE )
-                FeatureGossipMenu = "Je veux changer de piercings.";
+                FeatureGossipMenu = "I want to change my piercings.";
             break;
         case RACE_DWARF:
             if ( player->getGender() == GENDER_FEMALE )
-                FeatureGossipMenu = "Je veux changer de boucles d'oreilles.";
+                FeatureGossipMenu = "I want to change my earrings.";
             break;
         case RACE_NIGHTELF:
             if ( player->getGender() == GENDER_FEMALE )
-                FeatureGossipMenu = "Je veux changer de tatouage.";
+                FeatureGossipMenu = "I want to change my markings.";
             break;
         case RACE_UNDEAD_PLAYER:
-            FeatureGossipMenu = "Je veux changer mon visage.";
+            FeatureGossipMenu = "I want to change my face.";
             break;
         case RACE_TAUREN:
             if ( player->getGender() == GENDER_FEMALE )
-                FeatureGossipMenu = "Je veux changer de coupe de cheveux.";
+                FeatureGossipMenu = "I want to change my hair.";
             break;
         case RACE_GNOME:
             if ( player->getGender() == GENDER_FEMALE )
-                FeatureGossipMenu = "Je veux changer de boucles d'oreilles.";
+                FeatureGossipMenu = "I want to change my earrings.";
             break;
         case RACE_TROLL:
-            FeatureGossipMenu = "Je veux changer de defenses.";
+            FeatureGossipMenu = "I want to change my tusks.";
             break;
         case RACE_BLOODELF:
             if ( player->getGender() == GENDER_FEMALE )
-                FeatureGossipMenu = "Je veux changer de boucles d'oreilles.";
+                FeatureGossipMenu = "I want to change my earrings.";
             break;
         case RACE_DRAENEI:
-            player->getGender() == GENDER_FEMALE ? FeatureGossipMenu = "Je veux changer de cornes." : FeatureGossipMenu = "Je veux changer de tentacules.";
+            player->getGender() == GENDER_FEMALE ? FeatureGossipMenu = "I want to change my horns." : FeatureGossipMenu = "I want to change my tentacles.";
             break;
 	}
     // MAP
@@ -223,8 +223,8 @@ bool GossipSelect_barber(Player *player, Creature *_Creature, uint32 sender, uin
                 else
                     player->SendBuyError( BUY_ERR_NOT_ENOUGHT_MONEY, _Creature, 0, 0);
             }
-            player->ADD_GOSSIP_ITEM( 0, "Je veux changer de coupe de cheveux.", GOSSIP_SENDER_OPTION , GOSSIP_ACTION_INFO_DEF + 2);
-            player->ADD_GOSSIP_ITEM( 0, "Je veux changer la couleur de mes cheveux.", GOSSIP_SENDER_OPTION , GOSSIP_ACTION_INFO_DEF + 4);
+            player->ADD_GOSSIP_ITEM( 0, "I want to change my hair style.", GOSSIP_SENDER_OPTION , GOSSIP_ACTION_INFO_DEF + 2);
+            player->ADD_GOSSIP_ITEM( 0, "I want to change my hair color.", GOSSIP_SENDER_OPTION , GOSSIP_ACTION_INFO_DEF + 4);
             player->ADD_GOSSIP_ITEM( 0, FeatureGossipMenu, GOSSIP_SENDER_OPTION , GOSSIP_ACTION_INFO_DEF + 6);
             player->SEND_GOSSIP_MENU(50023, _Creature->GetGUID());
             break;
@@ -238,9 +238,9 @@ bool GossipSelect_barber(Player *player, Creature *_Creature, uint32 sender, uin
             if ( action == GOSSIP_ACTION_INFO_DEF+3 && sender == GOSSIP_SENDER_SUBOPTION )
                 SelectHairStyle(player,-1);				
             // choose options again
-            player->ADD_GOSSIP_ITEM( 0, "Suivant !", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 2);
-            player->ADD_GOSSIP_ITEM( 0, "Precedent !", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 3);
-            player->ADD_GOSSIP_ITEM( 0, "C'est mon choix.", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM( 0, "Next one !", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 2);
+            player->ADD_GOSSIP_ITEM( 0, "Previous one !", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 3);
+            player->ADD_GOSSIP_ITEM( 0, "I'll have this one.", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 1);
             player->SEND_GOSSIP_MENU(50024, _Creature->GetGUID());
             break;
 
@@ -254,9 +254,9 @@ bool GossipSelect_barber(Player *player, Creature *_Creature, uint32 sender, uin
             if ( action == GOSSIP_ACTION_INFO_DEF+5 && sender == GOSSIP_SENDER_SUBOPTION )
                 SelectHairColor(player,-1);					
             // choose options again
-            player->ADD_GOSSIP_ITEM( 0, "Suivant !", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 4);
-            player->ADD_GOSSIP_ITEM( 0, "Precedent !",GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 5);
-            player->ADD_GOSSIP_ITEM( 0, "C'est mon choix.", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM( 0, "Next one !", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 4);
+            player->ADD_GOSSIP_ITEM( 0, "Previous one !",GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 5);
+            player->ADD_GOSSIP_ITEM( 0, "I'll have this one.", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 1);
             player->SEND_GOSSIP_MENU(50024, _Creature->GetGUID());
             break;
 
@@ -270,9 +270,9 @@ bool GossipSelect_barber(Player *player, Creature *_Creature, uint32 sender, uin
             if ( action == GOSSIP_ACTION_INFO_DEF+7 && sender == GOSSIP_SENDER_SUBOPTION )
                 SelectFacialFeature(player,-1);				
             // choose options again
-            player->ADD_GOSSIP_ITEM( 0, "Suivant !", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 6);
-            player->ADD_GOSSIP_ITEM( 0, "Precedent !", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 7);
-            player->ADD_GOSSIP_ITEM( 0, "C'est mon choix.", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM( 0, "Next one !", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 6);
+            player->ADD_GOSSIP_ITEM( 0, "Previous one !", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 7);
+            player->ADD_GOSSIP_ITEM( 0, "I'll have this one.", GOSSIP_SENDER_SUBOPTION , GOSSIP_ACTION_INFO_DEF + 1);
             player->SEND_GOSSIP_MENU(50024, _Creature->GetGUID());
             break;
 

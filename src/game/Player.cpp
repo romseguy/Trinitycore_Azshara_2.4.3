@@ -5350,9 +5350,9 @@ void Player::SetSkill(uint32 id, uint16 currVal, uint16 maxVal)
                time_t rawtime = time_t(m_nextProfessionReset);
                struct tm *timeinfo = localtime(&rawtime);
                char buffer [80];
-               strftime(buffer, 80, "Prochain oubli possible : %d/%m %H:%M", timeinfo);
+               strftime(buffer, 80, "Next possible unlearn : %d/%m %H:%M", timeinfo);
 
-               GetSession()->SendNotification("Vous ne pouvez oublier qu'un seul metier par semaine.");
+               GetSession()->SendNotification("You only can unlearn one profession per week.");
                ChatHandler(this).PSendSysMessage(buffer);
                return;
            }

@@ -72,9 +72,9 @@ void SendSubMenu_arenaspectate(Player *player, Creature *_Creature, uint32 arena
     }
     if(totalcount > 0)
     {
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,"Page suivante" ,arenaType, action - (GOSSIP_MAX_MENU_ITEMS-3));
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,"Page precedente" ,arenaType, action + (GOSSIP_MAX_MENU_ITEMS-3));
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,"Actualiser" ,arenaType, action);
+        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,"Next page" ,arenaType, action - (GOSSIP_MAX_MENU_ITEMS-3));
+        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,"Previous page" ,arenaType, action + (GOSSIP_MAX_MENU_ITEMS-3));
+        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,"Refresh" ,arenaType, action);
     }
     player->SEND_GOSSIP_MENU(totalcount > 0 ? DEFAULT_GOSSIP_MESSAGE : 130304 ,_Creature->GetGUID());
 }
@@ -88,7 +88,7 @@ void SendMenu_arenaspectate(Player *player, Creature *_Creature, uint32 action)
     }
     if(player->IsMounted())
     {
-        player->GetSession()->SendNotification("Slez z mounta.");
+        player->GetSession()->SendNotification("Impossible while mounted.");
         return;
     }
     player->CLOSE_GOSSIP_MENU();
