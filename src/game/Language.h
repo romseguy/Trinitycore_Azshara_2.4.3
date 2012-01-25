@@ -806,6 +806,8 @@ enum OregonStrings
     LANG_BG_AV_START_TWO_MINUTES        = 1333,
     // FREE IDS                           1334-1999
 
+    LANG_CANT_DO_THAT                   = 1500,
+
     // Ticket Strings 2000-2029
     LANG_COMMAND_TICKETNEW              = 2000,
     LANG_COMMAND_TICKETUPDATED          = 2001,

@@ -18,6 +18,7 @@
 //void AddSC_ArenaSpectator();
 void AddSC_npc_arenaspectate();
 void AddSC_barber();
+void AddSC_npc_profession();
 
 //world
 void AddSC_areatrigger_scripts();
@@ -387,6 +388,7 @@ void AddScripts()
 
     AddSC_npc_arenaspectate();
 	AddSC_barber();
+	AddSC_npc_profession();
 	
     AddSC_areatrigger_scripts();
     AddSC_boss_emeriss();

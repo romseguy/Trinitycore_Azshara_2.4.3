@@ -2135,6 +2135,14 @@ bool ChatHandler::HandleTeleCommand(const char * args)
 bool ChatHandler::HandleDuelCommand(const char * args)
 {
     Player* _player = m_session->GetPlayer();
+
+    if (_player->InBattleGround() || _player->duel || _player->isInCombat())
+    {
+        SendSysMessage(LANG_CANT_DO_THAT);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
     GameTele const* tele = objmgr.GetGameTele((_player->GetTeam() == ALLIANCE)? 428 : 427);
 
     if (!tele)
@@ -2161,6 +2169,14 @@ bool ChatHandler::HandleDuelCommand(const char * args)
 bool ChatHandler::HandleShopCommand(const char * args)
 {
     Player* _player = m_session->GetPlayer();
+
+    if (_player->InBattleGround() || _player->duel || _player->isInCombat())
+    {
+        SendSysMessage(LANG_CANT_DO_THAT);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
     GameTele const* tele = objmgr.GetGameTele((_player->GetTeam() == ALLIANCE)? 425 : 426);
 
     if (!tele)

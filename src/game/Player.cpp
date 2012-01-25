@@ -661,6 +661,9 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
     // original spells
     learnDefaultSpells(true);
 
+    // hearthstone
+    StoreNewItemInBestSlots(6948, 1);
+
     // profession spells
     // cooking
     learnSpell(33359);
@@ -674,72 +677,7 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
     learnSpell(27028);
     SetSkill(129, 375, 375);
 
-    // original action bar
-    std::list<uint16>::const_iterator action_itr[4];
-    for (int i=0; i<4; i++)
-        action_itr[i] = info->action[i].begin();
-
-    for (; action_itr[0] != info->action[0].end() && action_itr[1] != info->action[1].end();)
-    {
-        uint16 taction[4];
-        for (int i=0; i<4 ;i++)
-            taction[i] = (*action_itr[i]);
-
-        addActionButton((uint8)taction[0], taction[1], (uint8)taction[2], (uint8)taction[3]);
-
-        for (int i=0; i<4 ;i++)
-            ++action_itr[i];
-    }
-
-    // original items
-    CharStartOutfitEntry const* oEntry = NULL;
-    for (uint32 i = 1; i < sCharStartOutfitStore.GetNumRows(); ++i)
-    {
-        if (CharStartOutfitEntry const* entry = sCharStartOutfitStore.LookupEntry(i))
-        {
-            if (entry->RaceClassGender == RaceClassGender)
-            {
-                oEntry = entry;
-                break;
-            }
-        }
-    }
-
-    if (oEntry)
-    {
-        for (int j = 0; j < MAX_OUTFIT_ITEMS; ++j)
-        {
-            if (oEntry->ItemId[j] <= 0)
-                continue;
-
-            uint32 item_id = oEntry->ItemId[j];
-
-            ItemPrototype const* iProto = objmgr.GetItemPrototype(item_id);
-            if (!iProto)
-            {
-                sLog.outErrorDb("Initial item id %u (race %u class %u) from CharStartOutfit.dbc not listed in item_template, ignoring.",item_id,getRace(),getClass());
-                continue;
-            }
-
-            uint32 count = iProto->Stackable;               // max stack by default (mostly 1)
-            if (iProto->Class == ITEM_CLASS_CONSUMABLE && iProto->SubClass == ITEM_SUBCLASS_FOOD)
-            {
-                switch(iProto->Spells[0].SpellCategory)
-                {
-                    case SPELL_CATEGORY_FOOD:                                // food
-                        if (iProto->Stackable > 4)
-                            count = 4;
-                        break;
-                    case SPELL_CATEGORY_DRINK:                                // drink
-                        if (iProto->Stackable > 2)
-                            count = 2;
-                        break;
-                }
-            }
-
-            StoreNewItemInBestSlots(item_id, count);
-        }
-    }
+    UpdateSkillsToMaxSkillsForLevel();
 
     for (PlayerCreateInfoItems::const_iterator item_id_itr = info->item.begin(); item_id_itr != info->item.end(); ++item_id_itr++)
         StoreNewItemInBestSlots(item_id_itr->item_id, item_id_itr->item_amount);
