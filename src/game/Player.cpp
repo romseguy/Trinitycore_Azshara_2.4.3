@@ -677,6 +677,10 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
     learnSpell(27028);
     SetSkill(129, 375, 375);
 
+    // riding
+    learnSpell(34093);
+    SetSkill(762, 300, 300);
+
     UpdateSkillsToMaxSkillsForLevel();
 
     for (PlayerCreateInfoItems::const_iterator item_id_itr = info->item.begin(); item_id_itr != info->item.end(); ++item_id_itr++)
