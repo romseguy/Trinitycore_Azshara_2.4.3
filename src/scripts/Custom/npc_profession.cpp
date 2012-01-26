@@ -129,13 +129,13 @@ bool GossipHello_global_npc_profession(Player *player, Creature *_Creature)
     player->ADD_GOSSIP_ITEM_EXTENDED(0, "Alchemy",           GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1, WARN_RESET, 0, false);
     player->ADD_GOSSIP_ITEM_EXTENDED(0, "Blacksmithing",     GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2, WARN_RESET, 0, false);
     player->ADD_GOSSIP_ITEM_EXTENDED(0, "Enchanting",      	 GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3, WARN_RESET, 0, false);
-    player->ADD_GOSSIP_ITEM_EXTENDED(0, "Engeneering",       GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4, WARN_RESET, 0, false);
+    player->ADD_GOSSIP_ITEM_EXTENDED(0, "Engineering",       GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4, WARN_RESET, 0, false);
     player->ADD_GOSSIP_ITEM_EXTENDED(0, "Herbalism",         GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+5, WARN_RESET, 0, false);
     player->ADD_GOSSIP_ITEM_EXTENDED(0, "Jewelcrafting",     GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+6, WARN_RESET, 0, false);
-    player->ADD_GOSSIP_ITEM_EXTENDED(0, "Leatherwork",       GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+7, WARN_RESET, 0, false);
+    player->ADD_GOSSIP_ITEM_EXTENDED(0, "Leatherworking",       GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+7, WARN_RESET, 0, false);
     player->ADD_GOSSIP_ITEM_EXTENDED(0, "Mining",            GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+8, WARN_RESET, 0, false);
     player->ADD_GOSSIP_ITEM_EXTENDED(0, "Tailoring",           GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+9, WARN_RESET, 0, false);
-    player->ADD_GOSSIP_ITEM_EXTENDED(0, "Skining",          GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+10, WARN_RESET, 0, false);
+    player->ADD_GOSSIP_ITEM_EXTENDED(0, "Skinning",          GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+10, WARN_RESET, 0, false);
     player->PlayerTalkClass->SendGossipMenu(2, _Creature->GetGUID());
 
     return true;
@@ -180,7 +180,7 @@ bool GossipHello_engineering_npc_profession(Player *player, Creature *_Creature)
 {
     if (!player->isInCombat())
     {
-        player->ADD_GOSSIP_ITEM_EXTENDED(0, "Learn engeneering.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4, WARN_RESET, 0, false);
+        player->ADD_GOSSIP_ITEM_EXTENDED(0, "Learn engineering.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4, WARN_RESET, 0, false);
         player->ADD_GOSSIP_ITEM(1, "Mats.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+11);
         player->PlayerTalkClass->SendGossipMenu(2, _Creature->GetGUID());
         return true;
@@ -216,7 +216,7 @@ bool GossipHello_leatherworking_npc_profession(Player *player, Creature *_Creatu
 {
     if (!player->isInCombat())
     {
-        player->ADD_GOSSIP_ITEM_EXTENDED(0, "Learn leatherwork.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+7, WARN_RESET, 0, false);
+        player->ADD_GOSSIP_ITEM_EXTENDED(0, "Learn leatherworking.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+7, WARN_RESET, 0, false);
         player->ADD_GOSSIP_ITEM(1, "Mats.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+11);
         player->PlayerTalkClass->SendGossipMenu(2, _Creature->GetGUID());
         return true;
@@ -252,7 +252,7 @@ bool GossipHello_skinning_npc_profession(Player *player, Creature *_Creature)
 {
     if (!player->isInCombat())
     {
-        player->ADD_GOSSIP_ITEM_EXTENDED(0, "Learn skining.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+10, WARN_RESET, 0, false);
+        player->ADD_GOSSIP_ITEM_EXTENDED(0, "Learn skinning.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+10, WARN_RESET, 0, false);
         player->ADD_GOSSIP_ITEM(1, "Mats.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+11);
         player->PlayerTalkClass->SendGossipMenu(2, _Creature->GetGUID());
         return true;

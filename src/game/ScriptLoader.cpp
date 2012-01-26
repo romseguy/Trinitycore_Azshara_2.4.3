@@ -19,6 +19,7 @@
 void AddSC_npc_arenaspectate();
 void AddSC_barber();
 void AddSC_npc_profession();
+void AddSC_npc_sub_profession();
 void AddSC_npc_swap_reput();
 
 //world
@@ -390,6 +391,7 @@ void AddScripts()
     AddSC_npc_arenaspectate();
 	AddSC_barber();
 	AddSC_npc_profession();
+	AddSC_npc_sub_profession();
 	AddSC_npc_swap_reput();
 	
     AddSC_areatrigger_scripts();

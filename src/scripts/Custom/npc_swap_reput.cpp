@@ -23,7 +23,7 @@ bool GossipSelect_npc_swap_reput(Player *player, Creature *_Creature, uint32 sen
 }
 
 bool GossipHello_npc_swap_reput(Player *player, Creature *_Creature)
-{ sLog.outError("FOOLISHCORE : HELLO");
+{
     if (player->isInCombat())
         return false;
 
