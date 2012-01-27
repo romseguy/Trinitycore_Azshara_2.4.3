@@ -21,6 +21,7 @@ void AddSC_barber();
 void AddSC_npc_profession();
 void AddSC_npc_sub_profession();
 void AddSC_npc_swap_reput();
+void AddSC_npc_beastmaster();
 
 //world
 void AddSC_areatrigger_scripts();
@@ -389,10 +390,11 @@ void AddScripts()
 
 
     AddSC_npc_arenaspectate();
-	AddSC_barber();
-	AddSC_npc_profession();
-	AddSC_npc_sub_profession();
-	AddSC_npc_swap_reput();
+    AddSC_barber();
+    AddSC_npc_profession();
+    AddSC_npc_sub_profession();
+    AddSC_npc_swap_reput();
+    AddSC_npc_beastmaster
 	
     AddSC_areatrigger_scripts();
     AddSC_boss_emeriss();
