@@ -2558,13 +2558,7 @@ void SpellMgr::LoadSpellCustomAttr()
         case 31843:
         case 34243:
         case 408: // Kidney Shot
-			spellInfo->speed = 200.0f;
-			spellInfo->EffectMechanic[0] = MECHANIC_STUN;
-            break;
         case 8643:
-			spellInfo->speed = 200.0f;
-			spellInfo->EffectMechanic[0] = MECHANIC_STUN;
-            break;
         case 8983: // Bash
         case 6798:
         case 5211:

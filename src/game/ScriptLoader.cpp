@@ -394,7 +394,7 @@ void AddScripts()
     AddSC_npc_profession();
     AddSC_npc_sub_profession();
     AddSC_npc_swap_reput();
-    AddSC_npc_beastmaster
+    AddSC_npc_beastmaster;
 	
     AddSC_areatrigger_scripts();
     AddSC_boss_emeriss();
