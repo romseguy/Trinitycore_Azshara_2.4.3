@@ -127,6 +127,7 @@ REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,
 -- Paladin -- Human
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('1',  '2',  '196', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('1',  '2',  '197', NULL ,  '1');
+REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('1',  '2',  '199', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('1',  '2',  '200', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('1',  '2',  '201', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('1',  '2',  '202', NULL ,  '1');
@@ -134,6 +135,7 @@ REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,
 -- Paladin -- Dwarf
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('3',  '2',  '196', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('3',  '2',  '197', NULL ,  '1');
+REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('3',  '2',  '199', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('3',  '2',  '200', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('3',  '2',  '201', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('3',  '2',  '202', NULL ,  '1');
@@ -141,6 +143,7 @@ REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,
 -- Paladin -- Draenei
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('11',  '2',  '196', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('11',  '2',  '197', NULL ,  '1');
+REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('11',  '2',  '199', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('11',  '2',  '200', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('11',  '2',  '201', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('11',  '2',  '202', NULL ,  '1');
@@ -148,6 +151,7 @@ REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,
 -- Paladin -- Bloodelf
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('10',  '2',  '196', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('10',  '2',  '197', NULL ,  '1');
+REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('10',  '2',  '199', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('10',  '2',  '200', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('10',  '2',  '201', NULL ,  '1');
 REPLACE INTO `playercreateinfo_spell_custom` (`race` ,`class` ,`Spell` ,`Note` ,`Active`)VALUES ('10',  '2',  '202', NULL ,  '1');

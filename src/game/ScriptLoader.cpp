@@ -22,6 +22,7 @@ void AddSC_npc_profession();
 void AddSC_npc_sub_profession();
 void AddSC_npc_swap_reput();
 void AddSC_npc_beastmaster();
+void AddSC_npc_trade_currency();
 
 //world
 void AddSC_areatrigger_scripts();
@@ -395,6 +396,7 @@ void AddScripts()
     AddSC_npc_sub_profession();
     AddSC_npc_swap_reput();
     AddSC_npc_beastmaster();
+    AddSC_npc_trade_currency();
 	
     AddSC_areatrigger_scripts();
     AddSC_boss_emeriss();
