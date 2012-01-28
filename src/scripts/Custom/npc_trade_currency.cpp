@@ -16,17 +16,17 @@ bool GossipSelect_npc_trade_currency(Player *player, Creature *_Creature, uint32
             }
 
             player->ModifyMoney(-100*GOLD);
-            player->ModifyHonorPoints(800);
+            player->ModifyHonorPoints(2000);
             break;
         case 2:
-            if (player->GetHonorPoints() < 800)
+            if (player->GetHonorPoints() < 2000)
             {
-                player->GetSession()->SendNotification("You need to have at least 800 honor points.");
+                player->GetSession()->SendNotification("You need to have at least 2000 honor points.");
                 player->PlayerTalkClass->CloseGossip();
                 return true;
             }
 
-            player->ModifyHonorPoints(-800);
+            player->ModifyHonorPoints(-2000);
             player->ModifyMoney(100*GOLD);
             break;
     }
@@ -40,8 +40,8 @@ bool GossipHello_npc_trade_currency(Player *player, Creature *_Creature)
     if (player->isInCombat())
         return false;
 
-    player->ADD_GOSSIP_ITEM_EXTENDED(0, "100 gold to 800 honor points",        GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1, WARN_RESET_GOLD_HONOR, 0, false);
-    player->ADD_GOSSIP_ITEM_EXTENDED(0, "800 honor points to 100 gold",        GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2, WARN_RESET_HONOR_GOLD, 0, false);
+    player->ADD_GOSSIP_ITEM_EXTENDED(0, "100 gold to 2000 honor points",        GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1, WARN_RESET_GOLD_HONOR, 0, false);
+    player->ADD_GOSSIP_ITEM_EXTENDED(0, "2000 honor points to 100 gold",        GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2, WARN_RESET_HONOR_GOLD, 0, false);
     player->PlayerTalkClass->SendGossipMenu(2, _Creature->GetGUID());
 
     return true;
