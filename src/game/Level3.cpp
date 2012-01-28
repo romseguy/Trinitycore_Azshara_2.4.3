@@ -1259,7 +1259,7 @@ bool ChatHandler::HandleReloadItemTemplateCommand(const char*)
 {
     sLog.outString( "WARNING: Reloading item_template" );
     objmgr.LoadItemPrototypes();
-    SendGlobalSysMessage("WARNIONG: DB table `item_template` reloaded.");
+    SendGlobalSysMessage("WARNING: DB table `item_template` reloaded.");
     return true;
 }
 

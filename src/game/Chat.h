@@ -516,6 +516,7 @@ class ChatHandler
         bool HandleMmapTestArea(const char* args);
         bool HandleDuelCommand(const char * args);
         bool HandleShopCommand(const char * args);
+        bool HandleShattrathCommand(const char * args);
 
         //! Development Commands
         bool HandleSetValue(const char* args);

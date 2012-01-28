@@ -704,6 +704,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "mmap",           SEC_GAMEMASTER,     false, NULL,                                           "", mmapCommandTable },
         { "shop",           SEC_PLAYER,         false, &ChatHandler::HandleShopCommand,                "", NULL },
         { "duel",           SEC_PLAYER,         false, &ChatHandler::HandleDuelCommand,                "", NULL },
+        { "shattrath",      SEC_PLAYER,         false, &ChatHandler::HandleShattrathCommand,                "", NULL },
 
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };

@@ -2200,6 +2200,40 @@ bool ChatHandler::HandleShopCommand(const char * args)
     return true;
 }
 
+bool ChatHandler::HandleShattrathCommand(const char * args)
+{
+    Player* _player = m_session->GetPlayer();
+
+    if (_player->InBattleGround() || _player->duel || _player->isInCombat())
+    {
+        SendSysMessage(LANG_CANT_DO_THAT);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    GameTele const* tele = objmgr.GetGameTele(335);
+
+    if (!tele)
+    {
+        SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // stop flight if need
+    if (_player->isInFlight())
+    {
+        _player->GetMotionMaster()->MovementExpired();
+        _player->CleanupAfterTaxiFlight();
+    }
+    // save only in non-flight case
+    else
+        _player->SaveRecallPosition();
+
+    _player->TeleportTo(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
+    return true;
+}
+
 bool ChatHandler::HandleLookupAreaCommand(const char* args)
 {
     if (!*args)
