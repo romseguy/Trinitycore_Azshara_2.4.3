@@ -2763,7 +2763,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
     // Check for immune (use charges)
     if (pVictim->IsImmunedToSpell(spell,true))
 	{	
-		if (spell->Id == 2094 || spell->Mechanic == MECHANIC_STUN) // Vanished Blind removes stealth 
+		if (spell->Id == 2094 || spell->Mechanic == MECHANIC_STUN || spell->Id == 1833 || spell->Id == 8643 || spell->Id == 10308) // Vanished Blind removes stealth 
 		{
 			pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
 		}
