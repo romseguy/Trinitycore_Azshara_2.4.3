@@ -42,7 +42,7 @@
 
 // Charters ID in item_template
 #define GUILD_CHARTER               5863
-#define GUILD_CHARTER_COST          100000                    // 10 G
+#define GUILD_CHARTER_COST          0                 // 10 G
 #define ARENA_TEAM_CHARTER_2v2      23560
 #define ARENA_TEAM_CHARTER_2v2_COST 0                 // 80 G
 #define ARENA_TEAM_CHARTER_3v3      23561
