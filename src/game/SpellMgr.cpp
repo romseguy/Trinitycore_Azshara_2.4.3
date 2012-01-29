@@ -2573,6 +2573,8 @@ void SpellMgr::LoadSpellCustomAttr()
 	        break;
         case 7922:                        // Charge stun
         case 25274:                       // Intercept stun
+			spellInfo->speed = 50.0f;     // Minor delay
+            break;
 		case 853:						  // HoJ R1
 		case 5588:						  // HoJ R2			
 		case 5589:						  // HoJ R3	
