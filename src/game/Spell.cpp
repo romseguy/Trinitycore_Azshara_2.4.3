@@ -1091,7 +1091,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
         && (unit->IsImmunedToDamage(GetSpellSchoolMask(m_spellInfo),true) ||
         unit->IsImmunedToSpell(m_spellInfo,true)))
     {
-		if (spell->Mechanic != MECHANIC_CONFUSED || spell->Mechanic != MECHANIC_STUN || spell->Mechanic != MECHANIC_FEAR || spell->Id != 2094 || spell->Id != 1833 || spell->Id != 8643 || spell->Id != 10308 || spell->Id != 10890 || spell->Id != 5246 || spell->Id != 17928) 
+		if (m_spellInfo->Mechanic != MECHANIC_CONFUSED || m_spellInfo->Mechanic != MECHANIC_STUN || m_spellInfo->Mechanic != MECHANIC_FEAR || m_spellInfo->Id != 2094 || m_spellInfo->Id != 1833 || m_spellInfo->Id != 8643 || m_spellInfo->Id != 10308 || m_spellInfo->Id != 10890 || m_spellInfo->Id != 5246 || m_spellInfo->Id != 17928) 
 		{
 			m_damage = 0;
 			m_caster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_IMMUNE);
