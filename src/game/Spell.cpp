@@ -771,11 +771,6 @@ void Spell::AddUnitTarget(Unit* pVictim, uint32 effIndex)
     else
         target.timeDelay = 0LL;
 
-    // some spells have no speed but are delayed
-	// this includes Blind, Charge and Intercept
-	if (m_spellInfo->Id == 2094 || m_spellInfo->Id == 11578 || m_spellInfo->Id == 25275)
-		m_delayMoment = 200;
-
     // If target reflect spell back to caster
     if (target.missCondition == SPELL_MISS_REFLECT)
     {
@@ -1096,7 +1091,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
         && (unit->IsImmunedToDamage(GetSpellSchoolMask(m_spellInfo),true) ||
         unit->IsImmunedToSpell(m_spellInfo,true)))
     {
-		if (m_spellInfo->Id != 2094 || m_spellInfo->Mechanic == MECHANIC_STUN) 
+		if (spell->Mechanic != MECHANIC_CONFUSED || spell->Mechanic != MECHANIC_STUN || spell->Mechanic != MECHANIC_FEAR || spell->Id != 2094 || spell->Id != 1833 || spell->Id != 8643 || spell->Id != 10308 || spell->Id != 10890 || spell->Id != 5246 || spell->Id != 17928) 
 		{
 			m_damage = 0;
 			m_caster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_IMMUNE);

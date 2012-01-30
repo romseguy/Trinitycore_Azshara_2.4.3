@@ -2582,7 +2582,7 @@ void SpellMgr::LoadSpellCustomAttr()
 			spellInfo->speed = 200.0f;    // Minor delay
             break;
 		case 2094:                        // Blind
-            spellInfo->speed = 600.0f;    // Minor delay
+            spellInfo->speed = 200.0f;    // Minor delay
 			break;
 		case 1776:						  // Gouge delay
 		case 1777:

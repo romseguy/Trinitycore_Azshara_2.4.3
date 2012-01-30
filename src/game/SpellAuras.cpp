@@ -2038,6 +2038,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 			case 42432:                                      // Custom aura triggered by vanish to allow Vanish / Blind
 				m_target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_CONFUSED, apply);
 				m_target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_STUN, apply);
+				m_target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_FEAR, apply);
                 return;
             case 1515:                                      // Tame beast
                 // FIX_ME: this is 2.0.12 threat effect replaced in 2.1.x by dummy aura, must be checked for correctness
@@ -2147,6 +2148,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
         {
 			case 42432:                                      // Blind immunity fade
 				m_target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_CONFUSED, apply);
+				m_target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_STUN, apply);
 				m_target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_STUN, apply);
 				return;
 				
