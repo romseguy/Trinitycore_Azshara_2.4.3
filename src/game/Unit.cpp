@@ -3341,7 +3341,7 @@ void Unit::InterruptSpellNotGrenade(CurrentSpellTypes spellType, bool withDelaye
         && (withInstant || spell->GetCastTime() > 0))
     {
         // for example, do not let self-stun aura interrupt itself
-        if (!spell->IsInterruptable())
+        if (!spell->IsInterruptable() || spell->m_spellInfo->Id == 4068 || spell->m_spellInfo->Id == 19769 || spell->m_spellInfo->Id == 30217 || spell->m_spellInfo->Id == 39965)
             return;
 
         m_currentSpells[spellType] = NULL;
