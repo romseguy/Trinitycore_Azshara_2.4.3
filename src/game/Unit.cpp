@@ -5453,6 +5453,9 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
                 // should not proc on self due to shadow word death backlash
                 if (procSpell && procSpell->Id == 32409)
                     return false;
+					
+				if (procSpell && procSpell->Id == 32996)
+                    return false;
 
                 // touch of weakness
                 if (dummySpell->SpellIconID == 1591)
