@@ -3540,9 +3540,12 @@ void Spell::EffectDispel(uint32 i)
                 else
                 unitTarget->RemoveAurasDueToSpellByDispel(spellInfo->Id, j->second, m_caster);
              }
-			m_caster->CombatStart(unitTarget,true);
-     		unitTarget->CombatStart(m_caster,true);
-            m_caster->SendMessageToSet(&data, true);
+			m_caster->SendMessageToSet(&data, true);
+			if (unitTarget->IsHostileTo(m_caster))
+			{
+				m_caster->CombatStart(unitTarget,true);
+				unitTarget->CombatStart(m_caster,true);
+			}
 
             // On succes dispel
             // Devour Magic
@@ -3575,9 +3578,12 @@ void Spell::EffectDispel(uint32 i)
             data << uint32(m_spellInfo->Id);                // dispel spell id
             for (std::list< uint32 >::iterator j = fail_list.begin(); j != fail_list.end(); ++j)
                 data << uint32(*j);                         // Spell Id
-			m_caster->CombatStart(unitTarget,true);
-			unitTarget->CombatStart(m_caster,true);
-            m_caster->SendMessageToSet(&data, true);
+			m_caster->SendMessageToSet(&data, true);
+			if (unitTarget->IsHostileTo(m_caster))
+			{
+				m_caster->CombatStart(unitTarget,true);
+				unitTarget->CombatStart(m_caster,true);
+			}
         }
     }
 }
