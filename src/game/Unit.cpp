@@ -6638,6 +6638,12 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
     // dummy basepoints or other customs
     switch(trigger_spell_id)
     {
+		case 15269: // Blackout
+		{
+			if (procSpell->SpellIconID == 502 || procSpell->Id == 34650 || procSpell->Id == 41967 || procSpell->Id == 34433 || procSpell->SpellIconID == 76 || procSpell->SpellIconID == 19 || procSpell->SpellIconID == 1591 || procSpell->Id == 15487 || !pVictim || pVictim == this) // Blackout self-stun fix AND now it can't proc from mind vision/ hex of weakness/ silence
+			return false;
+            break;
+		}
         // Cast positive spell on enemy target
         case 7099:  // Curse of Mending
         case 39647: // Curse of Mending
