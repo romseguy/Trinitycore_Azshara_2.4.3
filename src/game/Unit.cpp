@@ -2779,6 +2779,12 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
 		if (pVictim->HasAuraType(SPELL_AURA_REFLECT_SPELLS))
 			return SPELL_MISS_IMMUNE;
 	}
+	
+	if (spell->Mechanic == MECHANIC_FEAR || spell->Mechanic == MECHANIC_SLEEP || spell->Mechanic == MECHANIC_CHARM)
+	{
+		if (pVictim->HasAura(7744,0))
+			return SPELL_MISS_IMMUNE;
+	}
 
     // All positive spells can`t miss
     // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
