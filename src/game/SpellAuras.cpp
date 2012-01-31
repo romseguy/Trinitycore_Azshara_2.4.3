@@ -1307,14 +1307,6 @@ void Aura::TriggerSpell()
                     }
 //                    // Mark of Frost
 //                    case 23184: break;
-                    // Piercing Howl
-                    case 12323:
-                    {
-                        m_target->RemoveAurasDueToSpell(26889);
-                        m_target->RemoveAurasDueToSpell(26888);
-                        m_target->RemoveAurasDueToSpell(1787);
-                            return;
-                    }
                     // Restoration
                     case 23493:
                     {
