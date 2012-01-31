@@ -9474,11 +9474,23 @@ float Unit::GetStealthModifierValue() const
 
 bool Unit::canDetectStealthOf(Unit const* target, float distance) const
 {
-    if(GetTypeId() == TYPEID_PLAYER && ToPlayer()->m_isArenaSpectator) // if arena spectator, not do not show stealth players
+    if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->m_isArenaSpectator) // if arena spectator, not do not show stealth players
         return false;
-
-    if (distance < 5.0f) //collision
-        return true;
+	
+	if (GetTypeId() != TYPEID_PLAYER)
+	{
+		if (distance < 0.24f) //collision
+			return true;
+		else
+			return false;
+	}
+		
+	if (GetTypeId() == TYPEID_PLAYER)
+	{
+		if (distance < 5.0f) //collision
+			return true;
+	}
+	
     if (HasAuraType(SPELL_AURA_DETECT_STEALTH))
         return true;
 
