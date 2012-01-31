@@ -2782,13 +2782,19 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
 	
 	if (spell->Mechanic == MECHANIC_FEAR)
 	{
-		if (pVictim->HasAura(6346,0) || pVictim->HasAura(7744,0))
+		if (pVictim->HasAura(6346,0) || pVictim->HasAura(7744,0) || pVictim->HasAura(12292,0) || pVictim->HasAura(18499,0))
 			return SPELL_MISS_IMMUNE;
 	}
 	
 	if (spell->Mechanic == MECHANIC_SLEEP || spell->Mechanic == MECHANIC_CHARM)
 	{
 		if (pVictim->HasAura(7744,0))
+			return SPELL_MISS_IMMUNE;
+	}
+	
+	if (spell->Mechanic == MECHANIC_FEAR || spell->Mechanic == MECHANIC_STUN)
+	{
+		if (pVictim->HasAura(19574,0) || pVictim->HasAura(34471,0))
 			return SPELL_MISS_IMMUNE;
 	}
 
