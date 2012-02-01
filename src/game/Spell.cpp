@@ -3890,6 +3890,8 @@ uint8 Spell::CanCast(bool strict)
                     // hart version required facing
                     if (m_targets.getUnitTarget() && !m_caster->IsFriendlyTo(m_targets.getUnitTarget()) && !m_caster->HasInArc(M_PI, target))
                         return SPELL_FAILED_UNIT_NOT_INFRONT;
+                    if (m_targets.getUnitTarget() && m_targets.getUnitTarget()->ToPlayer()->duel)
+                        return SPELL_FAILED_BAD_TARGETS;
                 }
                 else if (m_spellInfo->Id == 19938)          // Awaken Peon
                 {
