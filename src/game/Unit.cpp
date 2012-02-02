@@ -2780,6 +2780,12 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
 			return SPELL_MISS_IMMUNE;
 	}
 	
+	if (spell->Mechanic == MECHANIC_STUN)
+	{
+		if (pVictim->HasAura(1953,0))
+			return SPELL_MISS_IMMUNE;
+	}
+	
 	if (spell->Mechanic == MECHANIC_FEAR)
 	{
 		if (pVictim->HasAura(6346,0) || pVictim->HasAura(7744,0) || pVictim->HasAura(12292,0) || pVictim->HasAura(18499,0))
