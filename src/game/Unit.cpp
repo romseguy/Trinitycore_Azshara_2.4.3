@@ -9487,8 +9487,12 @@ bool Unit::canDetectStealthOf(Unit const* target, float distance) const
 		
 	if (GetTypeId() == TYPEID_PLAYER)
 	{
-		if (distance < 5.0f) //collision
+		if (distance < 5.0f && !target->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_STEALTH, SPELLFAMILY_ROGUE ,SPELLFAMILYFLAG_ROGUE_VANISH)) //collision
 			return true;
+		else if (distance < 0.05f && target->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_STEALTH, SPELLFAMILY_ROGUE ,SPELLFAMILYFLAG_ROGUE_VANISH))
+			return true;
+		else
+			return false;
 	}
 	
     if (HasAuraType(SPELL_AURA_DETECT_STEALTH))
@@ -9511,7 +9515,7 @@ bool Unit::canDetectStealthOf(Unit const* target, float distance) const
     visibleDistance = visibleDistance > MAX_PLAYER_STEALTH_DETECT_RANGE ? MAX_PLAYER_STEALTH_DETECT_RANGE : visibleDistance;
 
     if (!HasInArc(M_PI, target)) //behind
-        visibleDistance /= 4; 
+        return false; 
 
 	 return distance < visibleDistance;
 }

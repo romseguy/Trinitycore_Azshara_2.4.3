@@ -18658,9 +18658,6 @@ bool Player::canSeeOrDetect(Unit const* u, bool detect, bool inVisibleList, bool
 {
     if(u->GetTypeId() == TYPEID_PLAYER && u->ToPlayer()->m_isArenaSpectator == true)
         return false;
-		
-	if(u->GetTypeId() == TYPEID_PLAYER && u->ToPlayer()->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_STEALTH, SPELLFAMILY_ROGUE ,SPELLFAMILYFLAG_ROGUE_VANISH))
-        return false;
 
     // Always can see self
     if (m_mover == u || this == u)
