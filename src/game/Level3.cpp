@@ -56,6 +56,8 @@
 #include "WardenDataStorage.h"
 #include "MoveMap.h"                                        // for mmap manager
 #include "PathFinder.h"                                     // for mmap commands
+#include "OutdoorPvPMgr.h"
+#include "OutdoorPvPFFA.h"
 
 bool ChatHandler::HandleAHBotOptionsCommand(const char *args)
 {
@@ -7598,3 +7600,167 @@ bool ChatHandler::HandleMmapTestArea(const char* args)
     return true;
 }
 
+bool ChatHandler::HandleInfoFFA(const char* args)
+{
+    OutdoorPvPFFA *pvpFFA = (OutdoorPvPFFA*)sOutdoorPvPMgr.GetOutdoorPvPToZoneId(sWorld.getFFAZone());
+
+    if (!pvpFFA)
+    {
+        SendSysMessage("Erreur: le script de la zone FFA n'est pas actif");
+        return true;
+    }
+
+    FFAZone const* ffaz = pvpFFA->FFA();
+    PSendSysMessage("Zone FFA active [%s] (id: %u)", (ffaz->Name).c_str(), ffaz->Id);
+    return true;
+}
+
+bool ChatHandler::HandleSetFFA(const char* args)
+{
+    if (!*args)
+        return false;
+
+    uint32 id = (uint32) atoi((char*)args);
+
+    if (!id)
+        return false;
+
+    OutdoorPvPFFA *pvpFFA = (OutdoorPvPFFA*)sOutdoorPvPMgr.GetOutdoorPvPToZoneId(sWorld.getFFAZone());
+
+    if (!pvpFFA)
+    {
+        SendSysMessage("Erreur: le script de la zone FFA n'est pas actif");
+        return true;
+    }
+
+    if (!pvpFFA->SetFFAZone(id))
+    {
+        SendSysMessage("Erreur: impossible de changer de zone ffa");
+        return true;
+    }
+
+    std::string str = "|cFF00FFFFChangement de zone FFA !";
+    pvpFFA->SendMessage(str);
+    PSendSysMessage("Changement de zone ffa pour la zone %s (id: %u)", (pvpFFA->FFAName()).c_str(), id);
+    return true;
+}
+
+bool ChatHandler::HandleGetFFA(const char* args)
+{
+    OutdoorPvPFFA *pvpFFA = (OutdoorPvPFFA*)sOutdoorPvPMgr.GetOutdoorPvPToZoneId(sWorld.getFFAZone());
+
+    if (!pvpFFA)
+    {
+        SendSysMessage("Erreur: le script de la zone FFA n'est pas actif");
+        return true;
+    }
+
+    FFAZoneMap const& info = pvpFFA->GetAllFFAInfo();
+    SendSysMessage("-------------------------");
+
+    for (FFAZoneMap::const_iterator itr = info.begin(); itr != info.end(); ++itr)
+    {
+        PSendSysMessage("Zone [%s] (id: %u)", ((&itr->second)->Name).c_str(), itr->first);
+    }
+
+    SendSysMessage("-------------------------");
+    return true;
+}
+
+bool ChatHandler::HandleStartMastodonte(const char* args)
+{
+    if (!*args)
+    {
+        OutdoorPvPFFA *pvpFFA = (OutdoorPvPFFA*)sOutdoorPvPMgr.GetOutdoorPvPToZoneId(sWorld.getFFAZone());
+
+        if (!pvpFFA)
+        {
+            SendSysMessage("Erreur: le script de la zone FFA n'est pas actif");
+            return true;
+        }
+
+        if (pvpFFA->GetMastodonte())
+        {
+            SendSysMessage("Erreur: Le mode mastodonte de la zone FFA est deja actif");
+            return true;
+        }
+
+        if (!pvpFFA->SpawnFlag())
+        {
+            SendSysMessage("Erreur: Impossible de spawn le flag");
+            return true;
+        }
+
+        std::string str = "";
+        str = "|cFF00FFFF Debut de l'event mastodonte en zone FFA!";
+        WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
+        data << str;
+        sWorld.SendGlobalMessage(&data);
+        SendSysMessage("Le mode mastodonte est actif en zone FFA");
+
+        return true;
+    }
+    else
+    {
+        uint32 time = (uint32) atoi((char*)args);
+        OutdoorPvPFFA *pvpFFA = (OutdoorPvPFFA*)sOutdoorPvPMgr.GetOutdoorPvPToZoneId(sWorld.getFFAZone());
+
+        if (!pvpFFA)
+        {
+            SendSysMessage("Erreur: le script de la zone FFA n'est pas actif");
+            return true;
+        }
+
+        if (pvpFFA->GetMastodonte())
+        {
+            SendSysMessage("Erreur: Le mode mastodonte de la zone FFA est deja actif");
+            return true;
+        }
+
+        if (!pvpFFA->SpawnFlag(time))
+        {
+            SendSysMessage("Erreur: Impossible de spawn le flag");
+            return true;
+        }
+
+        std::string str = "";
+        str = "|cFF00FFFF Debut de l'event mastodonte !";
+        WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
+        data << str;
+        sWorld.SendGlobalMessage(&data);
+        PSendSysMessage("Le mode mastodonte est actif en zone FFA durant %u minutes", time);
+        return true;
+    }
+
+    return false;
+}
+
+bool ChatHandler::HandleStopMastodonte(const char* /*args*/)
+{
+    OutdoorPvPFFA *pvpFFA = (OutdoorPvPFFA*)sOutdoorPvPMgr.GetOutdoorPvPToZoneId(sWorld.getFFAZone());
+
+    if (!pvpFFA)
+    {
+        SendSysMessage("Erreur: le script de la zone FFA n'est pas actif");
+        return true;
+    }
+
+    if (pvpFFA->GetMastodonte())
+    {
+        pvpFFA->GetDespawnFlag();
+        SendSysMessage("Le mode mastodonte de la zone FFA n'est plus actif");
+        std::string str = "";
+        str = "|cFF00FFFF Fin de l'event mastodonte en zone FFA!";
+        WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
+        data << str;
+        sWorld.SendGlobalMessage(&data);
+        return true;
+    }
+    else
+    {
+        SendSysMessage("Erreur: le mode mastodonte de la zone FFA n'est pas actif");
+        return true;
+    }
+
+    return false;
+}

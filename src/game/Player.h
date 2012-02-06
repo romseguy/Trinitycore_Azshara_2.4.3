@@ -38,6 +38,7 @@
 #include "Pet.h"
 #include "MapReference.h"
 #include "Util.h"                                           // for Tokens typedef
+#include "TDFMgr.h"
 
 #include<string>
 #include<vector>
@@ -1457,6 +1458,8 @@ class Player : public Unit, public GridObject<Player>
         void removeActionButton(uint8 button);
         void SendInitialActionButtons();
 
+        bool IsFFAZone();
+
         PvPInfo pvpInfo;
         void UpdatePvPState(bool onlyFFA = false);
         void SetPvP(bool state)
@@ -2111,6 +2114,7 @@ class Player : public Unit, public GridObject<Player>
 
         bool isAllowedToLoot(const Creature* creature);
 
+        TDFMgr& GetTDFMgr() { return m_TDFMgr; }
         DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
         bool HasTitle(uint32 bitIndex);
         bool HasTitle(CharTitlesEntry const* title) { return HasTitle(title->bit_index); }
@@ -2406,6 +2410,8 @@ class Player : public Unit, public GridObject<Player>
         bool m_bHasBeenAliveAtDelayedTeleport;
 
         uint32 m_DetectInvTimer;
+
+        TDFMgr m_TDFMgr;
 
         // Temporary removed pet cache
         uint32 m_temporaryUnsummonedPetNumber;

@@ -66,6 +66,7 @@
 #include "ScriptMgr.h"
 #include "ProgressBar.h"
 #include "WardenDataStorage.h"
+#include "TDFMgr.h"
 
 INSTANTIATE_SINGLETON_1(World);
 
@@ -503,6 +504,10 @@ void World::LoadConfigSettings(bool reload)
         rate_values[RATE_TALENT] = 1.0f;
     }
     rate_values[RATE_CORPSE_DECAY_LOOTED] = sConfig.GetFloatDefault("Rate.Corpse.Decay.Looted",0.5f);
+
+    m_configs[CONFIG_NEXT_TIME_FFA] = sConfig.GetIntDefault("FFA.NextZoneTime", 1)*HOUR;
+    if (m_configs[CONFIG_NEXT_TIME_FFA] < 0)
+        m_configs[CONFIG_NEXT_TIME_FFA] = HOUR;
 
     rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] = sConfig.GetFloatDefault("TargetPosRecalculateRange",1.5f);
     if (rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] < CONTACT_DISTANCE)
@@ -1364,6 +1369,9 @@ void World::SetInitialWorldSettings()
 
     sLog.outString("Loading Skill Fishing base level requirements...");
     objmgr.LoadFishingBaseSkillLevel();
+
+    sLog.outString("Loading Tour de force...");
+    sTDFMgr.LoadTDFFromDB();
 
     // Load dynamic data tables from the database
     sLog.outString("Loading Item Auctions...");

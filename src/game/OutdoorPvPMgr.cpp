@@ -25,6 +25,7 @@
 #include "OutdoorPvPZM.h"
 #include "OutdoorPvPSI.h"
 #include "OutdoorPvPEP.h"
+#include "OutdoorPvPFFA.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Policies/SingletonImp.h"
@@ -123,6 +124,19 @@ void OutdoorPvPMgr::InitOutdoorPvP()
     {
         m_OutdoorPvPSet.push_back(pOP);
         sLog.outDebug("OutdoorPvP : EP successfully initiated.");
+    }
+
+    pOP = new OutdoorPvPFFA;
+    // respawn, init variables
+    if (!pOP->SetupOutdoorPvP())
+    {
+        sLog.outDebug("OutdoorPvP : FFA init failed.");
+        delete pOP;
+    }
+    else
+    {
+        m_OutdoorPvPSet.push_back(pOP);
+        sLog.outDebug("OutdoorPvP : FFA successfully initiated.");
     }
 }
 

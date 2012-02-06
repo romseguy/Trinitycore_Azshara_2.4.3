@@ -860,7 +860,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         GetPlayer()->InnEnter(time(NULL), atEntry->mapid, atEntry->x, atEntry->y, atEntry->z);
         GetPlayer()->SetRestType(REST_TYPE_IN_TAVERN);
 
-        if (sWorld.IsFFAPvPRealm())
+        if (sWorld.IsFFAPvPRealm() || GetPlayer()->IsFFAZone())
             GetPlayer()->SetFFAPvP(false);
 
         return;

@@ -203,6 +203,12 @@ class ChatHandler
         bool HandleModifyArenaCommand(const char* args);
         bool HandleModifyGenderCommand(const char* args);
 
+        bool HandleInfoFFA(const char* args);
+        bool HandleSetFFA(const char* args);
+        bool HandleGetFFA(const char* args);
+        bool HandleStartMastodonte(const char* args);
+        bool HandleStopMastodonte(const char* args);
+
         //-----------------------Npc Commands-----------------------
         bool HandleNpcAddCommand(const char* args);
         bool HandleNpcAddMoveCommand(const char* args);

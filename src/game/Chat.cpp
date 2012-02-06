@@ -152,6 +152,16 @@ ChatCommand * ChatHandler::getCommandTable()
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
+    static ChatCommand ffaCommandTable[] =
+    {
+        { "info",           SEC_GAMEMASTER,     true,  &ChatHandler::HandleInfoFFA,               "", NULL },
+        { "setzone",        SEC_GAMEMASTER,     true,  &ChatHandler::HandleSetFFA,                  "", NULL },
+        { "all",            SEC_GAMEMASTER,     true,  &ChatHandler::HandleGetFFA,                  "", NULL },
+        { "startmastodonte",SEC_GAMEMASTER,     true,  &ChatHandler::HandleStartMastodonte,            "", NULL },
+        { "stopmastodonte", SEC_GAMEMASTER,     true,  &ChatHandler::HandleStopMastodonte,             "", NULL },
+        { NULL,             0,                  false, NULL,                                           "", NULL }
+    };
+
     static ChatCommand wpCommandTable[] =
     {
         { "show",           SEC_GAMEMASTER,     false, &ChatHandler::HandleWpShowCommand,              "", NULL },
@@ -705,6 +715,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "shop",           SEC_PLAYER,         false, &ChatHandler::HandleShopCommand,                "", NULL },
         { "duel",           SEC_PLAYER,         false, &ChatHandler::HandleDuelCommand,                "", NULL },
         { "shattrath",      SEC_PLAYER,         false, &ChatHandler::HandleShattrathCommand,                "", NULL },
+        { "ffa",           SEC_GAMEMASTER,     false, NULL,                                           "", ffaCommandTable },
 
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };

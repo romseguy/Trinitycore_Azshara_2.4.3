@@ -60,6 +60,7 @@
 #include "BattleGroundAV.h"
 #include "BattleGroundMgr.h"
 #include "OutdoorPvP.h"
+#include "OutdoorPvPFFA.h"
 #include "OutdoorPvPMgr.h"
 #include "ArenaTeam.h"
 #include "Chat.h"
@@ -256,7 +257,7 @@ const int32 Player::ReputationRank_Length[MAX_REPUTATION_RANK] = {36000, 3000, 3
 
 UpdateMask Player::updateVisualBits;
 
-Player::Player (WorldSession *session): Unit()
+Player::Player (WorldSession *session): Unit(), m_TDFMgr(this)
 {
     m_usedReady = false;
     m_isArenaSpectator = false;
@@ -18303,11 +18304,28 @@ void Player::UpdateHomebindTime(uint32 time)
     }
 }
 
+bool Player::IsFFAZone()
+{
+    if (!IsInWorld())
+        return false;
+
+    if (OutdoorPvP * opvp = GetOutdoorPvP())
+        if (opvp->GetTypeId() == OUTDOOR_PVP_FFA)
+        {
+            OutdoorPvPFFA *opvpFFA = (OutdoorPvPFFA*)opvp;
+            if (opvpFFA && opvpFFA->IsInFFA(GetZoneId(), GetAreaId()))
+                return true;
+        }
+
+    return false;
+}
+
 void Player::UpdatePvPState(bool onlyFFA)
 {
     // TODO: should we always synchronize UNIT_FIELD_BYTES_2, 1 of controller and controlled?
     if (!pvpInfo.inNoPvPArea && !isGameMaster()
-        && (pvpInfo.inFFAPvPArea || sWorld.IsFFAPvPRealm()))
+        && (pvpInfo.inFFAPvPArea || sWorld.IsFFAPvPRealm() || IsFFAZone())
+        )
     {
         if (!IsFFAPvP())
         {

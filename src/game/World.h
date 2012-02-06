@@ -257,8 +257,9 @@ enum WorldConfigs
     CONFIG_AUTOBROADCAST_CENTER,
     CONFIG_BOOL_MMAP_ENABLED,
     CONFIG_BOOL_WARDEN_KICK,
-	CONFIG_ARENA_SPECTATOR_UPDATES,
-	CONFIG_VALUE_COUNT
+    CONFIG_ARENA_SPECTATOR_UPDATES,
+    CONFIG_NEXT_TIME_FFA,
+    CONFIG_VALUE_COUNT
 };
 
 // Server rates
@@ -553,6 +554,13 @@ class World
                 return 0;
         }
 
+        uint32 getFFAZone() const
+        {
+            return FFAZoneId;
+        }
+
+        void setFFAZoneId(uint32 id) { FFAZoneId = id; }
+
         // Are we on a "Player versus Player" server?
         bool IsPvPRealm() { return (getConfig(CONFIG_GAME_TYPE) == REALM_TYPE_PVP || getConfig(CONFIG_GAME_TYPE) == REALM_TYPE_RPPVP || getConfig(CONFIG_GAME_TYPE) == REALM_TYPE_FFA_PVP); }
         bool IsFFAPvPRealm() { return getConfig(CONFIG_GAME_TYPE) == REALM_TYPE_FFA_PVP; }
@@ -624,6 +632,7 @@ class World
         void InitDailyQuestResetTime();
         void ResetDailyQuests();
     private:
+        uint32 FFAZoneId;
         static volatile bool m_stopEvent;
         static uint8 m_ExitCode;
         uint32 m_ShutdownTimer;
