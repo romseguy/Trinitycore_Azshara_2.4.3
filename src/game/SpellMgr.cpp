@@ -2572,6 +2572,8 @@ void SpellMgr::LoadSpellCustomAttr()
 	        spellInfo->Attributes |= SPELL_ATTR_IMPOSSIBLE_DODGE_PARRY_BLOCK;
 	        break;
         case 7922:                        // Charge stun
+			spellInfo->speed = 1.0f;
+			break;
         case 25274:                       // Intercept stun
 			spellInfo->speed = 50.0f;     // Minor delay
             break;
